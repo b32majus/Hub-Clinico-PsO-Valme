@@ -1438,60 +1438,23 @@ function buildTherapyFieldNames(prefix) {
   return fields;
 }
 
-const VISIT_SPECIFIC_FIELDS = [
-  "bsa",
-  "pga",
-  "pasi",
-  "pasi_cabeza_eritema",
-  "pasi_cabeza_induracion",
-  "pasi_cabeza_escamas",
-  "pasi_cabeza_area",
-  "pasi_tronco_eritema",
-  "pasi_tronco_induracion",
-  "pasi_tronco_escamas",
-  "pasi_tronco_area",
-  "pasi_brazos_eritema",
-  "pasi_brazos_induracion",
-  "pasi_brazos_escamas",
-  "pasi_brazos_area",
-  "pasi_piernas_eritema",
-  "pasi_piernas_induracion",
-  "pasi_piernas_escamas",
-  "pasi_piernas_area",
-  "observaciones_clinicas",
-  "eva_prurito",
-  "eva_dolor",
-  "escozor",
-  "fisuracion",
-  "sangrado",
-  "alteracion_funcional",
-  "alteracion_sueno",
-  "dlqi_q1",
-  "dlqi_q2",
-  "dlqi_q3",
-  "dlqi_q4",
-  "dlqi_q5",
-  "dlqi_q6",
-  "dlqi_q7",
-  "dlqi_q8",
-  "dlqi_q9",
-  "dlqi_q10",
-  "dlqi_total",
-  "pure4_q1",
-  "pure4_q2",
-  "pure4_q3",
-  "pure4_q4",
-  "pure4_total_positivas",
-  "seguimiento_adherencia_categoria",
-  "seguimiento_ajuste_terapeutico",
-  "seguimiento_adherencia_morisky_q1",
-  "seguimiento_adherencia_morisky_q2",
-  "seguimiento_adherencia_morisky_q3",
-  "seguimiento_adherencia_morisky_q4",
-  "seguimiento_morisky_total_no_adherencia",
-  "seguimiento_motivo_cambio",
-  "seguimiento_efectos_adversos",
-  ...buildTherapyFieldNames("tx_seguimiento")
+const STABLE_FIELD_SET = new Set([...STABLE_TEXT_FIELDS, ...STABLE_ONE_FIELDS, ...STABLE_MANY_FIELDS]);
+
+// Fields that belong to an encounter and are never inherited from a previously
+// selected patient. Derived from HEADERS so a schema field cannot be silently
+// forgotten. `nusha` identifies the patient and `fecha_visita` is the shared
+// encounter date entered by the user, so both are preserved across a switch.
+const VISIT_SPECIFIC_FIELDS = HEADERS.filter(
+  h => h !== "nusha" && h !== "fecha_visita" && !STABLE_FIELD_SET.has(h)
+);
+
+// Every patient-scoped control that must be empty before a target patient is
+// hydrated. Cleared as one explicit boundary, not field by field.
+const PATIENT_RESET_FIELDS = [
+  ...VISIT_SPECIFIC_FIELDS,
+  ...STABLE_TEXT_FIELDS,
+  ...STABLE_ONE_FIELDS,
+  ...STABLE_MANY_FIELDS
 ];
 
 function setv(k, v) {
@@ -2357,11 +2320,14 @@ function resetDetailsState() {
   detailsDefault.forEach((open, detail) => detail.open = open);
 }
 
-function clearVisitSpecificUI() {
-  VISIT_SPECIFIC_FIELDS.forEach(key => delete S[key]);
-  document.querySelectorAll(".scale-btn.active,.answer-option.active,.toggle button.active").forEach(el => el.classList.remove("active"));
+function resetPatientState() {
+  // Hard patient/visit state boundary. Every patient-scoped key and control is
+  // cleared before any target-patient hydration. Clearing means empty/absent;
+  // no clinical value is invented from absence.
+  Object.keys(S).forEach(key => delete S[key]);
+  document.querySelectorAll(".toggle button.active,.scale-btn.active,.answer-option.active").forEach(el => el.classList.remove("active"));
   document.querySelectorAll(".dlqi-subquestion").forEach(el => el.classList.add("hidden"));
-  VISIT_SPECIFIC_FIELDS.forEach(name => {
+  PATIENT_RESET_FIELDS.forEach(name => {
     const el = document.querySelector(`[name="${name}"]`);
     if (!el) return;
     if (el.tagName === "SELECT") el.selectedIndex = 0;
@@ -2375,10 +2341,16 @@ function clearVisitSpecificUI() {
   document.getElementById("dlqiTotal").textContent = "0";
   document.getElementById("moriskyTotal").textContent = "Pendiente";
   document.getElementById("moriskyStatus").textContent = "Morisky-Green: pendiente";
+  document.getElementById("prevBox").classList.add("hidden");
+  primaryTherapyState = createEmptyTherapyState();
   followTherapyState = createEmptyTherapyState();
+  renderTherapyGroups("primary");
   renderTherapyGroups("follow");
   bindTherapyEvents();
+  syncTherapiesToS();
   setDecision("");
+  setPreviousVisitContext(null);
+  updateSpecialBadge();
 }
 
 function deriveTratamientoPrevioConsulta(row) {
@@ -2420,17 +2392,13 @@ function deriveTratamientoPrevioConsulta(row) {
 
 function applyStablePreload(row) {
   applyingPreload = true;
-  clearVisitSpecificUI();
+  resetPatientState();
   const resolvedNusha = row.nusha || row.nhc || "";
   setFieldValue("nusha", resolvedNusha);
   setVisitTypeLock(true);
   STABLE_TEXT_FIELDS.forEach(key => {
     const value = key === "tratamiento_previo_consulta" ? deriveTratamientoPrevioConsulta(row) : (row[key] ?? "");
-    if (key === "tratamiento_previo_consulta") {
-      setFieldValue(key, value || "");
-      return;
-    }
-    if (value !== "") setFieldValue(key, value);
+    setFieldValue(key, value || "");
   });
   STABLE_ONE_FIELDS.forEach(key => setOneValue(key, row[key] ?? ""));
   STABLE_MANY_FIELDS.forEach(key => setManyValue(key, String(row[key] || "0") === "1"));
@@ -2450,6 +2418,7 @@ function autoSearchByNusha() {
   if (!baseRows.length) return;
   const id = normalizeId(nushaInput.value);
   if (!id) {
+    resetPatientState();
     setVisitTypeLock(false);
     setPreviousVisitContext(null);
     return;
@@ -2457,6 +2426,7 @@ function autoSearchByNusha() {
   const currentDate = document.querySelector('[name="fecha_visita"]')?.value || "";
   const found = getLatestVisitRow(id, currentDate);
   if (!found) {
+    resetPatientState();
     setVisitTypeLock(false);
     setBaseStatus(`Base cargada: ${baseFileName} (${baseRows.length} filas). NUSHA no encontrado.`, false);
     setPreviousVisitContext(null);
@@ -2534,19 +2504,8 @@ function toTxt(row) {
 
 function resetPatient() {
   form.reset();
+  resetPatientState();
   setVisitTypeLock(false);
-  Object.keys(S).forEach(key => delete S[key]);
-  document.querySelectorAll(".toggle button.active,.scale-btn.active,.answer-option.active").forEach(el => el.classList.remove("active"));
-  document.querySelectorAll(".dlqi-subquestion").forEach(el => el.classList.add("hidden"));
-  document.getElementById("prevBox").classList.add("hidden");
-  primaryTherapyState = createEmptyTherapyState();
-  followTherapyState = createEmptyTherapyState();
-  renderTherapyGroups("primary");
-  renderTherapyGroups("follow");
-  bindTherapyEvents();
-  setDecision("");
-  setPreviousVisitContext(null);
-  updateSpecialBadge();
   resetDetailsState();
   mode();
   recalc();

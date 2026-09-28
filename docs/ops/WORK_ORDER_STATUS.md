@@ -36,7 +36,7 @@
 |---|---|---|---|---|---|
 | DOC-00 | Baseline, auditoría y plan maestro | Documental | `DONE_DOCS` | Ninguna | PsO-Valme |
 | PSO-01 | Caracterización V1 vs V2 | Read-only / QA | `DONE_VERIFIED` | DOC-00 | PsO-Valme |
-| PSO-02 | Aislamiento de estado por paciente | Clínica/funcional | `PLANNED` | PSO-01 | PsO-Valme |
+| PSO-02 | Aislamiento de estado por paciente | Clínica/funcional | `DONE_VERIFIED` | PSO-01 | PsO-Valme (`index.html`) |
 | PSO-03 | Missingness PASI/DLQI/PURE-4 | Clínica/funcional | `PLANNED` | PSO-01; preferible PSO-02 | PsO-Valme |
 | PSO-04 | Cohorte actual y filtros dashboard | Analítica/funcional | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-05 | Longitudinalidad y fechas | Datos/funcional | `PLANNED` | PSO-01 | PsO-Valme |
@@ -124,6 +124,55 @@ V1/V2, `index.html`, XLSX/CSV/DOCX, fixtures, `main`, `Hub-Clinico-Badajoz`.
 ### Delivery
 
 Informe documental; un único commit local `docs(pso): characterize dashboard v1 vs v2`; sin push/PR/merge.
+
+## PSO-02 — cierre
+
+### Objetivo
+
+Impedir que el estado clínico del paciente A sobreviva en UI, estado interno o exportación al
+buscar/seleccionar el paciente B en `index.html` sin pulsar `Nuevo Paciente`.
+
+### Base / rama
+
+`work/pso-valme-train-a-20260928`; HEAD de partida `65ee0d2432ba4f71b80256d18971a37f62d3c543`; árbol limpio.
+
+### Causa raíz
+
+`clearVisitSpecificUI()` limpiaba una lista manual incompleta y solo reseteaba `followTherapyState`.
+`derivacion_derma_reuma`, `impresion_clinica`, `objetivo_terapeutico`, `otras_derivaciones`,
+`proxima_revision`, `comentarios_finales` y `tx_primera_*` quedaban fuera; `syncTherapiesToS()`
+reinyectaba la terapia de primera visita del paciente anterior. Además, la rama de NUSHA
+vacío/desconocido de `autoSearchByNusha()` no limpiaba nada. Los campos estables del paciente A
+también sobrevivían cuando la fila del paciente B traía el campo vacío.
+
+### Cambio
+
+- `VISIT_SPECIFIC_FIELDS` se deriva de `HEADERS` menos los campos estables y menos `nusha`/`fecha_visita`
+  (fecha de encuentro compartida), evitando listas frágiles.
+- `clearVisitSpecificUI()` se sustituye por `resetPatientState()`, frontera única que limpia todo el
+  estado de paciente (estables + visita + terapia primera y seguimiento), re-renderiza y sincroniza.
+- `applyStablePreload()` hidrata siempre desde la fila del paciente destino, incluido el valor vacío.
+- `autoSearchByNusha()` invoca la frontera con NUSHA vacío y no encontrado.
+- `resetPatient()` reutiliza la misma frontera.
+
+### No toca
+
+Dashboards V1/V2; semántica de missingness de scores (PSO-03); selección de visita previa/fechas
+(PSO-05); dependencia/vendor XLSX; fixtures; `main`; `Hub-Clinico-Badajoz`.
+
+### Regresión determinista
+
+`tests/patient_state_isolation.test.js` (Playwright + CSV sintético) cubre A→B existente, A→B
+desconocido, consistencia UI/estado, aislamiento de terapia primera/seguimiento y reseteo explícito
+`Nuevo Paciente`. Pre-fix: 27/46; post-fix: 46/46. QA de navegador realizada con el mismo harness.
+
+### Delivery
+
+Un único commit local `fix(pso): isolate patient state on patient switch`; sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit restaura el comportamiento previo sin tocar datos.
 
 ## DERMA-READ-01 — cierre
 
@@ -216,7 +265,8 @@ El repositorio externo permaneció sin modificar (refs remotas re-verificadas id
 Dado que la prioridad de producto es Extremadura:
 
 1. adjudicar la caché local V1-only en **PSO-06** (o descartarla motivadamente);
-2. ejecutar **PSO-02…PSO-05** sobre V2, cerrando defectos compartidos listados en el informe de PSO-01;
+2. **PSO-02 completada** (`DONE_VERIFIED`, `index.html`); continuar **PSO-03…PSO-05**, cerrando los
+   defectos listados en el informe de PSO-01;
 3. **DERMA-READ-01 y DERMA-READ-01B completadas** (`DONE_VERIFIED`); sus informes (Reuma y
    Farmacia/Nexus) alimentan **DERMA-DESIGN-01**, aún `BLOCKED` por PSO-07 + DERMA-READ-01 +
    DERMA-READ-01B;
