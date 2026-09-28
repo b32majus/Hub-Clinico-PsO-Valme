@@ -9,8 +9,8 @@
 | Elemento | Estado |
 |---|---|
 | `main` | Base original del prototipo; HEAD inicial verificado para este plan: `9d722c8da792ffe51ce2ea9a1420af71a70522f1` |
-| Rama documental actual | `docs/pso-valme-promueve-derma-plan-20260928` |
-| Cambio funcional en esta rama | Ninguno |
+| Rama de ejecución actual | `work/pso-valme-train-a-20260928` |
+| Cambio funcional en esta rama | PSO-02 (aislamiento de estado) y PSO-03 (missingness de scores) en `index.html` |
 | Dashboard de referencia | `Cuadro_Mando_Psoriasis_Valme_v2.html` adjudicado como baseline donante por PSO-01 (veredicto `V2_WITH_V1_FEATURES_TO_PORT`) |
 | Dashboard v1 | Referencia histórica temporal; no borrar; única capacidad V1-only: caché local con auto-restauración |
 | Estado asistencial | Prototipo / datos sintéticos; no piloto ni producción |
@@ -37,7 +37,7 @@
 | DOC-00 | Baseline, auditoría y plan maestro | Documental | `DONE_DOCS` | Ninguna | PsO-Valme |
 | PSO-01 | Caracterización V1 vs V2 | Read-only / QA | `DONE_VERIFIED` | DOC-00 | PsO-Valme |
 | PSO-02 | Aislamiento de estado por paciente | Clínica/funcional | `DONE_VERIFIED` | PSO-01 | PsO-Valme (`index.html`) |
-| PSO-03 | Missingness PASI/DLQI/PURE-4 | Clínica/funcional | `PLANNED` | PSO-01; preferible PSO-02 | PsO-Valme |
+| PSO-03 | Missingness PASI/DLQI/PURE-4 | Clínica/funcional | `DONE_VERIFIED` | PSO-01; PSO-02 | PsO-Valme (`index.html`) |
 | PSO-04 | Cohorte actual y filtros dashboard | Analítica/funcional | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-05 | Longitudinalidad y fechas | Datos/funcional | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-06 | Portabilidad XLSX + schema | Técnica | `PLANNED` | PSO-01 | PsO-Valme |
@@ -174,6 +174,61 @@ Un único commit local `fix(pso): isolate patient state on patient switch`; sin 
 
 Revertir el commit restaura el comportamiento previo sin tocar datos.
 
+## PSO-03 — cierre
+
+### Objetivo
+
+Impedir que un instrumento clínico no contestado o incompleto se serialice, muestre o exporte como un
+score válido de cero. `missing` no puede convertirse en `0` para PASI, DLQI ni PURE-4, sin impedir que
+un resultado legítimamente cero (instrumento completo y todo cero) siga siendo representable.
+
+### Base / rama
+
+`work/pso-valme-train-a-20260928`; HEAD de partida `8ba6420ab4cd36297066b3f8274f448f9807d3a9`; árbol limpio.
+
+### Causa raíz
+
+- `recalcPASI()` leía los componentes con `?.value || 0`, calculaba siempre y escribía los 16
+  componentes como `"0"` cuando no se habían tocado; el select PASI nacía en `0`.
+- `recalcDLQI()` sumaba `Number(S["dlqi_qN"] || 0)` para los 10 ítems y siempre fijaba `dlqi_total`.
+- `recalcPUREMorisky()` sumaba los 4 ítems con `|| 0`, siempre fijaba `pure4_total_positivas` y, con
+  total ≥2, escribía `derivacion_derma_reuma = 1` sin acción clínica explícita.
+- Morisky ya distinguía pendiente/incompleto de resultado válido y se reutilizó como patrón conceptual.
+
+### Cambio
+
+- PASI: el select incorpora una opción vacía inicial; `recalcPASI()` exige los 16 componentes
+  (4 regiones × 4 métricas) para fijar `pasi`. Sin completar: pendiente/incompleto y componentes
+  vacíos. Todo cero completo: `pasi = "0.0"`.
+- DLQI: `dlqi_total` solo se fija con los 10 ítems contestados. Todo cero explícito: `0`.
+  Vacío o parcial: pendiente/incompleto.
+- PURE-4: `pure4_total_positivas` solo se fija con los 4 ítems contestados. Cuatro negativos: `0`.
+  Positivo (≥2) muestra recomendación pero ya no escribe `derivacion_derma_reuma`; la decisión
+  manual del clínico se conserva.
+- Estado/UI/exportación: total, vista (`Pendiente` / `Incompleto (n/N)` / valor) y fila exportada
+  comparten la misma semántica. El reset de PSO-02 devuelve los instrumentos a pendiente.
+
+### No toca
+
+Dashboards V1/V2 y su semántica de cohorte/control (PSO-04); umbrales clínicos; rediseño de
+formularios/estilos; texto de ítems; importación XLSX; fixtures demo; `main`; `Hub-Clinico-Badajoz`.
+
+### Regresión determinista
+
+`tests/clinical_score_missingness.test.js` (Playwright headless, datos sintéticos) cubre, para
+PASI/DLQI/PURE-4: sin contestar → pendiente; parcial → incompleto; completo todo cero → `0`;
+completo no cero → valor esperado; reset → pendiente; y la separación PURE-4 positivo ↔ derivación
+realizada. Resultado: 42/42 PASS. La regresión PSO-02 `tests/patient_state_isolation.test.js`
+permanece 46/46 PASS. `git diff --check` PASS. No se realizó QA visual manual.
+
+### Delivery
+
+Un único commit local `fix(pso): preserve missingness in clinical scores`; sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit restaura el comportamiento previo sin tocar datos.
+
 ## DERMA-READ-01 — cierre
 
 ### Objetivo
@@ -265,8 +320,8 @@ El repositorio externo permaneció sin modificar (refs remotas re-verificadas id
 Dado que la prioridad de producto es Extremadura:
 
 1. adjudicar la caché local V1-only en **PSO-06** (o descartarla motivadamente);
-2. **PSO-02 completada** (`DONE_VERIFIED`, `index.html`); continuar **PSO-03…PSO-05**, cerrando los
-   defectos listados en el informe de PSO-01;
+2. **PSO-02 y PSO-03 completadas** (`DONE_VERIFIED`, `index.html`); continuar **PSO-04/PSO-05**,
+   cerrando los defectos listados en el informe de PSO-01;
 3. **DERMA-READ-01 y DERMA-READ-01B completadas** (`DONE_VERIFIED`); sus informes (Reuma y
    Farmacia/Nexus) alimentan **DERMA-DESIGN-01**, aún `BLOCKED` por PSO-07 + DERMA-READ-01 +
    DERMA-READ-01B;

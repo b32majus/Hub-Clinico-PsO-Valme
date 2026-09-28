@@ -1072,7 +1072,7 @@
               <tbody id="pasiBody"></tbody>
             </table>
           </div>
-          <div class="pasi-total">PASI Total: <span id="pasiTotalView">0.0</span></div>
+          <div class="pasi-total">PASI Total: <span id="pasiTotalView">Pendiente</span></div>
         </div>
 
         <div class="grid" style="margin-top:0.7rem;">
@@ -1106,7 +1106,7 @@
       <summary>DLQI</summary>
       <div class="content">
         <div class="prom-summary-grid">
-          <div class="score-chip">DLQI Total<strong id="dlqiTotal">0</strong></div>
+          <div class="score-chip">DLQI Total<strong id="dlqiTotal">Pendiente</strong></div>
         </div>
 
         <details class="questionnaire" open>
@@ -1130,7 +1130,7 @@
       <summary>PURE-4</summary>
       <div class="content" id="pureBox"></div>
       <div class="content">
-        <div class="inline-total">PURE-4 Positivas: <span id="pureTotal">0</span></div>
+        <div class="inline-total">PURE-4 Positivas: <span id="pureTotal">Pendiente</span></div>
         <div class="alert" id="pureAlert"></div>
       </div>
     </details>
@@ -2030,25 +2030,58 @@ function bindMoriskyInteractions() {
 }
 
 function recalcDLQI() {
+  // A DLQI total is authoritative only when every implemented item is answered.
+  // Missing or partial completion must stay pending/incomplete, never a false 0.
   let total = 0;
-  for (let i = 1; i <= 10; i++) total += Number(S[`dlqi_q${i}`] || 0);
-  setv("dlqi_total", String(total));
-  document.getElementById("dlqiTotal").textContent = String(total);
+  let answered = 0;
+  for (let i = 1; i <= 10; i++) {
+    const raw = S[`dlqi_q${i}`];
+    if (raw === undefined || raw === null || raw === "") continue;
+    const value = Number(raw);
+    if (!Number.isFinite(value)) continue;
+    answered += 1;
+    total += value;
+  }
+  const totalEl = document.getElementById("dlqiTotal");
+  if (answered === 10) {
+    setv("dlqi_total", String(total));
+    totalEl.textContent = String(total);
+  } else {
+    delete S.dlqi_total;
+    totalEl.textContent = answered === 0 ? "Pendiente" : `Incompleto (${answered}/10)`;
+  }
 }
 
 function recalcPUREMorisky() {
+  // PURE-4 scoring is not a referral action. A positive screen can raise an
+  // alert, but the scoring code must never write derivacion_derma_reuma.
   let pure = 0;
+  let pureAnswered = 0;
   let morisky = 0;
   const moriskyAnswers = [];
   for (let i = 1; i <= 4; i++) {
-    pure += Number(S[`pure4_q${i}`] || 0);
+    const pureValue = S[`pure4_q${i}`];
+    if (pureValue === "0" || pureValue === "1") {
+      pure += Number(pureValue);
+      pureAnswered += 1;
+    }
     const value = S[`seguimiento_adherencia_morisky_q${i}`];
     moriskyAnswers.push(value);
     if (value === "0" || value === "1") {
       morisky += Number(value);
     }
   }
-  setv("pure4_total_positivas", String(pure));
+  const pureTotalEl = document.getElementById("pureTotal");
+  const pureAlertEl = document.getElementById("pureAlert");
+  if (pureAnswered === 4) {
+    setv("pure4_total_positivas", String(pure));
+    pureTotalEl.textContent = String(pure);
+    pureAlertEl.textContent = pure >= 2 ? "PURE-4 positivo (≥2): valorar derivación Derma-Reuma." : "";
+  } else {
+    delete S.pure4_total_positivas;
+    pureTotalEl.textContent = pureAnswered === 0 ? "Pendiente" : `Incompleto (${pureAnswered}/4)`;
+    pureAlertEl.textContent = "";
+  }
   const moriskyAnswered = moriskyAnswers.filter(value => value === "0" || value === "1").length;
   const moriskyStatusEl = document.getElementById("moriskyStatus");
   if (moriskyAnswered === 4) {
@@ -2061,9 +2094,6 @@ function recalcPUREMorisky() {
     document.getElementById("moriskyTotal").textContent = moriskyAnswered === 0 ? "Pendiente" : `Incompleto (${moriskyAnswered}/4)`;
     if (moriskyStatusEl) moriskyStatusEl.textContent = moriskyAnswered === 0 ? "Morisky-Green: pendiente" : "Morisky-Green: incompleto";
   }
-  document.getElementById("pureTotal").textContent = String(pure);
-  document.getElementById("pureAlert").textContent = pure >= 2 ? "PURE-4 positivo (≥2): valorar derivación Derma-Reuma." : "";
-  if (pure >= 2 && !S.derivacion_derma_reuma) setOneValue("derivacion_derma_reuma", "1");
 }
 
 function renderPasiTable() {
@@ -2071,37 +2101,60 @@ function renderPasiTable() {
   body.innerHTML = "";
   PASI_REGIONS.forEach(region => {
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${region.label}</td><td>${buildPasiSelect(region.key, "eritema", 4)}</td><td>${buildPasiSelect(region.key, "induracion", 4)}</td><td>${buildPasiSelect(region.key, "escamas", 4)}</td><td>${buildPasiSelect(region.key, "area", 6)}</td><td>${region.weight.toFixed(2)}</td><td><span id="pasi_sub_${region.key}">0.0</span></td>`;
+    row.innerHTML = `<td>${region.label}</td><td>${buildPasiSelect(region.key, "eritema", 4)}</td><td>${buildPasiSelect(region.key, "induracion", 4)}</td><td>${buildPasiSelect(region.key, "escamas", 4)}</td><td>${buildPasiSelect(region.key, "area", 6)}</td><td>${region.weight.toFixed(2)}</td><td><span id="pasi_sub_${region.key}">—</span></td>`;
     body.appendChild(row);
   });
   body.querySelectorAll("select").forEach(select => select.addEventListener("change", recalc));
 }
 
 function buildPasiSelect(region, metric, max) {
-  let html = `<select data-pasi="pasi_${region}_${metric}"><option value="0">0</option>`;
+  let html = `<select data-pasi="pasi_${region}_${metric}"><option value=""></option><option value="0">0</option>`;
   for (let i = 1; i <= max; i++) html += `<option value="${i}">${i}</option>`;
   return html + "</select>";
 }
 
 function recalcPASI() {
+  // PASI requires every component of the implemented instrument to be answered.
+  // No partial authority exists, so an unanswered component keeps the total
+  // pending/incomplete instead of manufacturing a false 0.
+  const PASI_METRICS = ["eritema", "induracion", "escamas", "area"];
+  const totalComponents = PASI_REGIONS.length * PASI_METRICS.length;
   let total = 0;
+  let answered = 0;
   PASI_REGIONS.forEach(region => {
-    const er = Number(document.querySelector(`select[data-pasi="pasi_${region.key}_eritema"]`)?.value || 0);
-    const ind = Number(document.querySelector(`select[data-pasi="pasi_${region.key}_induracion"]`)?.value || 0);
-    const esc = Number(document.querySelector(`select[data-pasi="pasi_${region.key}_escamas"]`)?.value || 0);
-    const area = Number(document.querySelector(`select[data-pasi="pasi_${region.key}_area"]`)?.value || 0);
-    setv(`pasi_${region.key}_eritema`, String(er));
-    setv(`pasi_${region.key}_induracion`, String(ind));
-    setv(`pasi_${region.key}_escamas`, String(esc));
-    setv(`pasi_${region.key}_area`, String(area));
-    const subtotal = (er + ind + esc) * area * region.weight;
+    const values = {};
+    let regionComplete = true;
+    PASI_METRICS.forEach(metric => {
+      const key = `pasi_${region.key}_${metric}`;
+      const raw = document.querySelector(`select[data-pasi="${key}"]`)?.value ?? "";
+      const value = raw === "" ? Number.NaN : Number(raw);
+      if (Number.isFinite(value)) {
+        setv(key, String(value));
+        values[metric] = value;
+        answered += 1;
+      } else {
+        regionComplete = false;
+        delete S[key];
+        values[metric] = 0;
+      }
+    });
+    const subtotal = (values.eritema + values.induracion + values.escamas) * values.area * region.weight;
     total += subtotal;
-    document.getElementById(`pasi_sub_${region.key}`).textContent = subtotal.toFixed(1);
+    const subEl = document.getElementById(`pasi_sub_${region.key}`);
+    if (subEl) subEl.textContent = regionComplete ? subtotal.toFixed(1) : "—";
   });
-  const formatted = total.toFixed(1);
-  setv("pasi", formatted);
-  document.getElementById("pasiTotalView").textContent = formatted;
-  document.getElementById("pasiResult").value = formatted;
+  const totalEl = document.getElementById("pasiTotalView");
+  const inputEl = document.getElementById("pasiResult");
+  if (answered === totalComponents) {
+    const formatted = total.toFixed(1);
+    setv("pasi", formatted);
+    totalEl.textContent = formatted;
+    inputEl.value = formatted;
+  } else {
+    delete S.pasi;
+    inputEl.value = "";
+    totalEl.textContent = answered === 0 ? "Pendiente" : `Incompleto (${answered}/${totalComponents})`;
+  }
 }
 
 function updateSpecialBadge() {
@@ -2333,12 +2386,13 @@ function resetPatientState() {
     if (el.tagName === "SELECT") el.selectedIndex = 0;
     else el.value = "";
   });
-  document.querySelectorAll('[data-pasi]').forEach(select => select.value = "0");
+  document.querySelectorAll('[data-pasi]').forEach(select => select.value = "");
+  document.querySelectorAll('[id^="pasi_sub_"]').forEach(el => el.textContent = "—");
   document.getElementById("pasiResult").value = "";
-  document.getElementById("pasiTotalView").textContent = "0.0";
-  document.getElementById("pureTotal").textContent = "0";
+  document.getElementById("pasiTotalView").textContent = "Pendiente";
+  document.getElementById("pureTotal").textContent = "Pendiente";
   document.getElementById("pureAlert").textContent = "";
-  document.getElementById("dlqiTotal").textContent = "0";
+  document.getElementById("dlqiTotal").textContent = "Pendiente";
   document.getElementById("moriskyTotal").textContent = "Pendiente";
   document.getElementById("moriskyStatus").textContent = "Morisky-Green: pendiente";
   document.getElementById("prevBox").classList.add("hidden");
