@@ -1,0 +1,87 @@
+# Índice documental — Hub Clínico Psoriasis Valme
+
+**Última actualización:** 2026-09-28  
+**Repositorio:** `b32majus/Hub-Clinico-PsO-Valme`  
+**Objetivo actual:** rescate mínimo fiable de Psoriasis + preparación del onboarding de Dermatología en PROMueve Extremadura.
+
+## 1. Fuente de verdad local
+
+Orden recomendado dentro de este repositorio:
+
+1. instrucción/WO actual;
+2. GitHub live: rama, HEAD y código publicado;
+3. este `docs/INDEX.md`;
+4. `docs/ops/WORK_ORDER_STATUS.md`;
+5. plan maestro vigente;
+6. auditorías preservadas;
+7. artefactos históricos del prototipo.
+
+Para `b32majus/Hub-Clinico-Badajoz`, este repo **no es autoridad**. Cualquier afirmación sobre PROMueve/Reuma/Farmacia/Nexus debe verificarse live en el repo PROMueve antes de actuar.
+
+## 2. Documentos vigentes
+
+### Plan maestro
+
+[`plans/PSO_VALME_TO_PROMUEVE_DERMATOLOGY_MASTER_PLAN_20260928.md`](./plans/PSO_VALME_TO_PROMUEVE_DERMATOLOGY_MASTER_PLAN_20260928.md)
+
+Define:
+
+- prioridad Extremadura;
+- papel de Valme como donante clínico, no arquitectura objetivo;
+- fases F0–F6;
+- WOs candidatas;
+- gate para transferir el trabajo a `Hub-Clinico-Badajoz`;
+- límites entre repositorios.
+
+### Estado de trabajo
+
+[`ops/WORK_ORDER_STATUS.md`](./ops/WORK_ORDER_STATUS.md)
+
+Tablero vivo de WOs, dependencias y estado.
+
+### Auditoría inicial
+
+[`audits/PSO_VALME_INITIAL_AUDIT_20260928.md`](./audits/PSO_VALME_INITIAL_AUDIT_20260928.md)
+
+Preserva la auditoría técnica/funcional inicial del prototipo antes de modificar código.
+
+## 3. Decisiones vigentes
+
+- La prioridad de producto es **PROMueve Extremadura / Dermatología**.
+- Valme no debe convertirse primero en un producto perfecto para después “migrarlo”.
+- Se realiza un saneamiento mínimo para obtener un contrato clínico fiable de Psoriasis.
+- `Cuadro_Mando_Psoriasis_Valme_v2.html` es **candidata de referencia**, pendiente de caracterización V1/V2.
+- V1 no se elimina hasta demostrar que V2 no pierde funcionalidad relevante.
+- La implementación real de Dermatología se hará nativamente en `Hub-Clinico-Badajoz` contra la autoridad viva de PROMueve Nexus.
+- Este repo puede conservar auditorías read-only y diseño previo del onboarding para evitar contaminar PROMueve antes de aprobar el traslado.
+- Solo datos sintéticos/demo en repositorios y QA.
+
+## 4. Artefactos raíz del prototipo
+
+| Artefacto | Rol actual |
+|---|---|
+| `index.html` | Formulario Psoriasis; sujeto a saneamiento mínimo |
+| `Cuadro_Mando_Psoriasis_Valme_v2.html` | Candidata de dashboard de referencia |
+| `Cuadro_Mando_Psoriasis_Valme_v1.html` | Referencia histórica temporal |
+| `Base Datos_PsO_Valme_demo.csv` | Fixture/demo textual visible |
+| `Base Datos_PsO_Valme.xlsx` | XLSX presente; rol exacto pendiente de adjudicación |
+| `psoriasis_valme_base_longitudinal.xlsx` | XLSX longitudinal; rol exacto pendiente de adjudicación |
+| `Guia_Operativa_Psoriasis_Valme.docx` | Documentación operativa histórica |
+
+No asumir que un XLSX es “master” hasta documentarlo explícitamente.
+
+## 5. Próxima lectura
+
+Para continuar el trabajo:
+
+1. leer este índice;
+2. leer `ops/WORK_ORDER_STATUS.md`;
+3. leer el plan maestro;
+4. abrir la auditoría inicial solo cuando se necesite detalle del diagnóstico;
+5. verificar GitHub live antes de iniciar cualquier WO.
+
+## 6. Regla de frontera con PROMueve
+
+No modificar `b32majus/Hub-Clinico-Badajoz` desde este repo.
+
+El paso a PROMueve exige gate de transferencia, WO propia y autorización explícita en el repositorio destino.
