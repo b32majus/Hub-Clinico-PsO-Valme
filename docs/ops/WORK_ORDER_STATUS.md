@@ -11,8 +11,8 @@
 | `main` | Base original del prototipo; HEAD inicial verificado para este plan: `9d722c8da792ffe51ce2ea9a1420af71a70522f1` |
 | Rama documental actual | `docs/pso-valme-promueve-derma-plan-20260928` |
 | Cambio funcional en esta rama | Ninguno |
-| Dashboard de referencia | `Cuadro_Mando_Psoriasis_Valme_v2.html` como **candidata**, pendiente de PSO-01 |
-| Dashboard v1 | Referencia histórica temporal; no borrar hasta caracterización |
+| Dashboard de referencia | `Cuadro_Mando_Psoriasis_Valme_v2.html` adjudicado como baseline donante por PSO-01 (veredicto `V2_WITH_V1_FEATURES_TO_PORT`) |
+| Dashboard v1 | Referencia histórica temporal; no borrar; única capacidad V1-only: caché local con auto-restauración |
 | Estado asistencial | Prototipo / datos sintéticos; no piloto ni producción |
 | Prioridad de producto | PROMueve Extremadura / módulo Dermatología |
 
@@ -35,7 +35,7 @@
 | ID | Título | Tipo | Estado | Dependencias | Repo de ejecución |
 |---|---|---|---|---|---|
 | DOC-00 | Baseline, auditoría y plan maestro | Documental | `DONE_DOCS` | Ninguna | PsO-Valme |
-| PSO-01 | Caracterización V1 vs V2 | Read-only / QA | `PLANNED` | DOC-00 | PsO-Valme |
+| PSO-01 | Caracterización V1 vs V2 | Read-only / QA | `DONE_VERIFIED` | DOC-00 | PsO-Valme |
 | PSO-02 | Aislamiento de estado por paciente | Clínica/funcional | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-03 | Missingness PASI/DLQI/PURE-4 | Clínica/funcional | `PLANNED` | PSO-01; preferible PSO-02 | PsO-Valme |
 | PSO-04 | Cohorte actual y filtros dashboard | Analítica/funcional | `PLANNED` | PSO-01 | PsO-Valme |
@@ -98,11 +98,37 @@ La rama puede descartarse sin impacto en `main`.
 
 La instrucción actual autorizó dejar la documentación publicada en una rama del repositorio. **No se ha abierto PR ni se ha mergeado a `main`.**
 
+## PSO-01 — cierre
+
+### Objetivo
+
+Adjudicar con evidencia directa de código si V2 es la baseline donante correcta y si V1 contiene capacidad o semántica que deba preservarse.
+
+### Rama / base
+
+`work/pso-valme-train-a-20260928`; HEAD de partida `8cffc18d5608d89765bbdebc18ab87d227aa5215`; árbol limpio.
+
+### Entregable
+
+`docs/audits/PSO_DASHBOARD_V1_V2_CHARACTERIZATION_20260928.md`.
+
+### Veredicto
+
+`V2_WITH_V1_FEATURES_TO_PORT`. V2 es superconjunto funcional de V1 (habilita Gestión Global y exportación; añade timeline tx-change y relleno de área). Única capacidad V1-only: `persistDatasetCache`/`restoreCachedDataset` (caché local + auto-restauración), a adjudicar explícitamente. V1 no se borra.
+
+### NO TOCA
+
+V1/V2, `index.html`, XLSX/CSV/DOCX, fixtures, `main`, `Hub-Clinico-Badajoz`.
+
+### Delivery
+
+Informe documental; un único commit local `docs(pso): characterize dashboard v1 vs v2`; sin push/PR/merge.
+
 ## Próxima acción recomendada
 
 Dado que la prioridad de producto es Extremadura:
 
-1. ejecutar **PSO-01** para confirmar qué conserva V2 frente a V1;
-2. iniciar en paralelo **DERMA-READ-01**, auditoría read-only de Reuma/Farmacia/Foundation en PROMueve;
-3. después ejecutar los P0/P1 de Valme que condicionan el contrato donante;
+1. adjudicar la caché local V1-only en **PSO-06** (o descartarla motivadamente);
+2. ejecutar **PSO-02…PSO-05** sobre V2, cerrando defectos compartidos listados en el informe de PSO-01;
+3. iniciar en paralelo **DERMA-READ-01**, auditoría read-only de Reuma/Farmacia/Foundation en PROMueve;
 4. no iniciar cambios en `Hub-Clinico-Badajoz` hasta completar el gate de transferencia y recibir autorización explícita.

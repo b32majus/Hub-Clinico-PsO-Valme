@@ -45,13 +45,19 @@ Tablero vivo de WOs, dependencias y estado.
 
 Preserva la auditoría técnica/funcional inicial del prototipo antes de modificar código.
 
+### Caracterización V1 vs V2 (PSO-01)
+
+[`audits/PSO_DASHBOARD_V1_V2_CHARACTERIZATION_20260928.md`](./audits/PSO_DASHBOARD_V1_V2_CHARACTERIZATION_20260928.md)
+
+Adjudica V2 como baseline donante (`V2_WITH_V1_FEATURES_TO_PORT`), documenta la única capacidad V1-only (caché local con auto-restauración) y lista defectos compartidos por ambos.
+
 ## 3. Decisiones vigentes
 
 - La prioridad de producto es **PROMueve Extremadura / Dermatología**.
 - Valme no debe convertirse primero en un producto perfecto para después “migrarlo”.
 - Se realiza un saneamiento mínimo para obtener un contrato clínico fiable de Psoriasis.
-- `Cuadro_Mando_Psoriasis_Valme_v2.html` es **candidata de referencia**, pendiente de caracterización V1/V2.
-- V1 no se elimina hasta demostrar que V2 no pierde funcionalidad relevante.
+- `Cuadro_Mando_Psoriasis_Valme_v2.html` es la **baseline donante** adjudicada por PSO-01 (veredicto `V2_WITH_V1_FEATURES_TO_PORT`).
+- V1 no se elimina; su única capacidad V1-only es la caché local con auto-restauración, pendiente de adjudicar en PSO-06.
 - La implementación real de Dermatología se hará nativamente en `Hub-Clinico-Badajoz` contra la autoridad viva de PROMueve Nexus.
 - Este repo puede conservar auditorías read-only y diseño previo del onboarding para evitar contaminar PROMueve antes de aprobar el traslado.
 - Solo datos sintéticos/demo en repositorios y QA.
@@ -61,8 +67,8 @@ Preserva la auditoría técnica/funcional inicial del prototipo antes de modific
 | Artefacto | Rol actual |
 |---|---|
 | `index.html` | Formulario Psoriasis; sujeto a saneamiento mínimo |
-| `Cuadro_Mando_Psoriasis_Valme_v2.html` | Candidata de dashboard de referencia |
-| `Cuadro_Mando_Psoriasis_Valme_v1.html` | Referencia histórica temporal |
+| `Cuadro_Mando_Psoriasis_Valme_v2.html` | Dashboard de referencia / baseline donante (adjudicado PSO-01) |
+| `Cuadro_Mando_Psoriasis_Valme_v1.html` | Referencia histórica temporal; no borrar |
 | `Base Datos_PsO_Valme_demo.csv` | Fixture/demo textual visible |
 | `Base Datos_PsO_Valme.xlsx` | XLSX presente; rol exacto pendiente de adjudicación |
 | `psoriasis_valme_base_longitudinal.xlsx` | XLSX longitudinal; rol exacto pendiente de adjudicación |
