@@ -1,0 +1,2637 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Formulario Estructurado de Psoriasis</title>
+<style>
+  :root {
+    --primary-color: #0f766e;
+    --secondary-color: #155e75;
+    --accent-color: #e7c46a;
+    --text-color: #11313f;
+    --muted-color: #526370;
+    --border-color: #d9e4ea;
+    --surface-color: rgba(255, 255, 255, 0.95);
+    --success-color: #0f766e;
+    --danger-color: #dc2626;
+    --shadow-soft: 0 18px 42px rgba(15, 45, 61, 0.08);
+    --shadow-card: 0 10px 24px rgba(15, 45, 61, 0.08);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Aptos", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(15, 118, 110, 0.18), transparent 26%),
+      radial-gradient(circle at top right, rgba(231, 196, 106, 0.22), transparent 28%),
+      linear-gradient(180deg, #f5fbfb 0%, #eef4f6 100%);
+    color: var(--text-color);
+    line-height: 1.5;
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  .header {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.2rem;
+    margin-bottom: 1.25rem;
+    padding: 1.7rem 2rem;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #0f766e 0%, #155e75 55%, #254f6b 100%);
+    color: #fff;
+    box-shadow: 0 24px 48px rgba(15, 45, 61, 0.22);
+  }
+
+  .header::after {
+    content: "";
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    right: -100px;
+    top: -140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 68%);
+    pointer-events: none;
+  }
+
+  .header-copy,
+  .header-meta {
+    position: relative;
+    z-index: 1;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.36rem 0.75rem;
+    margin-bottom: 0.7rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: clamp(1.75rem, 3.8vw, 2.55rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .header-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.52rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    font-weight: 600;
+    font-size: 0.87rem;
+  }
+
+  .meta-pill.highlight {
+    background: rgba(231, 196, 106, 0.2);
+    border-color: rgba(231, 196, 106, 0.45);
+    color: #fff7db;
+  }
+
+  .section {
+    background: var(--surface-color);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(217, 228, 234, 0.95);
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 0.9rem;
+    overflow: hidden;
+  }
+
+  .section > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0.95rem 1rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    border-bottom: 1px solid #e7eef1;
+    background: linear-gradient(90deg, #f8fcfc 0%, #f1f7f9 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .section > summary:hover {
+    background: linear-gradient(90deg, #f4fbfb 0%, #eef5f7 100%);
+  }
+
+  .section > summary::after {
+    content: "▼";
+    font-size: 0.78rem;
+    color: var(--secondary-color);
+    transition: transform 0.25s ease;
+  }
+
+  .section:not([open]) > summary::after {
+    transform: rotate(-90deg);
+  }
+
+  .section > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .loader-panel {
+    background: var(--surface-color);
+    border: 1px solid rgba(217, 228, 234, 0.95);
+    border-radius: 18px;
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 0.95rem;
+    padding: 0.95rem 1rem;
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .loader-panel strong {
+    color: var(--secondary-color);
+  }
+
+  .loader-status {
+    color: var(--muted-color);
+    font-size: 0.9rem;
+  }
+
+  .loader-status.ok {
+    color: var(--success-color);
+    font-weight: 700;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0.75rem;
+  }
+
+  .field {
+    grid-column: span 4;
+    min-width: 0;
+  }
+
+  .field.w6 {
+    grid-column: span 6;
+  }
+
+  .field.w8 {
+    grid-column: span 8;
+  }
+
+  .field.w12 {
+    grid-column: span 12;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.42rem;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.82rem 0.92rem;
+    border: 1px solid #cad8df;
+    border-radius: 14px;
+    font-size: 0.96rem;
+    background: #fbfdfe;
+    color: var(--text-color);
+    transition: 0.2s ease;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+    background: #fff;
+  }
+
+  textarea {
+    min-height: 92px;
+    resize: vertical;
+  }
+
+  .helper {
+    margin-top: 0.3rem;
+    color: var(--muted-color);
+    font-size: 0.82rem;
+  }
+
+  .tx-prev-box {
+    border: 1px solid #cad8df;
+    border-radius: 14px;
+    background: #fbfdfe;
+    padding: 0.9rem 1rem;
+  }
+
+  .tx-prev-title {
+    font-size: 0.84rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--secondary-color);
+  }
+
+  .tx-prev-date {
+    margin-top: 0.24rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+
+  .tx-prev-decision {
+    margin-top: 0.52rem;
+    font-size: 1.14rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    line-height: 1.35;
+  }
+
+  .tx-prev-subtitle {
+    margin-top: 0.86rem;
+    font-size: 0.84rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--secondary-color);
+  }
+
+  .tx-prev-line {
+    margin-top: 0.22rem;
+    font-size: 1rem;
+    color: var(--text-color);
+    line-height: 1.4;
+  }
+
+  .tx-prev-empty {
+    color: var(--muted-color);
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .sub {
+    border: 1px solid #d7e4eb;
+    border-radius: 14px;
+    padding: 0.75rem;
+    margin-bottom: 0.8rem;
+    background: linear-gradient(180deg, #fbfdfd 0%, #f4f8fa 100%);
+  }
+
+  .sub b {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+  }
+
+  .toggle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .toggle button {
+    border: 1px solid #cfdae0;
+    border-radius: 999px;
+    background: #f8fbfc;
+    color: var(--muted-color);
+    padding: 0.46rem 0.72rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .toggle button:hover {
+    border-color: #9bc5bf;
+    color: var(--primary-color);
+    background: #f2f9f8;
+  }
+
+  .toggle button.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 10px 20px rgba(15, 118, 110, 0.18);
+  }
+
+  .loc-btn.special {
+    border-color: #f1ce73;
+    background: #fffaf0;
+    color: #8a6a1d;
+  }
+
+  .loc-btn.special.active {
+    background: linear-gradient(135deg, #b8891f, #8a6a1d);
+    color: #fff;
+  }
+
+  .special-title {
+    margin-top: 0.55rem;
+    color: #7a5d1a;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .special-badge-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.45rem;
+  }
+
+  .special-badge {
+    padding: 0.35rem 0.62rem;
+    border-radius: 999px;
+    border: 1px solid #f1ce73;
+    background: #fff4d6;
+    color: #7a5d1a;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .scale-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .scale-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid #cadce5;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    color: #3f5b6d;
+  }
+
+  .scale-btn.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-color: transparent;
+    color: #fff;
+  }
+
+  .inline-total {
+    margin-top: 0.4rem;
+    color: var(--secondary-color);
+    font-weight: 800;
+  }
+
+  .alert {
+    color: #975a16;
+    font-weight: 700;
+    margin-top: 0.35rem;
+  }
+
+  .pasi-grid {
+    overflow-x: auto;
+    border: 1px solid #d9e4ea;
+    border-radius: 14px;
+  }
+
+  .pasi-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 860px;
+  }
+
+  .pasi-table th,
+  .pasi-table td {
+    border: 1px solid #d9e4ea;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.82rem;
+  }
+
+  .pasi-table th {
+    background: #f4f8fa;
+    color: var(--secondary-color);
+    font-weight: 800;
+  }
+
+  .pasi-table td:first-child {
+    text-align: left;
+    font-weight: 700;
+    color: #4b6170;
+  }
+
+  .pasi-table select {
+    min-width: 86px;
+  }
+
+  .pasi-total {
+    margin-top: 0.65rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    font-size: 1rem;
+  }
+
+  .prom-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .score-chip {
+    padding: 0.75rem 0.85rem;
+    border-radius: 14px;
+    border: 1px solid #d7e4eb;
+    background: #fff;
+    text-align: center;
+    color: var(--muted-color);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .score-chip strong {
+    display: block;
+    margin-top: 0.28rem;
+    color: var(--secondary-color);
+    font-size: 1.3rem;
+  }
+
+  details.questionnaire {
+    margin-top: 0.8rem;
+    border: 1px solid #d9e4ea;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #fff 0%, #f7fafb 100%);
+    overflow: hidden;
+  }
+
+  details.questionnaire summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1rem 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background: #f5fafb;
+  }
+
+  details.questionnaire summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details.questionnaire summary::after {
+    content: "Desplegar";
+    color: var(--muted-color);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  details.questionnaire[open] summary::after {
+    content: "Plegar";
+  }
+
+  .questionnaire-body {
+    padding: 1rem 1.1rem 1.1rem;
+  }
+
+  .questionnaire-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .questionnaire-table th,
+  .questionnaire-table td {
+    padding: 0.75rem 0.7rem;
+    border-top: 1px solid #e5edf1;
+    vertical-align: top;
+  }
+
+  .questionnaire-table thead th {
+    border-top: none;
+    color: var(--muted-color);
+    text-align: left;
+    font-size: 0.84rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .questionnaire-table tbody td:first-child {
+    width: 62%;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .questionnaire-table td:last-child {
+    width: 38%;
+  }
+
+  .question-subnote {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--muted-color);
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+
+  .answer-group {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .answer-option {
+    border: 1px solid #cfdae0;
+    border-radius: 999px;
+    background: #f8fbfc;
+    color: var(--muted-color);
+    padding: 0.46rem 0.72rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    transition: 0.2s ease;
+  }
+
+  .answer-option:hover {
+    border-color: #9bc5bf;
+    color: var(--primary-color);
+    background: #f2f9f8;
+  }
+
+  .answer-option.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 10px 20px rgba(15, 118, 110, 0.18);
+  }
+
+  .dlqi-subquestion {
+    margin-top: 0.6rem;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  .therapy-stack {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .therapy-group-card {
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid #d8e4ea;
+    background: linear-gradient(180deg, #fff 0%, #f5f9fb 100%);
+    box-shadow: var(--shadow-card);
+  }
+
+  .therapy-group-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .therapy-group-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--secondary-color);
+  }
+
+  .therapy-group-copy {
+    color: var(--muted-color);
+    font-size: 0.9rem;
+  }
+
+  .therapy-rows {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .therapy-row {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.9fr) minmax(220px, 1.1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .therapy-actions {
+    display: inline-flex;
+    gap: 0.45rem;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .therapy-action {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.15rem;
+    font-weight: 800;
+    transition: 0.2s ease;
+  }
+
+  .therapy-action.add {
+    background: #e7f3f2;
+    color: var(--primary-color);
+  }
+
+  .therapy-action.add:hover {
+    background: #d7ebe8;
+  }
+
+  .therapy-action.remove {
+    background: #f8ece9;
+    color: #a85a4d;
+  }
+
+  .therapy-action.remove:hover {
+    background: #f0dfdb;
+  }
+
+  .therapy-action-placeholder {
+    display: inline-block;
+    width: 42px;
+    height: 42px;
+  }
+
+  .decision-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .decision-btn {
+    min-height: 56px;
+    border: 1px solid #b8c3cd;
+    border-radius: 16px;
+    background: #f5f8fa;
+    color: #41576a;
+    font-size: 1.05rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .decision-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .decision-btn.active {
+    background: #28a745;
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 10px 20px rgba(40, 167, 69, 0.2);
+  }
+
+  .action-bar-bottom {
+    margin: 1.5rem auto 0.5rem;
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    background: var(--surface-color);
+    border: 1px solid rgba(217, 228, 234, 0.95);
+    box-shadow: var(--shadow-soft);
+    border-radius: 16px;
+    padding: 0.7rem;
+  }
+
+  .button {
+    border: none;
+    border-radius: 14px;
+    font-weight: 700;
+    color: #fff;
+    padding: 0.76rem 1.05rem;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .button:hover {
+    transform: translateY(-1px);
+  }
+
+  .button.primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  }
+
+  .button.secondary {
+    background: linear-gradient(135deg, #2f4858, #17324d);
+  }
+
+  .button.outline {
+    color: var(--primary-color);
+    background: #fff;
+    border: 1px solid #9ec8c0;
+  }
+
+  .toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--success-color);
+    color: #fff;
+    padding: 0.9rem 1.1rem;
+    border-radius: 12px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+    z-index: 1000;
+    font-weight: 700;
+    transition: 0.2s ease;
+  }
+
+  @media (max-width: 980px) {
+    body {
+      padding: 1rem;
+    }
+
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 1.2rem;
+    }
+
+    .header-meta {
+      justify-content: flex-start;
+    }
+
+    .field,
+    .field.w6,
+    .field.w8 {
+      grid-column: span 12;
+    }
+
+    .therapy-row {
+      grid-template-columns: 1fr;
+    }
+
+    .action-bar-bottom {
+      justify-content: stretch;
+      width: 100%;
+    }
+
+    .button {
+      width: 100%;
+    }
+
+    .decision-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .questionnaire-table,
+    .questionnaire-table thead,
+    .questionnaire-table tbody,
+    .questionnaire-table th,
+    .questionnaire-table td,
+    .questionnaire-table tr {
+      display: block;
+    }
+
+    .questionnaire-table thead {
+      display: none;
+    }
+
+    .questionnaire-table tbody td {
+      width: 100%;
+      border-top: none;
+      padding: 0.35rem 0;
+    }
+
+    .questionnaire-table tbody tr {
+      padding: 0.8rem 0;
+      border-top: 1px solid #e5edf1;
+    }
+
+    .answer-option {
+      flex: 1 1 120px;
+      text-align: center;
+      justify-content: center;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-copy">
+      <div class="eyebrow">Hospital Universitario de Valme</div>
+      <h1>Formulario Estructurado de Psoriasis</h1>
+    </div>
+    <div class="header-meta">
+      <span class="meta-pill">AGS Sur de Sevilla</span>
+      <span class="meta-pill highlight">Uso Asistencial Interno</span>
+    </div>
+  </div>
+
+  <div class="loader-panel">
+    <div>
+      <strong>Base de Seguimiento</strong>
+      <div class="loader-status" id="baseStatus">Sin base cargada en esta sesión.</div>
+    </div>
+    <div>
+      <button type="button" class="button outline" id="loadBaseBtn">Cargar Base Excel</button>
+      <input type="file" id="baseFileInput" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="hidden">
+    </div>
+  </div>
+
+  <form id="f">
+    <details class="section" open>
+      <summary>Datos de Consulta</summary>
+      <div class="content">
+        <div class="grid">
+          <div class="field"><label>NUSHA</label><input name="nusha" id="nushaInput"></div>
+          <div class="field"><label>Fecha de la Visita</label><input type="date" name="fecha_visita"></div>
+          <div class="field"><label>Tipo de Visita</label>
+            <select name="tipo_visita" id="tipo_visita">
+              <option value="primera">Primera Visita</option>
+              <option value="seguimiento">Visita de Seguimiento</option>
+            </select>
+            <div class="helper" id="visitModeHint">Sin bloqueo: puedes elegir Primera Visita o Visita de Seguimiento.</div>
+          </div>
+          <div class="field"><label>Procedencia</label>
+            <select name="procedencia">
+              <option value=""></option>
+              <option value="atencion_primaria">Atención Primaria</option>
+              <option value="dermatologia_general">Dermatología General</option>
+              <option value="multidisciplinar_derma_reuma">Multidisciplinar Derma-Reuma</option>
+            </select>
+          </div>
+          <div class="field w12">
+            <label>Tratamiento Previo (Seguimiento)</label>
+            <div class="tx-prev-box">
+              <input type="hidden" name="tratamiento_previo_consulta">
+              <div id="previousTxContext"><div class="tx-prev-empty">Sin visita previa asociada al NUSHA actual.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="section" open>
+      <summary>Historia de Psoriasis</summary>
+      <div class="content">
+        <div class="grid">
+          <div class="field"><label>Fecha de Inicio de Psoriasis</label><input type="date" name="fecha_inicio_psoriasis"></div>
+          <div class="field"><label>Fecha de Diagnóstico de Psoriasis</label><input type="date" name="fecha_diagnostico_psoriasis"></div>
+          <div class="field"><label>Curso Evolutivo</label>
+            <select name="curso_evolutivo">
+              <option value=""></option>
+              <option value="brotes">Brotes</option>
+              <option value="persistente">Persistente</option>
+              <option value="progresiva">Progresiva</option>
+              <option value="intermitente">Intermitente</option>
+            </select>
+          </div>
+          <div class="field w6"><label>Fenotipo</label>
+            <select name="fenotipo">
+              <option value=""></option>
+              <option value="placas">Placas</option>
+              <option value="guttata">Guttata</option>
+              <option value="inversa">Inversa</option>
+              <option value="pustulosa">Pustulosa</option>
+              <option value="eritrodermica">Eritrodérmica</option>
+              <option value="palmoplantar">Palmoplantar</option>
+              <option value="cuero_cabelludo_predominante">Cuero Cabelludo Predominante</option>
+              <option value="ungueal_predominante">Ungueal Predominante</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="field"><label>Antecedentes Familiares de Psoriasis</label>
+            <div class="toggle one" data-name="antecedentes_familiares_psoriasis">
+              <button type="button" data-v="1">Sí</button>
+              <button type="button" data-v="0">No</button>
+            </div>
+          </div>
+          <div class="field w12"><label>Desencadenantes</label>
+            <div class="toggle many">
+              <button type="button" data-k="desenc_infeccion">Infección</button>
+              <button type="button" data-k="desenc_estres">Estrés</button>
+              <button type="button" data-k="desenc_farmacos">Fármacos</button>
+              <button type="button" data-k="desenc_traumatismo_friccion">Traumatismo / Fricción</button>
+              <button type="button" data-k="desenc_retirada_corticoides">Retirada Corticoides</button>
+              <button type="button" data-k="desenc_tabaco">Tabaco</button>
+              <button type="button" data-k="desenc_alcohol">Alcohol</button>
+            </div>
+          </div>
+          <div class="field w6"><label>Otros Desencadenantes</label><input name="desenc_otros"></div>
+          <div class="field"><label>Tratamiento Previo</label>
+            <div class="toggle one" data-name="tratamiento_previo">
+              <button type="button" data-v="1">Sí</button>
+              <button type="button" data-v="0">No</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid hidden" id="prevBox">
+          <div class="field"><label>Tipo de Tratamiento Previo</label>
+            <select name="tipo_tratamiento_previo">
+              <option value=""></option>
+              <option value="topico">Tópico</option>
+              <option value="fototerapia">Fototerapia</option>
+              <option value="sistemico_convencional">Sistémico Convencional</option>
+              <option value="biologico">Biológico</option>
+              <option value="otros">Otros</option>
+            </select>
+          </div>
+          <div class="field w6"><label>Detalle de Tratamiento Previo</label><input name="tratamiento_previo_detalle"></div>
+          <div class="field"><label>Motivo de Suspensión</label><input name="motivo_suspension_previo"></div>
+          <div class="field"><label>Respuesta Previa</label><input name="respuesta_previa"></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary>Comorbilidades</summary>
+      <div class="content">
+        <div class="sub"><b>Cardiometabólicas</b><div class="toggle many">
+          <button type="button" data-k="comorb_obesidad">Obesidad</button>
+          <button type="button" data-k="comorb_sobrepeso">Sobrepeso</button>
+          <button type="button" data-k="comorb_hta">HTA</button>
+          <button type="button" data-k="comorb_dislipemia">Dislipemia</button>
+          <button type="button" data-k="comorb_diabetes_prediabetes">Diabetes / Prediabetes</button>
+          <button type="button" data-k="comorb_sindrome_metabolico">Síndrome Metabólico</button>
+        </div></div>
+        <div class="sub"><b>Hepáticas</b><div class="toggle many">
+          <button type="button" data-k="comorb_esteatosis_hepatica">Esteatosis</button>
+          <button type="button" data-k="comorb_alteracion_transaminasas">Transaminasas</button>
+          <button type="button" data-k="comorb_hepatopatia_cronica">Hepatopatía Crónica</button>
+        </div></div>
+        <div class="sub"><b>Reumatológicas / Inflamatorias</b><div class="toggle many">
+          <button type="button" data-k="comorb_artritis_psoriasica_conocida">APs Conocida</button>
+          <button type="button" data-k="comorb_sospecha_artritis_psoriasica">Sospecha APs</button>
+          <button type="button" data-k="comorb_eii">EII</button>
+        </div></div>
+        <div class="sub"><b>Cardiovasculares</b><div class="toggle many">
+          <button type="button" data-k="comorb_cardiopatia_isquemica">Cardiopatía Isquémica</button>
+          <button type="button" data-k="comorb_ictus_ait">Ictus / AIT</button>
+          <button type="button" data-k="comorb_insuficiencia_cardiaca">Insuficiencia Cardíaca</button>
+          <button type="button" data-k="comorb_enfermedad_vascular_periferica">Enf. Vascular Periférica</button>
+        </div></div>
+        <div class="sub"><b>Otras</b><div class="toggle many">
+          <button type="button" data-k="comorb_tabaquismo">Tabaquismo</button>
+          <button type="button" data-k="comorb_alcohol">Alcohol</button>
+          <button type="button" data-k="comorb_ansiedad_depresion">Ansiedad / Depresión</button>
+        </div></div>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary>Exploración Clínica</summary>
+      <div class="content">
+        <div class="sub">
+          <b>Localizaciones Afectas</b>
+          <div class="toggle many" id="locToggleBox">
+            <button type="button" class="loc-btn special" data-k="loc_cuero_cabelludo" data-zone="zona_esp_cuero_cabelludo">Cuero Cabelludo</button>
+            <button type="button" class="loc-btn special" data-k="loc_cara" data-zone="zona_esp_cara">Cara</button>
+            <button type="button" class="loc-btn" data-k="loc_tronco">Tronco</button>
+            <button type="button" class="loc-btn" data-k="loc_miembros_superiores">Miembros Superiores</button>
+            <button type="button" class="loc-btn" data-k="loc_miembros_inferiores">Miembros Inferiores</button>
+            <button type="button" class="loc-btn special" data-k="loc_pliegues" data-zone="zona_esp_pliegues">Pliegues</button>
+            <button type="button" class="loc-btn special" data-k="loc_genitales" data-zone="zona_esp_genitales">Genitales</button>
+            <button type="button" class="loc-btn special" data-k="loc_palmas" data-zone="zona_esp_palmas">Palmas</button>
+            <button type="button" class="loc-btn special" data-k="loc_plantas" data-zone="zona_esp_plantas">Plantas</button>
+            <button type="button" class="loc-btn special" data-k="loc_unas" data-zone="zona_esp_unas">Uñas</button>
+          </div>
+          <div class="special-title hidden" id="specialTitle">Zonas Especiales Afectadas:</div>
+          <div class="special-badge-wrap" id="specialBadgeWrap"></div>
+        </div>
+
+        <div class="grid">
+          <div class="field"><label>BSA</label><input type="number" step="0.1" name="bsa"></div>
+          <div class="field"><label>PGA</label><input type="number" step="1" name="pga" min="0" max="5"></div>
+          <div class="field"><label>PASI</label><input type="number" step="0.1" name="pasi" id="pasiResult" readonly></div>
+          <div class="field"><label>Afectación Ungueal</label>
+            <div class="toggle one" data-name="afectacion_ungueal">
+              <button type="button" data-v="1">Sí</button>
+              <button type="button" data-v="0">No</button>
+            </div>
+          </div>
+          <div class="field w8">
+            <div class="helper">BSA y PGA se mantienen como valoración clínica manual. PASI se calcula automáticamente con la tabla inferior.</div>
+          </div>
+        </div>
+
+        <div class="sub" style="margin-top:0.8rem;">
+          <b>Calculadora PASI</b>
+          <div class="helper">Escala severidad (0-4) y extensión por región (0-6). Pesos: Cabeza 0.10, Tronco 0.30, Brazos 0.20, Piernas 0.40.</div>
+          <div class="pasi-grid" style="margin-top:0.6rem;">
+            <table class="pasi-table">
+              <thead>
+                <tr>
+                  <th>Región</th>
+                  <th>Eritema (0-4)</th>
+                  <th>Induración (0-4)</th>
+                  <th>Escamas (0-4)</th>
+                  <th>Extensión (0-6)</th>
+                  <th>Peso</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="pasiBody"></tbody>
+            </table>
+          </div>
+          <div class="pasi-total">PASI Total: <span id="pasiTotalView">0.0</span></div>
+        </div>
+
+        <div class="grid" style="margin-top:0.7rem;">
+          <div class="field w12"><label>Observaciones Clínicas</label><textarea name="observaciones_clinicas"></textarea></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary>Síntomas e Impacto</summary>
+      <div class="content">
+        <div class="grid">
+          <div class="field w6">
+            <label>EVA Prurito (1-10)</label>
+            <div class="scale-group" id="evaPruritoScale"></div>
+          </div>
+          <div class="field w6">
+            <label>EVA Dolor (1-10)</label>
+            <div class="scale-group" id="evaDolorScale"></div>
+          </div>
+          <div class="field"><label>Escozor</label><div class="toggle one" data-name="escozor"><button type="button" data-v="1">Sí</button><button type="button" data-v="0">No</button></div></div>
+          <div class="field"><label>Fisuración</label><div class="toggle one" data-name="fisuracion"><button type="button" data-v="1">Sí</button><button type="button" data-v="0">No</button></div></div>
+          <div class="field"><label>Sangrado</label><div class="toggle one" data-name="sangrado"><button type="button" data-v="1">Sí</button><button type="button" data-v="0">No</button></div></div>
+          <div class="field"><label>Alteración Funcional</label><select name="alteracion_funcional"><option value=""></option><option value="no">No</option><option value="leve">Leve</option><option value="moderada">Moderada</option><option value="intensa">Intensa</option></select></div>
+          <div class="field"><label>Alteración del Sueño</label><select name="alteracion_sueno"><option value=""></option><option value="no">No</option><option value="leve">Leve</option><option value="moderada">Moderada</option><option value="intensa">Intensa</option></select></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary>DLQI</summary>
+      <div class="content">
+        <div class="prom-summary-grid">
+          <div class="score-chip">DLQI Total<strong id="dlqiTotal">0</strong></div>
+        </div>
+
+        <details class="questionnaire" open>
+          <summary>DLQI (10 Ítems)</summary>
+          <div class="questionnaire-body">
+            <table class="questionnaire-table">
+              <thead>
+                <tr>
+                  <th>Pregunta</th>
+                  <th>Respuesta</th>
+                </tr>
+              </thead>
+              <tbody id="dlqiBody"></tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary>PURE-4</summary>
+      <div class="content" id="pureBox"></div>
+      <div class="content">
+        <div class="inline-total">PURE-4 Positivas: <span id="pureTotal">0</span></div>
+        <div class="alert" id="pureAlert"></div>
+      </div>
+    </details>
+
+    <details class="section" open id="firstSec">
+      <summary>Tratamiento Instaurado (Primera Visita)</summary>
+      <div class="content">
+        <div class="therapy-stack">
+          <div class="therapy-group-card">
+            <div class="therapy-group-header">
+              <div>
+                <div class="therapy-group-title">Topicos</div>
+              </div>
+            </div>
+            <div id="therapy-topicos" class="therapy-rows"></div>
+          </div>
+
+          <div class="therapy-group-card">
+            <div class="therapy-group-header">
+              <div>
+                <div class="therapy-group-title">Sinteticos Convencionales</div>
+              </div>
+            </div>
+            <div id="therapy-sinteticos_convencionales" class="therapy-rows"></div>
+          </div>
+
+          <div class="therapy-group-card">
+            <div class="therapy-group-header">
+              <div>
+                <div class="therapy-group-title">Fototerapia</div>
+              </div>
+            </div>
+            <div id="therapy-fototerapia" class="therapy-rows"></div>
+          </div>
+
+          <div class="therapy-group-card">
+            <div class="therapy-group-header">
+              <div>
+                <div class="therapy-group-title">Biologicos</div>
+              </div>
+            </div>
+            <div id="therapy-biologicos" class="therapy-rows"></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="section hidden" id="followSec">
+      <summary>Seguimiento Terapéutico</summary>
+      <div class="content">
+        <label>Decisión Terapéutica</label>
+        <div class="decision-grid">
+          <button type="button" class="decision-btn" id="decisionContinueBtn">Continuar Tratamiento</button>
+          <button type="button" class="decision-btn" id="decisionChangeBtn">Cambiar Tratamiento</button>
+        </div>
+
+        <div id="continueBlock" class="hidden" style="margin-top:0.8rem;">
+          <div class="grid">
+            <div class="field"><label>Adherencia</label>
+              <select name="seguimiento_adherencia_categoria" id="seguimiento_adherencia_categoria">
+                <option value=""></option>
+                <option value="buena">Buena</option>
+                <option value="regular">Regular</option>
+                <option value="mala">Mala</option>
+              </select>
+            </div>
+            <div class="field w12"><label>Ajuste Terapéutico</label><textarea name="seguimiento_ajuste_terapeutico" placeholder="Describir ajustes en dosis, frecuencia u otros aspectos del tratamiento actual"></textarea></div>
+          </div>
+          <div id="moriskyBox"></div>
+          <span id="moriskyTotal" class="hidden">Pendiente</span>
+          <div class="inline-total" id="moriskyStatus">Morisky-Green: pendiente</div>
+        </div>
+
+        <div id="changeBlock" class="hidden" style="margin-top:0.8rem;">
+          <div class="grid">
+            <div class="field w12"><label>Motivo del Cambio</label><textarea name="seguimiento_motivo_cambio" placeholder="Describir el motivo del cambio de tratamiento"></textarea></div>
+            <div class="field">
+              <label>Efectos Adversos</label>
+              <div class="toggle one" data-name="seguimiento_efectos_adversos">
+                <button type="button" data-v="1">Sí</button>
+                <button type="button" data-v="0">No</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="therapy-stack" style="margin-top:0.8rem;">
+          <div class="helper"><b>Tratamiento Final de la Visita (Seguimiento)</b></div>
+          <div class="therapy-group-card">
+            <div class="therapy-group-header"><div><div class="therapy-group-title">Topicos</div></div></div>
+            <div id="follow-therapy-topicos" class="therapy-rows"></div>
+          </div>
+          <div class="therapy-group-card">
+            <div class="therapy-group-header"><div><div class="therapy-group-title">Sinteticos Convencionales</div></div></div>
+            <div id="follow-therapy-sinteticos_convencionales" class="therapy-rows"></div>
+          </div>
+          <div class="therapy-group-card">
+            <div class="therapy-group-header"><div><div class="therapy-group-title">Fototerapia</div></div></div>
+            <div id="follow-therapy-fototerapia" class="therapy-rows"></div>
+          </div>
+          <div class="therapy-group-card">
+            <div class="therapy-group-header"><div><div class="therapy-group-title">Biologicos</div></div></div>
+            <div id="follow-therapy-biologicos" class="therapy-rows"></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary>Plan y Seguimiento</summary>
+      <div class="content">
+        <div class="grid">
+          <div class="field w12"><label>Impresión Clínica</label><textarea name="impresion_clinica"></textarea></div>
+          <div class="field w12"><label>Objetivo Terapéutico</label><textarea name="objetivo_terapeutico"></textarea></div>
+          <div class="field"><label>Derivación Derma-Reuma</label><div class="toggle one" data-name="derivacion_derma_reuma"><button type="button" data-v="1">Sí</button><button type="button" data-v="0">No</button></div></div>
+          <div class="field w6"><label>Otras Derivaciones</label><input name="otras_derivaciones"></div>
+          <div class="field"><label>Próxima Revisión</label><input name="proxima_revision"></div>
+          <div class="field w12"><label>Comentarios Finales</label><textarea name="comentarios_finales"></textarea></div>
+        </div>
+      </div>
+    </details>
+
+    <div class="action-bar-bottom">
+      <button type="button" class="button outline" id="newBtn">Nuevo Paciente</button>
+      <button type="button" class="button primary" id="csvBtn">Exportar Fila CSV</button>
+      <button type="button" class="button secondary" id="txtBtn">Exportar TXT</button>
+    </div>
+  </form>
+
+<script src="../../materials_hs_valme/node_modules/jszip/dist/jszip.min.js"></script>
+<script>
+const HEADERS = `nusha,fecha_visita,tipo_visita,procedencia,tratamiento_previo_consulta,fecha_inicio_psoriasis,fecha_diagnostico_psoriasis,curso_evolutivo,fenotipo,antecedentes_familiares_psoriasis,desenc_infeccion,desenc_estres,desenc_farmacos,desenc_traumatismo_friccion,desenc_retirada_corticoides,desenc_tabaco,desenc_alcohol,desenc_otros,tratamiento_previo,tipo_tratamiento_previo,tratamiento_previo_detalle,motivo_suspension_previo,respuesta_previa,comorb_obesidad,comorb_sobrepeso,comorb_hta,comorb_dislipemia,comorb_diabetes_prediabetes,comorb_sindrome_metabolico,comorb_esteatosis_hepatica,comorb_alteracion_transaminasas,comorb_hepatopatia_cronica,comorb_artritis_psoriasica_conocida,comorb_sospecha_artritis_psoriasica,comorb_eii,comorb_cardiopatia_isquemica,comorb_ictus_ait,comorb_insuficiencia_cardiaca,comorb_enfermedad_vascular_periferica,comorb_tabaquismo,comorb_alcohol,comorb_ansiedad_depresion,loc_cuero_cabelludo,loc_cara,loc_tronco,loc_miembros_superiores,loc_miembros_inferiores,loc_pliegues,loc_genitales,loc_palmas,loc_plantas,loc_unas,zona_esp_cuero_cabelludo,zona_esp_unas,zona_esp_cara,zona_esp_genitales,zona_esp_palmas,zona_esp_plantas,zona_esp_pliegues,bsa,pga,pasi,pasi_cabeza_eritema,pasi_cabeza_induracion,pasi_cabeza_escamas,pasi_cabeza_area,pasi_tronco_eritema,pasi_tronco_induracion,pasi_tronco_escamas,pasi_tronco_area,pasi_brazos_eritema,pasi_brazos_induracion,pasi_brazos_escamas,pasi_brazos_area,pasi_piernas_eritema,pasi_piernas_induracion,pasi_piernas_escamas,pasi_piernas_area,afectacion_ungueal,observaciones_clinicas,eva_prurito,eva_dolor,escozor,fisuracion,sangrado,alteracion_funcional,alteracion_sueno,dlqi_q1,dlqi_q2,dlqi_q3,dlqi_q4,dlqi_q5,dlqi_q6,dlqi_q7,dlqi_q8,dlqi_q9,dlqi_q10,dlqi_total,pure4_q1,pure4_q2,pure4_q3,pure4_q4,pure4_total_positivas,derivacion_derma_reuma,tx_primera_topicos_farmaco_1,tx_primera_topicos_posologia_1,tx_primera_topicos_farmaco_2,tx_primera_topicos_posologia_2,tx_primera_topicos_farmaco_3,tx_primera_topicos_posologia_3,tx_primera_topicos_otros,tx_primera_sinteticos_convencionales_farmaco_1,tx_primera_sinteticos_convencionales_posologia_1,tx_primera_sinteticos_convencionales_farmaco_2,tx_primera_sinteticos_convencionales_posologia_2,tx_primera_sinteticos_convencionales_farmaco_3,tx_primera_sinteticos_convencionales_posologia_3,tx_primera_sinteticos_convencionales_otros,tx_primera_fototerapia_farmaco_1,tx_primera_fototerapia_posologia_1,tx_primera_fototerapia_farmaco_2,tx_primera_fototerapia_posologia_2,tx_primera_fototerapia_farmaco_3,tx_primera_fototerapia_posologia_3,tx_primera_fototerapia_otros,tx_primera_biologicos_farmaco_1,tx_primera_biologicos_posologia_1,tx_primera_biologicos_farmaco_2,tx_primera_biologicos_posologia_2,tx_primera_biologicos_farmaco_3,tx_primera_biologicos_posologia_3,tx_primera_biologicos_otros,tx_seguimiento_topicos_farmaco_1,tx_seguimiento_topicos_posologia_1,tx_seguimiento_topicos_farmaco_2,tx_seguimiento_topicos_posologia_2,tx_seguimiento_topicos_farmaco_3,tx_seguimiento_topicos_posologia_3,tx_seguimiento_topicos_otros,tx_seguimiento_sinteticos_convencionales_farmaco_1,tx_seguimiento_sinteticos_convencionales_posologia_1,tx_seguimiento_sinteticos_convencionales_farmaco_2,tx_seguimiento_sinteticos_convencionales_posologia_2,tx_seguimiento_sinteticos_convencionales_farmaco_3,tx_seguimiento_sinteticos_convencionales_posologia_3,tx_seguimiento_sinteticos_convencionales_otros,tx_seguimiento_fototerapia_farmaco_1,tx_seguimiento_fototerapia_posologia_1,tx_seguimiento_fototerapia_farmaco_2,tx_seguimiento_fototerapia_posologia_2,tx_seguimiento_fototerapia_farmaco_3,tx_seguimiento_fototerapia_posologia_3,tx_seguimiento_fototerapia_otros,tx_seguimiento_biologicos_farmaco_1,tx_seguimiento_biologicos_posologia_1,tx_seguimiento_biologicos_farmaco_2,tx_seguimiento_biologicos_posologia_2,tx_seguimiento_biologicos_farmaco_3,tx_seguimiento_biologicos_posologia_3,tx_seguimiento_biologicos_otros,seguimiento_adherencia_categoria,seguimiento_ajuste_terapeutico,seguimiento_adherencia_morisky_q1,seguimiento_adherencia_morisky_q2,seguimiento_adherencia_morisky_q3,seguimiento_adherencia_morisky_q4,seguimiento_morisky_total_no_adherencia,seguimiento_motivo_cambio,seguimiento_efectos_adversos,impresion_clinica,objetivo_terapeutico,otras_derivaciones,proxima_revision,comentarios_finales`.split(",");
+
+const S = {};
+const oneGroups = new Map();
+const form = document.getElementById("f");
+const detailsDefault = new Map();
+const baseStatus = document.getElementById("baseStatus");
+const loadBaseBtn = document.getElementById("loadBaseBtn");
+const baseFileInput = document.getElementById("baseFileInput");
+const nushaInput = document.getElementById("nushaInput");
+const visitTypeSelect = document.getElementById("tipo_visita");
+const visitModeHint = document.getElementById("visitModeHint");
+const previousTxContext = document.getElementById("previousTxContext");
+const continueBtn = document.getElementById("decisionContinueBtn");
+const changeBtn = document.getElementById("decisionChangeBtn");
+const continueBlock = document.getElementById("continueBlock");
+const changeBlock = document.getElementById("changeBlock");
+
+let baseRows = [];
+let baseFileName = "";
+let autoTimer = null;
+let applyingPreload = false;
+let visitTypeLockedToFollowup = false;
+let primaryTherapyState;
+let followTherapyState;
+
+const PASI_REGIONS = [
+  { key: "cabeza", label: "Cabeza", weight: 0.10 },
+  { key: "tronco", label: "Tronco", weight: 0.30 },
+  { key: "brazos", label: "Brazos", weight: 0.20 },
+  { key: "piernas", label: "Piernas", weight: 0.40 }
+];
+
+const DLQI_OPTION_SETS = {
+  standard: [
+    { label: "Mucho", value: "3" },
+    { label: "Bastante", value: "2" },
+    { label: "Un poco", value: "1" },
+    { label: "Nada", value: "0" }
+  ],
+  with_no_relation: [
+    { label: "Mucho", value: "3" },
+    { label: "Bastante", value: "2" },
+    { label: "Un poco", value: "1" },
+    { label: "Nada", value: "0" },
+    { label: "Sin relación", value: "0" }
+  ],
+  work_or_study_main: [
+    { label: "Sí", value: "yes" },
+    { label: "No", value: "no" },
+    { label: "Sin relación", value: "na" }
+  ],
+  work_or_study_followup: [
+    { label: "Bastante", value: "2" },
+    { label: "Un poco", value: "1" },
+    { label: "Nada", value: "0" }
+  ]
+};
+
+const DLQI_ITEMS = [
+  { id: "dlqi_q1", text: "1. Durante los últimos 7 días, ¿ha sentido picor, dolor o escozor en la piel?", optionSet: "standard" },
+  { id: "dlqi_q2", text: "2. Durante los últimos 7 días, ¿se ha sentido incómodo/a o cohibido/a debido a sus problemas de piel?", optionSet: "standard" },
+  { id: "dlqi_q3", text: "3. Durante los últimos 7 días, ¿le han molestado sus problemas de piel para hacer la compra u ocuparse de la casa (o del jardín)?", optionSet: "with_no_relation" },
+  { id: "dlqi_q4", text: "4. Durante los últimos 7 días, ¿han influido sus problemas de piel en la elección de la ropa que lleva?", optionSet: "with_no_relation" },
+  { id: "dlqi_q5", text: "5. Durante los últimos 7 días, ¿han influido sus problemas de piel en cualquier actividad social o recreativa?", optionSet: "with_no_relation" },
+  { id: "dlqi_q6", text: "6. Durante los últimos 7 días, ¿ha tenido dificultades para hacer deporte debido a sus problemas de piel?", optionSet: "with_no_relation" },
+  { id: "dlqi_q7", text: "7. Durante los últimos 7 días, ¿sus problemas de piel le han impedido totalmente trabajar o estudiar?", optionSet: "work_or_study_main", followupOptionSet: "work_or_study_followup", extra: "Si la respuesta es No: durante los últimos 7 días, ¿le han molestado sus problemas de piel en su trabajo o en sus estudios?" },
+  { id: "dlqi_q8", text: "8. Durante los últimos 7 días, ¿han causado sus problemas de piel dificultades con su pareja o sus amigos y familiares?", optionSet: "with_no_relation" },
+  { id: "dlqi_q9", text: "9. Durante los últimos 7 días, ¿han causado sus problemas de piel dificultades sexuales?", optionSet: "with_no_relation" },
+  { id: "dlqi_q10", text: "10. Durante los últimos 7 días, ¿le ha causado problemas el tratamiento de la piel, por ejemplo ensuciándole la casa o quitándole tiempo?", optionSet: "with_no_relation" }
+];
+
+const PURE4_ITEMS = [
+  { key: "pure4_q1", text: "1. ¿Ha tenido alguna vez un dedo rojo, hinchado y doloroso?" },
+  { key: "pure4_q2", text: "2. ¿Se le ha hinchado alguna articulación y le ha causado dolor?" },
+  { key: "pure4_q3", text: "3. ¿Ha sufrido dolor en la zona de los glúteos por la noche?" },
+  { key: "pure4_q4", text: "4. ¿Le han dolido los talones?" }
+];
+
+const MORISKY_ITEMS = [
+  { key: "seguimiento_adherencia_morisky_q1", text: "1. ¿Olvida alguna vez tomar la medicación?", yesScore: "1", noScore: "0" },
+  { key: "seguimiento_adherencia_morisky_q2", text: "2. ¿Toma la medicación a las horas indicadas?", yesScore: "0", noScore: "1" },
+  { key: "seguimiento_adherencia_morisky_q3", text: "3. Cuando se encuentra bien, ¿deja de tomar la medicación?", yesScore: "1", noScore: "0" },
+  { key: "seguimiento_adherencia_morisky_q4", text: "4. Si le sienta mal, ¿deja de tomarla?", yesScore: "1", noScore: "0" }
+];
+const MORISKY_ADHERENT_PATTERN = ["0", "0", "0", "0"];
+
+const THERAPY_GROUPS = [
+  { key: "topicos", label: "Topicos", options: ["Corticoides Topicos", "Calcipotriol/Betametasona", "Tacrolimus Topico"] },
+  { key: "sinteticos_convencionales", label: "Sinteticos Convencionales", options: ["Metotrexato", "Ciclosporina", "Acitretina", "Apremilast"] },
+  { key: "fototerapia", label: "Fototerapia", options: ["UVB Banda Estrecha", "PUVA", "Excimer"] },
+  { key: "biologicos", label: "Biologicos", options: ["Adalimumab", "Secukinumab", "Ixekizumab", "Guselkumab", "Risankizumab", "Ustekinumab"] }
+];
+const THERAPY_SLOT_LIMIT = 3;
+
+primaryTherapyState = createEmptyTherapyState();
+followTherapyState = createEmptyTherapyState();
+
+const STABLE_TEXT_FIELDS = [
+  "procedencia",
+  "tratamiento_previo_consulta",
+  "fecha_inicio_psoriasis",
+  "fecha_diagnostico_psoriasis",
+  "curso_evolutivo",
+  "fenotipo",
+  "desenc_otros",
+  "tipo_tratamiento_previo",
+  "tratamiento_previo_detalle",
+  "motivo_suspension_previo",
+  "respuesta_previa"
+];
+
+const STABLE_ONE_FIELDS = [
+  "antecedentes_familiares_psoriasis",
+  "tratamiento_previo",
+  "afectacion_ungueal"
+];
+
+const STABLE_MANY_FIELDS = [
+  "desenc_infeccion",
+  "desenc_estres",
+  "desenc_farmacos",
+  "desenc_traumatismo_friccion",
+  "desenc_retirada_corticoides",
+  "desenc_tabaco",
+  "desenc_alcohol",
+  "comorb_obesidad",
+  "comorb_sobrepeso",
+  "comorb_hta",
+  "comorb_dislipemia",
+  "comorb_diabetes_prediabetes",
+  "comorb_sindrome_metabolico",
+  "comorb_esteatosis_hepatica",
+  "comorb_alteracion_transaminasas",
+  "comorb_hepatopatia_cronica",
+  "comorb_artritis_psoriasica_conocida",
+  "comorb_sospecha_artritis_psoriasica",
+  "comorb_eii",
+  "comorb_cardiopatia_isquemica",
+  "comorb_ictus_ait",
+  "comorb_insuficiencia_cardiaca",
+  "comorb_enfermedad_vascular_periferica",
+  "comorb_tabaquismo",
+  "comorb_alcohol",
+  "comorb_ansiedad_depresion",
+  "loc_cuero_cabelludo",
+  "loc_cara",
+  "loc_tronco",
+  "loc_miembros_superiores",
+  "loc_miembros_inferiores",
+  "loc_pliegues",
+  "loc_genitales",
+  "loc_palmas",
+  "loc_plantas",
+  "loc_unas",
+  "zona_esp_cuero_cabelludo",
+  "zona_esp_unas",
+  "zona_esp_cara",
+  "zona_esp_genitales",
+  "zona_esp_palmas",
+  "zona_esp_plantas",
+  "zona_esp_pliegues"
+];
+
+function buildTherapyFieldNames(prefix) {
+  const fields = [];
+  THERAPY_GROUPS.forEach(group => {
+    for (let i = 1; i <= THERAPY_SLOT_LIMIT; i++) {
+      fields.push(`${prefix}_${group.key}_farmaco_${i}`);
+      fields.push(`${prefix}_${group.key}_posologia_${i}`);
+    }
+    fields.push(`${prefix}_${group.key}_otros`);
+  });
+  return fields;
+}
+
+const VISIT_SPECIFIC_FIELDS = [
+  "bsa",
+  "pga",
+  "pasi",
+  "pasi_cabeza_eritema",
+  "pasi_cabeza_induracion",
+  "pasi_cabeza_escamas",
+  "pasi_cabeza_area",
+  "pasi_tronco_eritema",
+  "pasi_tronco_induracion",
+  "pasi_tronco_escamas",
+  "pasi_tronco_area",
+  "pasi_brazos_eritema",
+  "pasi_brazos_induracion",
+  "pasi_brazos_escamas",
+  "pasi_brazos_area",
+  "pasi_piernas_eritema",
+  "pasi_piernas_induracion",
+  "pasi_piernas_escamas",
+  "pasi_piernas_area",
+  "observaciones_clinicas",
+  "eva_prurito",
+  "eva_dolor",
+  "escozor",
+  "fisuracion",
+  "sangrado",
+  "alteracion_funcional",
+  "alteracion_sueno",
+  "dlqi_q1",
+  "dlqi_q2",
+  "dlqi_q3",
+  "dlqi_q4",
+  "dlqi_q5",
+  "dlqi_q6",
+  "dlqi_q7",
+  "dlqi_q8",
+  "dlqi_q9",
+  "dlqi_q10",
+  "dlqi_total",
+  "pure4_q1",
+  "pure4_q2",
+  "pure4_q3",
+  "pure4_q4",
+  "pure4_total_positivas",
+  "seguimiento_adherencia_categoria",
+  "seguimiento_ajuste_terapeutico",
+  "seguimiento_adherencia_morisky_q1",
+  "seguimiento_adherencia_morisky_q2",
+  "seguimiento_adherencia_morisky_q3",
+  "seguimiento_adherencia_morisky_q4",
+  "seguimiento_morisky_total_no_adherencia",
+  "seguimiento_motivo_cambio",
+  "seguimiento_efectos_adversos",
+  ...buildTherapyFieldNames("tx_seguimiento")
+];
+
+function setv(k, v) {
+  S[k] = v;
+}
+
+function normalizeId(value) {
+  return String(value || "").trim().toUpperCase();
+}
+
+function parseDateToTs(value) {
+  if (!value) return Number.NaN;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? Number.NaN : d.getTime();
+}
+
+function formatDateEs(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleDateString("es-ES");
+}
+
+function humanizeCode(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const map = {
+    perdida_eficacia: "pérdida de eficacia",
+    efectos_adversos: "efectos adversos",
+    buena: "buena",
+    regular: "regular",
+    mala: "mala"
+  };
+  return map[text] || text.replace(/_/g, " ");
+}
+
+function prettyTherapyGroupLabel(groupKey, fallback) {
+  const map = {
+    topicos: "Tópicos",
+    sinteticos_convencionales: "Sintéticos Convencionales",
+    fototerapia: "Fototerapia",
+    biologicos: "Biológicos"
+  };
+  return map[groupKey] || fallback || groupKey;
+}
+
+function notify(message) {
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(100%)";
+    setTimeout(() => toast.remove(), 250);
+  }, 1700);
+}
+
+function setBaseStatus(text, ok = false) {
+  baseStatus.textContent = text;
+  baseStatus.classList.toggle("ok", ok);
+}
+
+function copyToClipboard(text, successMessage) {
+  navigator.clipboard.writeText(text).then(() => {
+    notify(successMessage);
+  }).catch(() => {
+    const temp = document.createElement("textarea");
+    temp.value = text;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    document.body.removeChild(temp);
+    notify(successMessage);
+  });
+}
+
+function detectCsvDelimiter(csv) {
+  const firstLine = String(csv || "").split(/\r?\n/).find(line => line.trim() !== "") || "";
+  let inQuotes = false;
+  let commas = 0;
+  let semicolons = 0;
+  for (let i = 0; i < firstLine.length; i++) {
+    const c = firstLine[i];
+    const next = firstLine[i + 1];
+    if (c === "\"") {
+      if (inQuotes && next === "\"") {
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+    if (!inQuotes) {
+      if (c === ",") commas += 1;
+      if (c === ";") semicolons += 1;
+    }
+  }
+  return semicolons > commas ? ";" : ",";
+}
+
+function parseCSV(csv) {
+  const delimiter = detectCsvDelimiter(csv);
+  const rows = [];
+  let row = [];
+  let value = "";
+  let inQuotes = false;
+  for (let i = 0; i < csv.length; i++) {
+    const c = csv[i];
+    const next = csv[i + 1];
+    if (c === "\"") {
+      if (inQuotes && next === "\"") {
+        value += "\"";
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+    if (c === delimiter && !inQuotes) {
+      row.push(value);
+      value = "";
+      continue;
+    }
+    if ((c === "\n" || c === "\r") && !inQuotes) {
+      if (c === "\r" && next === "\n") i += 1;
+      row.push(value);
+      if (row.length > 1 || row[0] !== "") rows.push(row);
+      row = [];
+      value = "";
+      continue;
+    }
+    value += c;
+  }
+  row.push(value);
+  if (row.length > 1 || row[0] !== "") rows.push(row);
+  return rows;
+}
+
+function columnRefToIndex(ref) {
+  let idx = 0;
+  const letters = String(ref || "").replace(/[^A-Z]/gi, "").toUpperCase();
+  for (let i = 0; i < letters.length; i++) {
+    idx = idx * 26 + (letters.charCodeAt(i) - 64);
+  }
+  return Math.max(0, idx - 1);
+}
+
+function normalizeZipPath(path) {
+  const raw = String(path || "").replace(/^\/+/, "");
+  const parts = [];
+  raw.split("/").forEach(part => {
+    if (!part || part === ".") return;
+    if (part === "..") {
+      parts.pop();
+      return;
+    }
+    parts.push(part);
+  });
+  return parts.join("/");
+}
+
+async function parseXLSX(file) {
+  if (typeof JSZip === "undefined") {
+    throw new Error("JSZip no disponible para lectura XLSX");
+  }
+  const buffer = await file.arrayBuffer();
+  const zip = await JSZip.loadAsync(buffer);
+
+  const workbookXml = await zip.file("xl/workbook.xml")?.async("text");
+  const relsXml = await zip.file("xl/_rels/workbook.xml.rels")?.async("text");
+  if (!workbookXml || !relsXml) throw new Error("XLSX inválido (workbook)");
+
+  const parser = new DOMParser();
+  const workbookDoc = parser.parseFromString(workbookXml, "application/xml");
+  const relsDoc = parser.parseFromString(relsXml, "application/xml");
+
+  const firstSheet = workbookDoc.getElementsByTagName("sheet")[0];
+  if (!firstSheet) throw new Error("XLSX sin hojas");
+
+  const relId = firstSheet.getAttribute("r:id") || firstSheet.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id");
+  if (!relId) throw new Error("XLSX sin relación de hoja");
+
+  const relationships = Array.from(relsDoc.getElementsByTagName("Relationship"));
+  const rel = relationships.find(item => item.getAttribute("Id") === relId);
+  if (!rel) throw new Error("No se encontró la hoja relacionada");
+
+  const target = rel.getAttribute("Target") || "";
+  const sheetPath = normalizeZipPath(target.startsWith("/") ? target : `xl/${target}`);
+  const sheetXml = await zip.file(sheetPath)?.async("text");
+  if (!sheetXml) throw new Error("No se pudo leer la hoja del XLSX");
+
+  let sharedStrings = [];
+  const sharedXml = await zip.file("xl/sharedStrings.xml")?.async("text");
+  if (sharedXml) {
+    const sharedDoc = parser.parseFromString(sharedXml, "application/xml");
+    sharedStrings = Array.from(sharedDoc.getElementsByTagName("si")).map(si => {
+      const tNodes = Array.from(si.getElementsByTagName("t"));
+      return tNodes.map(t => t.textContent || "").join("");
+    });
+  }
+
+  const sheetDoc = parser.parseFromString(sheetXml, "application/xml");
+  const rowNodes = Array.from(sheetDoc.getElementsByTagName("row"));
+  const matrix = rowNodes.map(rowNode => {
+    const row = [];
+    const cells = Array.from(rowNode.getElementsByTagName("c"));
+    cells.forEach(cell => {
+      const ref = cell.getAttribute("r") || "";
+      const colIndex = columnRefToIndex(ref);
+      const type = cell.getAttribute("t") || "";
+      let value = "";
+      if (type === "inlineStr") {
+        value = Array.from(cell.getElementsByTagName("t")).map(t => t.textContent || "").join("");
+      } else {
+        const v = cell.getElementsByTagName("v")[0]?.textContent || "";
+        if (type === "s") value = sharedStrings[Number(v)] ?? "";
+        else value = v;
+      }
+      row[colIndex] = value;
+    });
+    return row;
+  }).filter(row => row.some(cell => String(cell || "").trim() !== ""));
+
+  return matrix;
+}
+
+async function loadBaseFromFile(file) {
+  const isXlsx = /\.xlsx$/i.test(file.name) || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  const matrix = isXlsx ? await parseXLSX(file) : parseCSV(await file.text());
+  if (!matrix.length) {
+    baseRows = [];
+    setVisitTypeLock(false);
+    setBaseStatus("Base vacía o inválida.", false);
+    setPreviousVisitContext(null);
+    return;
+  }
+  const header = matrix[0].map(h => String(h || "").trim());
+  baseRows = matrix.slice(1).map((cells, index) => {
+    const row = {};
+    header.forEach((key, i) => {
+      row[key] = String(cells[i] ?? "").trim();
+    });
+    row.__index = index;
+    row.__id = normalizeId(row.nusha || row.nhc);
+    return row;
+  }).filter(row => row.__id);
+  baseFileName = file.name;
+  setBaseStatus(`Base cargada: ${baseFileName} (${baseRows.length} filas)`, true);
+  if (normalizeId(nushaInput.value)) autoSearchByNusha();
+  else {
+    setVisitTypeLock(false);
+    setPreviousVisitContext(null);
+  }
+}
+
+function getLatestVisitRow(id, currentDate) {
+  const candidates = baseRows.filter(r => r.__id === id);
+  if (!candidates.length) return null;
+  const currentTs = parseDateToTs(currentDate);
+  let scoped = candidates;
+  if (!Number.isNaN(currentTs)) {
+    const previous = candidates.filter(r => {
+      const ts = parseDateToTs(r.fecha_visita);
+      return !Number.isNaN(ts) && ts < currentTs;
+    });
+    if (previous.length) scoped = previous;
+  }
+  scoped.sort((a, b) => {
+    const ta = parseDateToTs(a.fecha_visita);
+    const tb = parseDateToTs(b.fecha_visita);
+    if (Number.isNaN(ta) && Number.isNaN(tb)) return b.__index - a.__index;
+    if (Number.isNaN(ta)) return 1;
+    if (Number.isNaN(tb)) return -1;
+    return tb - ta;
+  });
+  return scoped[0] || null;
+}
+
+function getPreviousDecisionLabel(row) {
+  const motivoCambio = String(row.seguimiento_motivo_cambio || "").trim();
+  if (motivoCambio) return `Cambio de tratamiento por ${humanizeCode(motivoCambio)}`;
+  const ajuste = String(row.seguimiento_ajuste_terapeutico || "").trim();
+  if (ajuste) return "Continuidad de tratamiento con ajuste";
+  if (String(row.tipo_visita || "").trim().toLowerCase() === "seguimiento") return "Continuidad de tratamiento";
+  return "Primera visita registrada";
+}
+
+function buildTherapyGroupLines(row, prefix) {
+  const groups = [];
+  THERAPY_GROUPS.forEach(group => {
+    const entries = [];
+    for (let i = 1; i <= THERAPY_SLOT_LIMIT; i++) {
+      const drug = String(row[`${prefix}_${group.key}_farmaco_${i}`] || "").trim();
+      const posology = String(row[`${prefix}_${group.key}_posologia_${i}`] || "").trim();
+      if (drug || posology) entries.push(`${drug || "(Sin tratamiento)"}${posology ? ` | ${posology}` : ""}`);
+    }
+    parseTherapyOthers(row[`${prefix}_${group.key}_otros`]).forEach(item => {
+      if (item.drug || item.posology) entries.push(`${item.drug || "(Sin tratamiento)"}${item.posology ? ` | ${item.posology}` : ""}`);
+    });
+    if (entries.length) groups.push(`${prettyTherapyGroupLabel(group.key, group.label)}: ${entries.join(" ; ")}`);
+  });
+  return groups;
+}
+
+function buildTherapySummary(row, prefix) {
+  return buildTherapyGroupLines(row, prefix).join(" || ");
+}
+
+function setPreviousVisitContext(row) {
+  if (!previousTxContext) return;
+  if (!row) {
+    previousTxContext.innerHTML = '<div class="tx-prev-empty">Sin visita previa asociada al NUSHA actual.</div>';
+    return;
+  }
+  const dateText = formatDateEs(row.fecha_visita) || "Fecha no disponible";
+  const decision = getPreviousDecisionLabel(row);
+  const prefix = hasTherapyDataInRow(row, "tx_seguimiento")
+    ? "tx_seguimiento"
+    : hasTherapyDataInRow(row, "tx_primera")
+      ? "tx_primera"
+      : "";
+  const treatmentLines = prefix ? buildTherapyGroupLines(row, prefix) : [];
+  const treatmentHtml = treatmentLines.length
+    ? treatmentLines.map(line => `<div class="tx-prev-line">${escapeHtml(line)}</div>`).join("")
+    : '<div class="tx-prev-line">Sin tratamiento registrado.</div>';
+
+  previousTxContext.innerHTML = `
+    <div class="tx-prev-title">Última Visita</div>
+    <div class="tx-prev-date">${escapeHtml(dateText)}</div>
+    <div class="tx-prev-decision">: ${escapeHtml(decision)}.</div>
+    <div class="tx-prev-subtitle">Tratamiento Registrado</div>
+    ${treatmentHtml}
+  `;
+}
+
+function bindOne(el) {
+  const name = el.dataset.name;
+  if (!name) return;
+  const buttons = [...el.querySelectorAll("button")];
+  if (!buttons.length) return;
+  oneGroups.set(name, { buttons });
+  buttons.forEach(button => {
+    button.onclick = () => {
+      buttons.forEach(x => x.classList.remove("active"));
+      button.classList.add("active");
+      setv(name, button.dataset.v);
+      if (name === "tratamiento_previo") {
+        document.getElementById("prevBox").classList.toggle("hidden", button.dataset.v !== "1");
+      }
+      recalc();
+    };
+  });
+}
+
+function setOneValue(name, value) {
+  const group = oneGroups.get(name);
+  if (!group) return;
+  const button = group.buttons.find(b => b.dataset.v === String(value));
+  group.buttons.forEach(b => b.classList.remove("active"));
+  if (button) {
+    button.classList.add("active");
+    setv(name, String(value));
+  } else {
+    delete S[name];
+  }
+  if (name === "tratamiento_previo") {
+    document.getElementById("prevBox").classList.toggle("hidden", String(value) !== "1");
+  }
+}
+
+function bindManyButtons() {
+  document.querySelectorAll(".many button").forEach(button => {
+    button.onclick = () => {
+      button.classList.toggle("active");
+      const active = button.classList.contains("active");
+      if (button.dataset.k) setv(button.dataset.k, active ? "1" : "0");
+      if (button.dataset.zone) setv(button.dataset.zone, active ? "1" : "0");
+      if (button.closest("#locToggleBox")) updateSpecialBadge();
+      recalc();
+    };
+  });
+}
+
+function setManyValue(key, active) {
+  const buttons = document.querySelectorAll(`.many button[data-k="${key}"],.many button[data-zone="${key}"]`);
+  buttons.forEach(button => button.classList.toggle("active", active));
+  setv(key, active ? "1" : "0");
+}
+
+function bindNamedInputs() {
+  document.querySelectorAll("input[name],select[name],textarea[name]").forEach(el => {
+    const handler = () => {
+      if (!applyingPreload) setv(el.name, el.value);
+      if (el.name === "tipo_visita") mode();
+      recalc();
+    };
+    el.addEventListener("input", handler);
+    el.addEventListener("change", handler);
+  });
+}
+
+function setFieldValue(name, value) {
+  const el = document.querySelector(`[name="${name}"]`);
+  if (!el) return;
+  if (el.tagName === "SELECT") {
+    const hasValue = [...el.options].some(o => o.value === value);
+    if (hasValue) {
+      el.value = value;
+    } else {
+      const byText = [...el.options].find(o => o.textContent.trim().toLowerCase() === String(value || "").trim().toLowerCase());
+      if (byText) el.value = byText.value;
+    }
+  } else {
+    el.value = value ?? "";
+  }
+  setv(name, el.value);
+}
+
+function renderScale(containerId, name) {
+  const box = document.getElementById(containerId);
+  box.innerHTML = "";
+  for (let i = 1; i <= 10; i++) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "scale-btn";
+    button.textContent = String(i);
+    button.dataset.v = String(i);
+    button.onclick = () => {
+      box.querySelectorAll(".scale-btn").forEach(x => x.classList.remove("active"));
+      button.classList.add("active");
+      setv(name, String(i));
+      recalc();
+    };
+    box.appendChild(button);
+  }
+}
+
+function setScaleValue(name, value) {
+  const id = name === "eva_prurito" ? "evaPruritoScale" : "evaDolorScale";
+  const box = document.getElementById(id);
+  box.querySelectorAll(".scale-btn").forEach(btn => {
+    const on = btn.dataset.v === String(value);
+    btn.classList.toggle("active", on);
+  });
+  if (value) setv(name, String(value)); else delete S[name];
+}
+
+function renderDLQI() {
+  const body = document.getElementById("dlqiBody");
+  body.innerHTML = DLQI_ITEMS.map(item => {
+    const options = DLQI_OPTION_SETS[item.optionSet] || [];
+    if (item.id === "dlqi_q7") {
+      const followOptions = DLQI_OPTION_SETS[item.followupOptionSet] || [];
+      return `<tr><td>${item.text}<span class="question-subnote">${item.extra}</span></td><td>
+        <div class="answer-group" data-dlqi-main="dlqi_q7">
+          ${options.map(opt => `<button type="button" class="answer-option" data-dlqi-option="dlqi_q7_main" data-value="${opt.value}">${opt.label}</button>`).join("")}
+        </div>
+        <div class="dlqi-subquestion hidden" data-dlqi-followup-wrap="dlqi_q7">
+          <div class="answer-group" data-dlqi-followup="dlqi_q7">
+            ${followOptions.map(opt => `<button type="button" class="answer-option" data-dlqi-option="dlqi_q7" data-value="${opt.value}">${opt.label}</button>`).join("")}
+          </div>
+        </div>
+      </td></tr>`;
+    }
+    return `<tr><td>${item.text}</td><td><div class="answer-group" data-dlqi-group="${item.id}">
+      ${options.map(opt => `<button type="button" class="answer-option" data-dlqi-option="${item.id}" data-value="${opt.value}">${opt.label}</button>`).join("")}
+    </div></td></tr>`;
+  }).join("");
+  bindDlqiInteractions();
+}
+
+function bindDlqiInteractions() {
+  document.querySelectorAll('[data-dlqi-group]').forEach(group => {
+    group.querySelectorAll(".answer-option").forEach(button => {
+      button.onclick = () => {
+        group.querySelectorAll(".answer-option").forEach(x => x.classList.remove("active"));
+        button.classList.add("active");
+        setv(button.dataset.dlqiOption, button.dataset.value);
+        recalc();
+      };
+    });
+  });
+  const mainGroup = document.querySelector('[data-dlqi-main="dlqi_q7"]');
+  const followupWrap = document.querySelector('[data-dlqi-followup-wrap="dlqi_q7"]');
+  const followupGroup = document.querySelector('[data-dlqi-followup="dlqi_q7"]');
+  if (mainGroup) {
+    mainGroup.querySelectorAll(".answer-option").forEach(button => {
+      button.onclick = () => {
+        mainGroup.querySelectorAll(".answer-option").forEach(x => x.classList.remove("active"));
+        button.classList.add("active");
+        const value = button.dataset.value;
+        setv("dlqi_q7_main", value);
+        if (value === "yes") {
+          setv("dlqi_q7", "3");
+          followupWrap?.classList.add("hidden");
+          clearDlqiFollowupSelection();
+        } else if (value === "na") {
+          setv("dlqi_q7", "0");
+          followupWrap?.classList.add("hidden");
+          clearDlqiFollowupSelection();
+        } else {
+          delete S.dlqi_q7;
+          followupWrap?.classList.remove("hidden");
+        }
+        recalc();
+      };
+    });
+  }
+  if (followupGroup) {
+    followupGroup.querySelectorAll(".answer-option").forEach(button => {
+      button.onclick = () => {
+        followupGroup.querySelectorAll(".answer-option").forEach(x => x.classList.remove("active"));
+        button.classList.add("active");
+        setv("dlqi_q7", button.dataset.value);
+        recalc();
+      };
+    });
+  }
+}
+
+function clearDlqiFollowupSelection() {
+  document.querySelectorAll('[data-dlqi-followup="dlqi_q7"] .answer-option').forEach(button => button.classList.remove("active"));
+}
+
+function renderPURE4() {
+  const box = document.getElementById("pureBox");
+  box.innerHTML = "";
+  PURE4_ITEMS.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "grid";
+    row.innerHTML = `<div class="field w8"><label>${item.text}</label></div><div class="field w4"><div class="toggle one" data-name="${item.key}"><button type="button" data-v="1">Sí</button><button type="button" data-v="0">No</button></div></div>`;
+    box.appendChild(row);
+  });
+}
+
+function renderMorisky() {
+  const box = document.getElementById("moriskyBox");
+  box.innerHTML = "";
+  MORISKY_ITEMS.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "grid";
+    row.innerHTML = `<div class="field w8"><label>${item.text}</label></div><div class="field w4"><div class="toggle morisky-toggle" data-morisky-key="${item.key}"><button type="button" data-v="${item.yesScore}">Sí</button><button type="button" data-v="${item.noScore}">No</button></div></div>`;
+    box.appendChild(row);
+  });
+}
+
+function setMoriskyValue(key, value) {
+  const toggle = document.querySelector(`#moriskyBox .morisky-toggle[data-morisky-key="${key}"]`);
+  if (!toggle) return;
+  const buttons = [...toggle.querySelectorAll("button")];
+  buttons.forEach(btn => btn.classList.remove("active"));
+  const selected = buttons.find(btn => btn.dataset.v === String(value));
+  if (selected) {
+    selected.classList.add("active");
+    setv(key, String(value));
+  } else {
+    delete S[key];
+  }
+}
+
+function bindMoriskyInteractions() {
+  document.querySelectorAll("#moriskyBox .morisky-toggle button").forEach(button => {
+    button.onclick = () => {
+      const toggle = button.closest(".morisky-toggle");
+      if (!toggle) return;
+      const key = toggle.dataset.moriskyKey;
+      if (!key) return;
+      setMoriskyValue(key, button.dataset.v ?? "");
+      recalc();
+    };
+  });
+}
+
+function recalcDLQI() {
+  let total = 0;
+  for (let i = 1; i <= 10; i++) total += Number(S[`dlqi_q${i}`] || 0);
+  setv("dlqi_total", String(total));
+  document.getElementById("dlqiTotal").textContent = String(total);
+}
+
+function recalcPUREMorisky() {
+  let pure = 0;
+  let morisky = 0;
+  const moriskyAnswers = [];
+  for (let i = 1; i <= 4; i++) {
+    pure += Number(S[`pure4_q${i}`] || 0);
+    const value = S[`seguimiento_adherencia_morisky_q${i}`];
+    moriskyAnswers.push(value);
+    if (value === "0" || value === "1") {
+      morisky += Number(value);
+    }
+  }
+  setv("pure4_total_positivas", String(pure));
+  const moriskyAnswered = moriskyAnswers.filter(value => value === "0" || value === "1").length;
+  const moriskyStatusEl = document.getElementById("moriskyStatus");
+  if (moriskyAnswered === 4) {
+    const adherente = moriskyAnswers.every((value, idx) => value === MORISKY_ADHERENT_PATTERN[idx]);
+    setv("seguimiento_morisky_total_no_adherencia", String(morisky));
+    document.getElementById("moriskyTotal").textContent = String(morisky);
+    if (moriskyStatusEl) moriskyStatusEl.textContent = adherente ? "Morisky-Green: adherente" : "Morisky-Green: no adherente";
+  } else {
+    delete S.seguimiento_morisky_total_no_adherencia;
+    document.getElementById("moriskyTotal").textContent = moriskyAnswered === 0 ? "Pendiente" : `Incompleto (${moriskyAnswered}/4)`;
+    if (moriskyStatusEl) moriskyStatusEl.textContent = moriskyAnswered === 0 ? "Morisky-Green: pendiente" : "Morisky-Green: incompleto";
+  }
+  document.getElementById("pureTotal").textContent = String(pure);
+  document.getElementById("pureAlert").textContent = pure >= 2 ? "PURE-4 positivo (≥2): valorar derivación Derma-Reuma." : "";
+  if (pure >= 2 && !S.derivacion_derma_reuma) setOneValue("derivacion_derma_reuma", "1");
+}
+
+function renderPasiTable() {
+  const body = document.getElementById("pasiBody");
+  body.innerHTML = "";
+  PASI_REGIONS.forEach(region => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${region.label}</td><td>${buildPasiSelect(region.key, "eritema", 4)}</td><td>${buildPasiSelect(region.key, "induracion", 4)}</td><td>${buildPasiSelect(region.key, "escamas", 4)}</td><td>${buildPasiSelect(region.key, "area", 6)}</td><td>${region.weight.toFixed(2)}</td><td><span id="pasi_sub_${region.key}">0.0</span></td>`;
+    body.appendChild(row);
+  });
+  body.querySelectorAll("select").forEach(select => select.addEventListener("change", recalc));
+}
+
+function buildPasiSelect(region, metric, max) {
+  let html = `<select data-pasi="pasi_${region}_${metric}"><option value="0">0</option>`;
+  for (let i = 1; i <= max; i++) html += `<option value="${i}">${i}</option>`;
+  return html + "</select>";
+}
+
+function recalcPASI() {
+  let total = 0;
+  PASI_REGIONS.forEach(region => {
+    const er = Number(document.querySelector(`select[data-pasi="pasi_${region.key}_eritema"]`)?.value || 0);
+    const ind = Number(document.querySelector(`select[data-pasi="pasi_${region.key}_induracion"]`)?.value || 0);
+    const esc = Number(document.querySelector(`select[data-pasi="pasi_${region.key}_escamas"]`)?.value || 0);
+    const area = Number(document.querySelector(`select[data-pasi="pasi_${region.key}_area"]`)?.value || 0);
+    setv(`pasi_${region.key}_eritema`, String(er));
+    setv(`pasi_${region.key}_induracion`, String(ind));
+    setv(`pasi_${region.key}_escamas`, String(esc));
+    setv(`pasi_${region.key}_area`, String(area));
+    const subtotal = (er + ind + esc) * area * region.weight;
+    total += subtotal;
+    document.getElementById(`pasi_sub_${region.key}`).textContent = subtotal.toFixed(1);
+  });
+  const formatted = total.toFixed(1);
+  setv("pasi", formatted);
+  document.getElementById("pasiTotalView").textContent = formatted;
+  document.getElementById("pasiResult").value = formatted;
+}
+
+function updateSpecialBadge() {
+  const wrap = document.getElementById("specialBadgeWrap");
+  const title = document.getElementById("specialTitle");
+  const active = [];
+  document.querySelectorAll("#locToggleBox button[data-zone]").forEach(button => {
+    if (button.classList.contains("active")) active.push({ zone: button.dataset.zone, label: button.textContent.trim() });
+  });
+  wrap.innerHTML = "";
+  active.forEach(item => {
+    const badge = document.createElement("span");
+    badge.className = "special-badge";
+    badge.textContent = item.label;
+    wrap.appendChild(badge);
+  });
+  title.classList.toggle("hidden", active.length === 0);
+}
+
+function createEmptyTherapyState() {
+  const state = {};
+  THERAPY_GROUPS.forEach(group => state[group.key] = [{ drug: "", posology: "" }]);
+  return state;
+}
+
+function therapyPrefixFromMode(mode) {
+  return mode === "primary" ? "tx_primera" : "tx_seguimiento";
+}
+
+function listTherapyColumns(prefix) {
+  return buildTherapyFieldNames(prefix);
+}
+
+function hasTherapyDataInRow(row, prefix) {
+  return listTherapyColumns(prefix).some(key => String(row[key] || "").trim() !== "");
+}
+
+function parseTherapyOthers(raw) {
+  const parts = String(raw || "").split("||").map(item => item.trim()).filter(Boolean);
+  return parts.map(part => {
+    const idx = part.indexOf("|");
+    if (idx < 0) return { drug: part, posology: "" };
+    return { drug: part.slice(0, idx).trim(), posology: part.slice(idx + 1).trim() };
+  });
+}
+
+function therapyStateFromRow(row, prefix) {
+  const state = createEmptyTherapyState();
+  THERAPY_GROUPS.forEach(group => {
+    const entries = [];
+    for (let i = 1; i <= THERAPY_SLOT_LIMIT; i++) {
+      const drug = String(row[`${prefix}_${group.key}_farmaco_${i}`] || "").trim();
+      const posology = String(row[`${prefix}_${group.key}_posologia_${i}`] || "").trim();
+      if (drug || posology) entries.push({ drug, posology });
+    }
+    const extras = parseTherapyOthers(row[`${prefix}_${group.key}_otros`]);
+    entries.push(...extras);
+    state[group.key] = entries.length ? entries : [{ drug: "", posology: "" }];
+  });
+  return state;
+}
+
+function preloadFollowTherapyFromRow(row) {
+  if (hasTherapyDataInRow(row, "tx_seguimiento")) {
+    followTherapyState = therapyStateFromRow(row, "tx_seguimiento");
+  } else if (hasTherapyDataInRow(row, "tx_primera")) {
+    followTherapyState = therapyStateFromRow(row, "tx_primera");
+  } else {
+    followTherapyState = createEmptyTherapyState();
+  }
+}
+
+function renderTherapyGroups(mode) {
+  THERAPY_GROUPS.forEach(group => renderTherapyRows(mode, group.key));
+}
+
+function renderTherapyRows(mode, groupKey) {
+  const group = THERAPY_GROUPS.find(item => item.key === groupKey);
+  const state = mode === "primary" ? primaryTherapyState : followTherapyState;
+  const containerId = mode === "primary" ? `therapy-${groupKey}` : `follow-therapy-${groupKey}`;
+  const container = document.getElementById(containerId);
+  if (!group || !container) return;
+  container.innerHTML = state[groupKey].map((entry, index) => `
+    <div class="therapy-row">
+      <div>
+        <label>Tratamiento</label>
+        <select data-therapy-mode="${mode}" data-therapy-group="${groupKey}" data-therapy-index="${index}" data-therapy-field="drug">
+          <option value=""></option>
+          ${[...group.options, ...((entry.drug && !group.options.includes(entry.drug)) ? [entry.drug] : [])].map(option => {
+            const safe = escapeHtml(option);
+            return `<option value="${safe}" ${entry.drug === option ? "selected" : ""}>${safe}</option>`;
+          }).join("")}
+        </select>
+      </div>
+      <div>
+        <label>Dosis / Frecuencia</label>
+        <input type="text" value="${escapeHtml(entry.posology)}" data-therapy-mode="${mode}" data-therapy-group="${groupKey}" data-therapy-index="${index}" data-therapy-field="posology">
+      </div>
+      <div class="therapy-actions">
+        <button type="button" class="therapy-action add" data-therapy-add-mode="${mode}" data-therapy-add="${groupKey}" aria-label="Añadir linea">+</button>
+        ${index > 0 ? `<button type="button" class="therapy-action remove" data-therapy-remove-mode="${mode}" data-therapy-remove="${groupKey}" data-therapy-remove-index="${index}" aria-label="Eliminar linea">−</button>` : '<span class="therapy-action-placeholder"></span>'}
+      </div>
+    </div>
+  `).join("");
+}
+
+function bindTherapyEvents() {
+  document.querySelectorAll("[data-therapy-field]").forEach(el => {
+    const eventName = el.tagName === "SELECT" ? "change" : "input";
+    el.addEventListener(eventName, () => {
+      const mode = el.dataset.therapyMode;
+      const group = el.dataset.therapyGroup;
+      const idx = Number(el.dataset.therapyIndex);
+      const field = el.dataset.therapyField;
+      const state = mode === "primary" ? primaryTherapyState : followTherapyState;
+      state[group][idx][field] = el.value;
+      syncTherapiesToS();
+    });
+  });
+
+  document.querySelectorAll("[data-therapy-add]").forEach(button => {
+    button.onclick = () => {
+      const mode = button.dataset.therapyAddMode;
+      const group = button.dataset.therapyAdd;
+      const state = mode === "primary" ? primaryTherapyState : followTherapyState;
+      state[group].push({ drug: "", posology: "" });
+      renderTherapyRows(mode, group);
+      bindTherapyEvents();
+    };
+  });
+
+  document.querySelectorAll("[data-therapy-remove]").forEach(button => {
+    button.onclick = () => {
+      const mode = button.dataset.therapyRemoveMode;
+      const group = button.dataset.therapyRemove;
+      const index = Number(button.dataset.therapyRemoveIndex);
+      const state = mode === "primary" ? primaryTherapyState : followTherapyState;
+      if (index <= 0) return;
+      state[group].splice(index, 1);
+      if (!state[group].length) state[group].push({ drug: "", posology: "" });
+      renderTherapyRows(mode, group);
+      bindTherapyEvents();
+      syncTherapiesToS();
+    };
+  });
+}
+
+function syncTherapiesToS() {
+  const syncScope = (mode, state) => {
+    const prefix = therapyPrefixFromMode(mode);
+    listTherapyColumns(prefix).forEach(key => delete S[key]);
+    THERAPY_GROUPS.forEach(group => {
+      const entries = state[group.key]
+        .map(entry => ({ drug: String(entry.drug || "").trim(), posology: String(entry.posology || "").trim() }))
+        .filter(entry => entry.drug || entry.posology);
+      const top = entries.slice(0, THERAPY_SLOT_LIMIT);
+      const rest = entries.slice(THERAPY_SLOT_LIMIT);
+      for (let i = 1; i <= THERAPY_SLOT_LIMIT; i++) {
+        const entry = top[i - 1] || { drug: "", posology: "" };
+        setv(`${prefix}_${group.key}_farmaco_${i}`, entry.drug);
+        setv(`${prefix}_${group.key}_posologia_${i}`, entry.posology);
+      }
+      const others = rest.map(entry => `${entry.drug}|${entry.posology}`).join(" || ");
+      setv(`${prefix}_${group.key}_otros`, others);
+    });
+  };
+  syncScope("primary", primaryTherapyState);
+  syncScope("follow", followTherapyState);
+}
+
+function setDecision(value) {
+  const decision = value || "";
+  continueBtn.classList.toggle("active", decision === "continuar");
+  changeBtn.classList.toggle("active", decision === "cambiar");
+  continueBlock.classList.toggle("hidden", decision !== "continuar");
+  changeBlock.classList.toggle("hidden", decision !== "cambiar");
+  if (decision !== "continuar") {
+    setFieldValue("seguimiento_adherencia_categoria", "");
+    setFieldValue("seguimiento_ajuste_terapeutico", "");
+    MORISKY_ITEMS.forEach(item => setMoriskyValue(item.key, ""));
+    delete S.seguimiento_morisky_total_no_adherencia;
+    document.getElementById("moriskyTotal").textContent = "Pendiente";
+    document.getElementById("moriskyStatus").textContent = "Morisky-Green: pendiente";
+  }
+  if (decision !== "cambiar") {
+    setFieldValue("seguimiento_motivo_cambio", "");
+    setOneValue("seguimiento_efectos_adversos", "");
+  }
+}
+
+function mode() {
+  const type = visitTypeSelect.value;
+  document.getElementById("firstSec").classList.toggle("hidden", type !== "primera");
+  document.getElementById("followSec").classList.toggle("hidden", type !== "seguimiento");
+}
+
+function setVisitTypeLock(lockToFollowup) {
+  visitTypeLockedToFollowup = lockToFollowup;
+  const primeraOption = visitTypeSelect.querySelector('option[value="primera"]');
+  if (primeraOption) primeraOption.disabled = lockToFollowup;
+  visitTypeSelect.disabled = lockToFollowup;
+  if (lockToFollowup) {
+    setFieldValue("tipo_visita", "seguimiento");
+    if (visitModeHint) visitModeHint.textContent = "Paciente encontrado en base: modo Seguimiento bloqueado automáticamente.";
+  } else if (visitModeHint) {
+    visitModeHint.textContent = "Sin bloqueo: puedes elegir Primera Visita o Visita de Seguimiento.";
+  }
+  mode();
+}
+
+function rememberDetailsDefaults() {
+  document.querySelectorAll("details.section").forEach(detail => detailsDefault.set(detail, detail.hasAttribute("open")));
+}
+
+function resetDetailsState() {
+  detailsDefault.forEach((open, detail) => detail.open = open);
+}
+
+function clearVisitSpecificUI() {
+  VISIT_SPECIFIC_FIELDS.forEach(key => delete S[key]);
+  document.querySelectorAll(".scale-btn.active,.answer-option.active,.toggle button.active").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".dlqi-subquestion").forEach(el => el.classList.add("hidden"));
+  VISIT_SPECIFIC_FIELDS.forEach(name => {
+    const el = document.querySelector(`[name="${name}"]`);
+    if (!el) return;
+    if (el.tagName === "SELECT") el.selectedIndex = 0;
+    else el.value = "";
+  });
+  document.querySelectorAll('[data-pasi]').forEach(select => select.value = "0");
+  document.getElementById("pasiResult").value = "";
+  document.getElementById("pasiTotalView").textContent = "0.0";
+  document.getElementById("pureTotal").textContent = "0";
+  document.getElementById("pureAlert").textContent = "";
+  document.getElementById("dlqiTotal").textContent = "0";
+  document.getElementById("moriskyTotal").textContent = "Pendiente";
+  document.getElementById("moriskyStatus").textContent = "Morisky-Green: pendiente";
+  followTherapyState = createEmptyTherapyState();
+  renderTherapyGroups("follow");
+  bindTherapyEvents();
+  setDecision("");
+}
+
+function deriveTratamientoPrevioConsulta(row) {
+  if (row.tratamiento_previo_consulta) return row.tratamiento_previo_consulta;
+  const prefix = hasTherapyDataInRow(row, "tx_seguimiento")
+    ? "tx_seguimiento"
+    : hasTherapyDataInRow(row, "tx_primera")
+      ? "tx_primera"
+      : "";
+  if (prefix) {
+    const lines = [];
+    THERAPY_GROUPS.forEach(group => {
+      const entries = [];
+      for (let i = 1; i <= THERAPY_SLOT_LIMIT; i++) {
+        const drug = String(row[`${prefix}_${group.key}_farmaco_${i}`] || "").trim();
+        const posology = String(row[`${prefix}_${group.key}_posologia_${i}`] || "").trim();
+        if (drug || posology) entries.push(`${drug}${posology ? " | " + posology : ""}`);
+      }
+      parseTherapyOthers(row[`${prefix}_${group.key}_otros`]).forEach(item => {
+        entries.push(`${item.drug}${item.posology ? " | " + item.posology : ""}`);
+      });
+      if (entries.length) lines.push(`${group.label}: ${entries.join(" ; ")}`);
+    });
+    if (lines.length) {
+      if (String(row.tipo_visita || "").trim().toLowerCase() === "seguimiento") {
+        return `${getPreviousDecisionLabel(row)} || ${lines.join(" || ")}`;
+      }
+      return lines.join(" || ");
+    }
+  }
+  const lines = [];
+  for (let i = 1; i <= 5; i++) {
+    const tx = row[`tx_instaurado_${i}`] || "";
+    const pos = row[`tx_posologia_${i}`] || "";
+    if (tx || pos) lines.push(`${tx}${pos ? " | " + pos : ""}`);
+  }
+  return lines.join(" ; ");
+}
+
+function applyStablePreload(row) {
+  applyingPreload = true;
+  clearVisitSpecificUI();
+  const resolvedNusha = row.nusha || row.nhc || "";
+  setFieldValue("nusha", resolvedNusha);
+  setVisitTypeLock(true);
+  STABLE_TEXT_FIELDS.forEach(key => {
+    const value = key === "tratamiento_previo_consulta" ? deriveTratamientoPrevioConsulta(row) : (row[key] ?? "");
+    if (key === "tratamiento_previo_consulta") {
+      setFieldValue(key, value || "");
+      return;
+    }
+    if (value !== "") setFieldValue(key, value);
+  });
+  STABLE_ONE_FIELDS.forEach(key => setOneValue(key, row[key] ?? ""));
+  STABLE_MANY_FIELDS.forEach(key => setManyValue(key, String(row[key] || "0") === "1"));
+  preloadFollowTherapyFromRow(row);
+  renderTherapyGroups("follow");
+  bindTherapyEvents();
+  syncTherapiesToS();
+  updateSpecialBadge();
+  setPreviousVisitContext(row);
+  document.getElementById("prevBox").classList.toggle("hidden", S.tratamiento_previo !== "1");
+  applyingPreload = false;
+  recalc();
+  notify("Datos estables precargados desde visita previa.");
+}
+
+function autoSearchByNusha() {
+  if (!baseRows.length) return;
+  const id = normalizeId(nushaInput.value);
+  if (!id) {
+    setVisitTypeLock(false);
+    setPreviousVisitContext(null);
+    return;
+  }
+  const currentDate = document.querySelector('[name="fecha_visita"]')?.value || "";
+  const found = getLatestVisitRow(id, currentDate);
+  if (!found) {
+    setVisitTypeLock(false);
+    setBaseStatus(`Base cargada: ${baseFileName} (${baseRows.length} filas). NUSHA no encontrado.`, false);
+    setPreviousVisitContext(null);
+    return;
+  }
+  setBaseStatus(`Base cargada: ${baseFileName} (${baseRows.length} filas). NUSHA encontrado y precargado.`, true);
+  applyStablePreload(found);
+}
+
+function recalc() {
+  recalcDLQI();
+  recalcPUREMorisky();
+  recalcPASI();
+  syncTherapiesToS();
+}
+
+function gather() {
+  syncTherapiesToS();
+  document.querySelectorAll("input[name],select[name],textarea[name]").forEach(el => setv(el.name, el.value));
+  const row = {};
+  HEADERS.forEach(h => row[h] = S[h] ?? "");
+  return row;
+}
+
+function esc(value) {
+  const text = String(value ?? "");
+  return /[",\n]/.test(text) ? `"${text.replace(/"/g, "\"\"")}"` : text;
+}
+
+function getLines(row, pairs) {
+  return pairs.filter(([key]) => row[key]).map(([key, label]) => `${label}: ${row[key]}`);
+}
+
+function getTreatmentLines(row, prefix) {
+  const lines = [];
+  THERAPY_GROUPS.forEach(group => {
+    const entries = [];
+    for (let i = 1; i <= THERAPY_SLOT_LIMIT; i++) {
+      const tx = String(row[`${prefix}_${group.key}_farmaco_${i}`] || "").trim();
+      const pos = String(row[`${prefix}_${group.key}_posologia_${i}`] || "").trim();
+      if (tx || pos) entries.push(`${tx || "(Sin Tratamiento)"}${pos ? " | " + pos : ""}`);
+    }
+    parseTherapyOthers(row[`${prefix}_${group.key}_otros`]).forEach(entry => {
+      entries.push(`${entry.drug || "(Sin Tratamiento)"}${entry.posology ? " | " + entry.posology : ""}`);
+    });
+    if (entries.length) lines.push(`- ${group.label}: ${entries.join(" ; ")}`);
+  });
+  return lines;
+}
+
+function block(title, lines) {
+  if (!lines.length) return "";
+  return `${title}\n${"-".repeat(title.length)}\n${lines.join("\n")}\n`;
+}
+
+function toTxt(row) {
+  const general = getLines(row, [["nusha", "NUSHA"], ["fecha_visita", "Fecha de la Visita"], ["tipo_visita", "Tipo de Visita"], ["procedencia", "Procedencia"], ["tratamiento_previo_consulta", "Tratamiento Previo"]]);
+  const actividad = getLines(row, [["curso_evolutivo", "Curso Evolutivo"], ["fenotipo", "Fenotipo"], ["bsa", "BSA"], ["pga", "PGA"], ["pasi", "PASI"], ["observaciones_clinicas", "Observaciones Clínicas"]]);
+  const impacto = getLines(row, [["eva_prurito", "EVA Prurito"], ["eva_dolor", "EVA Dolor"], ["dlqi_total", "DLQI Total"], ["pure4_total_positivas", "PURE-4 Positivas"], ["seguimiento_morisky_total_no_adherencia", "Morisky No Adherencia"]]);
+  const plan = getLines(row, [["seguimiento_adherencia_categoria", "Adherencia"], ["seguimiento_ajuste_terapeutico", "Ajuste Terapéutico"], ["seguimiento_motivo_cambio", "Motivo del Cambio"], ["seguimiento_efectos_adversos", "Efectos Adversos"], ["derivacion_derma_reuma", "Derivación Derma-Reuma"], ["impresion_clinica", "Impresión Clínica"], ["objetivo_terapeutico", "Objetivo Terapéutico"], ["otras_derivaciones", "Otras Derivaciones"], ["proxima_revision", "Próxima Revisión"], ["comentarios_finales", "Comentarios Finales"]]);
+  const txPrimera = getTreatmentLines(row, "tx_primera");
+  const txSeguimiento = getTreatmentLines(row, "tx_seguimiento");
+  return [
+    "FORMULARIO ESTRUCTURADO DE PSORIASIS - HOSPITAL UNIVERSITARIO DE VALME",
+    `Generado: ${new Date().toLocaleString("es-ES")}`,
+    "",
+    block("Datos de Consulta", general),
+    block("Actividad Clínica", actividad),
+    block("Síntomas e Impacto", impacto),
+    block("Tratamiento Instaurado", txPrimera),
+    block("Seguimiento Terapéutico", txSeguimiento),
+    block("Plan y Seguimiento", plan)
+  ].filter(Boolean).join("\n").trim() + "\n";
+}
+
+function resetPatient() {
+  form.reset();
+  setVisitTypeLock(false);
+  Object.keys(S).forEach(key => delete S[key]);
+  document.querySelectorAll(".toggle button.active,.scale-btn.active,.answer-option.active").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".dlqi-subquestion").forEach(el => el.classList.add("hidden"));
+  document.getElementById("prevBox").classList.add("hidden");
+  primaryTherapyState = createEmptyTherapyState();
+  followTherapyState = createEmptyTherapyState();
+  renderTherapyGroups("primary");
+  renderTherapyGroups("follow");
+  bindTherapyEvents();
+  setDecision("");
+  setPreviousVisitContext(null);
+  updateSpecialBadge();
+  resetDetailsState();
+  mode();
+  recalc();
+  notify("Formulario reiniciado");
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+loadBaseBtn.onclick = () => baseFileInput.click();
+baseFileInput.addEventListener("change", async () => {
+  const file = baseFileInput.files?.[0];
+  if (!file) return;
+  try {
+    await loadBaseFromFile(file);
+  } catch (err) {
+    setBaseStatus("Error al cargar archivo de base (Excel/CSV).", false);
+  }
+});
+
+nushaInput.addEventListener("input", () => {
+  if (!baseRows.length) return;
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(autoSearchByNusha, 300);
+});
+nushaInput.addEventListener("blur", () => {
+  if (!baseRows.length) return;
+  clearTimeout(autoTimer);
+  autoSearchByNusha();
+});
+nushaInput.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || !baseRows.length) return;
+  event.preventDefault();
+  clearTimeout(autoTimer);
+  autoSearchByNusha();
+});
+
+continueBtn.onclick = () => setDecision("continuar");
+changeBtn.onclick = () => setDecision("cambiar");
+
+document.getElementById("newBtn").onclick = resetPatient;
+document.getElementById("csvBtn").onclick = () => {
+  const row = gather();
+  const csv = HEADERS.join(",") + "\n" + HEADERS.map(h => esc(row[h])).join(",");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "visita_psoriasis_valme.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+document.getElementById("txtBtn").onclick = () => {
+  const row = gather();
+  copyToClipboard(toTxt(row), "TXT copiado al portapapeles");
+};
+
+renderScale("evaPruritoScale", "eva_prurito");
+renderScale("evaDolorScale", "eva_dolor");
+renderDLQI();
+renderPURE4();
+renderMorisky();
+bindMoriskyInteractions();
+renderPasiTable();
+renderTherapyGroups("primary");
+renderTherapyGroups("follow");
+bindTherapyEvents();
+document.querySelectorAll(".one").forEach(bindOne);
+bindManyButtons();
+bindNamedInputs();
+rememberDetailsDefaults();
+setDecision("");
+mode();
+setVisitTypeLock(false);
+updateSpecialBadge();
+syncTherapiesToS();
+setBaseStatus("Sin base cargada en esta sesión.", false);
+setPreviousVisitContext(null);
+recalc();
+</script>
+</body>
+</html>

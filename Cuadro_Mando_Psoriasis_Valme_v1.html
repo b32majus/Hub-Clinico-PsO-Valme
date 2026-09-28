@@ -1,0 +1,2706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuadro de Mando Psoriasis Valme</title>
+  <style>
+    :root {
+      --bg: #f3f8fa;
+      --card: #ffffff;
+      --ink: #153547;
+      --muted: #5f7380;
+      --brand: #0f766e;
+      --brand-2: #145b73;
+      --ok: #1f9d55;
+      --warn: #e6a700;
+      --bad: #d64545;
+      --line: #d8e4ea;
+      --shadow: 0 10px 28px rgba(21, 53, 71, 0.09);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Aptos", "Segoe UI", system-ui, sans-serif;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 10% -20%, rgba(15, 118, 110, 0.22), transparent 40%),
+        radial-gradient(circle at 90% -20%, rgba(20, 91, 115, 0.18), transparent 38%),
+        var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 1.25rem;
+    }
+
+    .shell {
+      max-width: 1450px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      border-radius: 24px;
+      padding: 1.6rem 1.8rem;
+      background: linear-gradient(130deg, #0f766e 0%, #145b73 55%, #2a4e66 100%);
+      color: #fff;
+      box-shadow: 0 20px 44px rgba(21, 53, 71, 0.25);
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      line-height: 1.1;
+      margin-bottom: 0.45rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      opacity: 0.95;
+      font-size: 0.97rem;
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: 0.45rem;
+      align-items: start;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.12);
+      padding: 0.35rem 0.7rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .load-card {
+      padding: 0.95rem 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .load-status {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .load-status.ok {
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid transparent;
+      background: #fff;
+      color: var(--ink);
+      padding: 0.62rem 0.95rem;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-main {
+      background: linear-gradient(130deg, #0f766e, #145b73);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .btn-main:hover {
+      box-shadow: 0 10px 22px rgba(21, 53, 71, 0.24);
+    }
+
+    .btn-soft {
+      border-color: #bdd0d8;
+      background: #f8fbfd;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .module-switch {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.95rem;
+    }
+
+    .module-btn {
+      border-color: #cad9df;
+      background: #fff;
+      color: #315364;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .module-btn.active {
+      background: linear-gradient(130deg, #0f766e, #145b73);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .panel {
+      padding: 1rem;
+      margin-bottom: 0.95rem;
+    }
+
+    .panel h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .subline {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-top: -0.2rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 0.7rem;
+      align-items: end;
+    }
+
+    .fg {
+      grid-column: span 3;
+      min-width: 0;
+    }
+
+    .fg.w4 { grid-column: span 4; }
+    .fg.w6 { grid-column: span 6; }
+    .fg.w12 { grid-column: span 12; }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+      color: #284b5d;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid #cbdbe2;
+      border-radius: 10px;
+      padding: 0.55rem 0.6rem;
+      background: #fff;
+      color: var(--ink);
+      font-size: 0.92rem;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(120px, 1fr));
+      gap: 0.7rem;
+      margin-bottom: 0.95rem;
+    }
+
+    .kpi {
+      padding: 0.8rem 0.7rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      min-height: 102px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi .k {
+      color: #436473;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.25;
+    }
+
+    .kpi .v {
+      font-size: 1.42rem;
+      font-weight: 900;
+      color: #103447;
+      letter-spacing: -0.02em;
+    }
+
+    .kpi .s {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 0.7rem;
+      margin-bottom: 0.95rem;
+    }
+
+    .chart-card {
+      grid-column: span 4;
+      padding: 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      min-height: 320px;
+    }
+
+    .chart-card.w6 { grid-column: span 6; }
+    .chart-card.w12 { grid-column: span 12; }
+
+    .chart-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      margin-bottom: 0.65rem;
+      color: #214c61;
+    }
+
+    .pie-layout {
+      display: grid;
+      grid-template-columns: minmax(150px, 180px) 1fr;
+      gap: 0.8rem;
+      align-items: center;
+      min-height: 240px;
+    }
+
+    .pie-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pie-donut {
+      --pie-bg: conic-gradient(#e4edf2 0deg 360deg);
+      width: 168px;
+      height: 168px;
+      border-radius: 50%;
+      background: var(--pie-bg);
+      position: relative;
+      box-shadow: inset 0 0 0 1px #d6e4eb;
+    }
+
+    .pie-hole {
+      position: absolute;
+      inset: 27px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #dbe8ee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #345969;
+    }
+
+    .pie-hole .n {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #5f7785;
+    }
+
+    .pie-hole .v {
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #143d50;
+      margin-top: 0.1rem;
+    }
+
+    .pie-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.42rem;
+    }
+
+    .pie-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.45rem;
+      align-items: center;
+      font-size: 0.83rem;
+    }
+
+    .pie-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 99px;
+    }
+
+    .pie-label {
+      color: #2c5062;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .pie-value {
+      color: #214a5d;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .bar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(110px, 1fr) minmax(140px, 1.8fr) minmax(60px, auto);
+      gap: 0.45rem;
+      align-items: center;
+      font-size: 0.84rem;
+    }
+
+    .bar-label {
+      color: #2a4d5e;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 99px;
+      background: #ecf2f5;
+      overflow: hidden;
+      border: 1px solid #dbe6ec;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0f766e, #145b73);
+    }
+
+    .bar-value {
+      text-align: right;
+      font-weight: 700;
+      color: #1f4251;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.78rem;
+      font-weight: 800;
+      border: 1px solid;
+    }
+
+    .status-controlada {
+      background: #eaf8ef;
+      color: #1f7b45;
+      border-color: #bfe3cc;
+    }
+
+    .status-intermedia {
+      background: #fff8e2;
+      color: #987300;
+      border-color: #f0de9c;
+    }
+
+    .status-no_controlada {
+      background: #ffefef;
+      color: #b63a3a;
+      border-color: #e8bcbc;
+    }
+
+    .status-sin_datos {
+      background: #f3f6f8;
+      color: #657886;
+      border-color: #d3e0e7;
+    }
+
+    .trend-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    .trend-table th,
+    .trend-table td {
+      border-bottom: 1px solid #e3edf2;
+      padding: 0.4rem 0.35rem;
+      text-align: left;
+    }
+
+    .trend-table th {
+      color: #3e6070;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .export-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .patient-search-row {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto;
+      gap: 0.65rem;
+      align-items: end;
+      margin-top: 0.55rem;
+      margin-bottom: 0.4rem;
+    }
+
+    #nushaSearch {
+      padding: 0.75rem 0.8rem;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      background: #fcfefe;
+    }
+
+    #searchPatientBtn {
+      min-height: 42px;
+      min-width: 170px;
+      font-size: 0.93rem;
+      letter-spacing: 0.02em;
+    }
+
+    .patient-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 0.9rem;
+    }
+
+    .patient-main {
+      font-size: clamp(1.06rem, 2vw, 1.25rem);
+      font-weight: 900;
+      color: #143f53;
+      letter-spacing: -0.01em;
+    }
+
+    .patient-hero {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.9rem;
+      align-items: center;
+      padding: 0.3rem 0.2rem 0.7rem;
+      border-bottom: 1px solid #dde9ef;
+      margin-bottom: 0.75rem;
+    }
+
+    .patient-avatar {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: linear-gradient(140deg, #0f766e, #145b73);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.55rem;
+      box-shadow: 0 8px 18px rgba(20, 63, 83, 0.22);
+    }
+
+    .patient-avatar svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    .patient-hero-main {
+      min-width: 0;
+    }
+
+    .patient-id-pill {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 0.22rem 0.64rem;
+      background: #e7f4ef;
+      border: 1px solid #c9e6da;
+      color: #176147;
+      font-size: 0.86rem;
+      font-weight: 900;
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.02em;
+    }
+
+    .patient-hero-status {
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .patient-workspace {
+      margin-top: 0.75rem;
+    }
+
+    .patient-overview {
+      border: 1px solid #d6e5ec;
+      border-radius: 14px;
+      padding: 0.9rem;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fcfd 100%);
+      box-shadow: 0 8px 22px rgba(20, 63, 83, 0.08);
+      margin-bottom: 0.8rem;
+    }
+
+    .patient-section-title {
+      margin: 0.85rem 0 0.55rem;
+      font-size: 0.95rem;
+      color: #255063;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .timeline-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 0.35rem;
+    }
+
+    .timeline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-bottom: 0.8rem;
+      max-height: 210px;
+      overflow: auto;
+      padding-right: 0.2rem;
+    }
+
+    .visit-card {
+      border: 1px solid #d2e0e7;
+      border-radius: 10px;
+      padding: 0.5rem 0.6rem;
+      background: #f8fcfd;
+      min-width: 156px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-size: 0.8rem;
+    }
+
+    .visit-card:hover {
+      transform: translateY(-1px);
+    }
+
+    .visit-card.active {
+      border-color: #0f766e;
+      background: #edf8f6;
+      box-shadow: inset 0 0 0 1px #0f766e;
+    }
+
+    .visit-date {
+      font-weight: 800;
+      color: #1f4657;
+    }
+
+    .visit-type {
+      color: #5e7380;
+    }
+
+    .patient-kpi-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.72rem;
+      margin-bottom: 0.05rem;
+    }
+
+    .pk-main-grid {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(96px, 1fr));
+      gap: 0.58rem;
+    }
+
+    .pk-main {
+      border: 1px solid #d7e5ec;
+      border-radius: 12px;
+      padding: 0.58rem 0.64rem;
+      background: #fff;
+      min-height: 102px;
+      box-shadow: 0 3px 10px rgba(22, 63, 83, 0.06);
+      border-top: 3px solid #9fc5d4;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .pk-main .k {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #4a6674;
+      letter-spacing: 0.05em;
+      font-weight: 800;
+    }
+
+    .pk-main .v {
+      font-size: 1.22rem;
+      font-weight: 900;
+      color: #173f52;
+      margin-top: 0.12rem;
+      line-height: 1.2;
+    }
+
+    .pk-main .vsub {
+      margin-top: 0.3rem;
+      color: #5b7381;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .pk-info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 0.58rem;
+    }
+
+    .pk-info {
+      border: 1px solid #d7e5ec;
+      border-radius: 12px;
+      padding: 0.6rem 0.68rem;
+      background: #fff;
+      min-height: 126px;
+      border-top: 3px solid #9fc5d4;
+      box-shadow: 0 3px 10px rgba(22, 63, 83, 0.06);
+    }
+
+    .pk-info.tx { border-top-color: #8d72e7; }
+    .pk-info.comorb { border-top-color: #35a575; }
+    .pk-info.loc { border-top-color: #2f93c5; }
+    .pk-info.special { border-top-color: #d96868; }
+
+    .pk-info .k {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: #456272;
+      letter-spacing: 0.05em;
+      font-weight: 900;
+      margin-bottom: 0.35rem;
+    }
+
+    .pk-info .v {
+      font-size: 0.9rem;
+      color: #20485a;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .pk-line {
+      margin-top: 0.15rem;
+    }
+
+    .pk-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 900;
+      background: #eef5f8;
+      color: #204f63;
+      border: 1px solid #d4e4eb;
+      margin-bottom: 0.35rem;
+    }
+
+    .kv-inline {
+      display: flex;
+      align-items: center;
+      gap: 0.36rem;
+      flex-wrap: wrap;
+    }
+
+    .status-inline {
+      margin-top: 0.28rem;
+    }
+
+    .status-chip.big {
+      font-size: 0.82rem;
+      padding: 0.28rem 0.7rem;
+    }
+
+    .svg-wrap {
+      width: 100%;
+      border: 1px solid #d6e4ea;
+      border-radius: 10px;
+      background: #fbfdfe;
+      padding: 0.3rem;
+      min-height: 250px;
+    }
+
+    .svg-wrap svg {
+      width: 100%;
+      height: 240px;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 0.4rem;
+      font-size: 0.79rem;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: #375a6b;
+      font-weight: 700;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 99px;
+      display: inline-block;
+    }
+
+    .patient-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 0.7rem;
+    }
+
+    .pcard {
+      grid-column: span 6;
+      border: 1px solid #d8e5ec;
+      border-radius: 12px;
+      padding: 0.78rem;
+      background: #fff;
+      min-height: 220px;
+      border-top: 4px solid #0f766e;
+    }
+
+    .pcard.w4 { grid-column: span 4; }
+    .pcard.w8 { grid-column: span 8; }
+    .pcard.w12 { grid-column: span 12; }
+    .pcard.tone-teal { border-top-color: #0f766e; }
+    .pcard.tone-blue { border-top-color: #2f93c5; }
+    .pcard.tone-purple { border-top-color: #8d72e7; }
+    .pcard.tone-amber { border-top-color: #d79a2b; }
+    .pcard.tone-green { border-top-color: #35a575; }
+    .pcard.tone-red { border-top-color: #d96868; }
+    .pcard.tone-slate { border-top-color: #6f8a98; }
+
+    .pcard-head {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.55rem;
+      border-bottom: 1px solid #e1ecf1;
+      padding-bottom: 0.45rem;
+    }
+
+    .pcard-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: #eef4f8;
+      border: 1px solid #d5e4ec;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #274f61;
+    }
+
+    .pcard-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .icon-stroke {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pcard h4 {
+      margin-bottom: 0.55rem;
+      color: #204a5d;
+      font-size: 0.95rem;
+      font-weight: 900;
+    }
+
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.35rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid #cfe0e8;
+      background: #f4fafc;
+      color: #2d5264;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 0.24rem 0.52rem;
+    }
+
+    .tx-block {
+      border: 1px solid #d7e5eb;
+      border-radius: 10px;
+      padding: 0.55rem;
+      margin-bottom: 0.42rem;
+      background: #fbfdfe;
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    .msg {
+      padding: 0.55rem 0.7rem;
+      border-radius: 10px;
+      margin-top: 0.5rem;
+      font-size: 0.84rem;
+      border: 1px solid;
+    }
+
+    .msg.error {
+      background: #fff1f1;
+      color: #a93434;
+      border-color: #e9c2c2;
+    }
+
+    .msg.ok {
+      background: #eefbf3;
+      color: #236d44;
+      border-color: #bee2cc;
+    }
+
+    .no-data {
+      color: #6b7f8b;
+      font-size: 0.86rem;
+      padding-top: 0.25rem;
+    }
+
+    .history-table-wrap {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid #dce9ef;
+      border-radius: 10px;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      min-width: 760px;
+    }
+
+    .history-table th,
+    .history-table td {
+      padding: 0.46rem 0.45rem;
+      border-bottom: 1px solid #e2edf2;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .history-table th {
+      background: #f4f9fb;
+      color: #3d5d6e;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 900;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .history-table tbody tr:nth-child(even) {
+      background: #fbfdfe;
+    }
+
+    @media (max-width: 1280px) {
+      .kpi-grid { grid-template-columns: repeat(4, minmax(120px, 1fr)); }
+      .chart-card { grid-column: span 6; }
+      .pk-main-grid { grid-template-columns: repeat(5, minmax(84px, 1fr)); }
+      .pk-info-grid { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+    }
+
+    @media (max-width: 980px) {
+      .fg { grid-column: span 6; }
+      .chart-card,
+      .chart-card.w6 { grid-column: span 12; }
+      .pcard,
+      .pcard.w4,
+      .pcard.w8 { grid-column: span 12; }
+      .patient-search-row { grid-template-columns: 1fr; }
+      .patient-hero { grid-template-columns: 1fr; }
+      .patient-avatar { width: 56px; height: 56px; font-size: 1.35rem; }
+      .patient-hero-status { justify-self: start; }
+      .pk-main-grid { grid-template-columns: repeat(3, minmax(84px, 1fr)); }
+      .pk-info-grid { grid-template-columns: 1fr; }
+      .pie-layout { grid-template-columns: 1fr; }
+      .pie-wrap { margin-bottom: 0.2rem; }
+    }
+
+    @media (max-width: 700px) {
+      .kpi-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+      .fg { grid-column: span 12; }
+      .pk-main-grid { grid-template-columns: repeat(2, minmax(84px, 1fr)); }
+      .module-switch { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div>
+        <h1>Cuadro de Mando de Psoriasis</h1>
+        <p>Hospital Universitario de Valme · Gestión poblacional y seguimiento longitudinal por NUSHA</p>
+      </div>
+      <div class="hero-pills">
+        <span class="pill">AGS Sur de Sevilla</span>
+        <span class="pill">Modo autónomo</span>
+        <span class="pill">Sin dependencias CDN</span>
+      </div>
+    </header>
+
+    <section class="card load-card">
+      <div>
+        <strong>Base de Datos</strong>
+        <div id="loadStatus" class="load-status">Sin archivo cargado.</div>
+      </div>
+      <div class="actions">
+        <button class="btn-main" type="button" id="loadBtn">Cargar Base XLSX</button>
+        <input id="fileInput" type="file" accept=".xlsx" class="hidden">
+      </div>
+    </section>
+
+    <div id="appShell" class="hidden">
+      <div class="module-switch" id="moduleSwitch">
+        <button class="module-btn active" id="btnGestion" type="button">Módulo Gestión</button>
+        <button class="module-btn" id="btnPaciente" type="button">Módulo Paciente</button>
+      </div>
+
+      <div id="gestionBundle">
+      <section class="card panel" id="gestionPanel">
+        <h2>Gestión Global (Última Visita por Paciente)</h2>
+        <div class="subline">
+          El cálculo de última visita se realiza dentro del rango temporal seleccionado. Sin rango, usa histórico completo.
+        </div>
+
+        <div class="filters-grid">
+          <div class="fg">
+            <label for="dateFrom">Fecha Desde</label>
+            <input type="date" id="dateFrom">
+          </div>
+          <div class="fg">
+            <label for="dateTo">Fecha Hasta</label>
+            <input type="date" id="dateTo">
+          </div>
+          <div class="fg">
+            <label for="tipoVisitaFilter">Tipo de Visita</label>
+            <select id="tipoVisitaFilter">
+              <option value="">Todas</option>
+              <option value="primera">Primera Visita</option>
+              <option value="seguimiento">Visita de Seguimiento</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label for="procedenciaFilter">Procedencia</label>
+            <select id="procedenciaFilter"><option value="">Todas</option></select>
+          </div>
+
+          <div class="fg">
+            <label for="fenotipoFilter">Fenotipo</label>
+            <select id="fenotipoFilter"><option value="">Todos</option></select>
+          </div>
+          <div class="fg">
+            <label for="cursoFilter">Curso Evolutivo</label>
+            <select id="cursoFilter"><option value="">Todos</option></select>
+          </div>
+          <div class="fg">
+            <label for="controlFilter">Estado de Control</label>
+            <select id="controlFilter">
+              <option value="">Todos</option>
+              <option value="controlada">Controlada</option>
+              <option value="intermedia">Intermedia</option>
+              <option value="no_controlada">No Controlada</option>
+              <option value="sin_datos">Sin Datos</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label for="specialFilter">Localizaciones Especiales</label>
+            <select id="specialFilter"></select>
+          </div>
+
+          <div class="fg">
+            <label for="comorbFilter">Comorbilidad</label>
+            <select id="comorbFilter"></select>
+          </div>
+          <div class="fg">
+            <label for="familyFilter">Familia Terapéutica Activa</label>
+            <select id="familyFilter"></select>
+          </div>
+          <div class="fg w4">
+            <label for="drugFilter">Fármaco Activo</label>
+            <select id="drugFilter"><option value="">Todos</option></select>
+          </div>
+          <div class="fg w4">
+            <div class="actions">
+              <button class="btn-soft" type="button" id="clearFiltersBtn">Limpiar Filtros</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="kpi-grid" id="kpiGrid">
+        <div class="kpi"><div class="k">Pacientes Únicos</div><div class="v" id="kpiPatients">0</div><div class="s">Última visita en rango</div></div>
+        <div class="kpi"><div class="k">Enfermedad No Controlada</div><div class="v" id="kpiActive">0 (0%)</div><div class="s">Semáforo clínico</div></div>
+        <div class="kpi"><div class="k">PASI Medio</div><div class="v" id="kpiPasiMean">0</div><div class="s">Promedio pacientes</div></div>
+        <div class="kpi"><div class="k">PASI &gt; 10</div><div class="v" id="kpiPasiHigh">0 (0%)</div><div class="s">Carga elevada</div></div>
+        <div class="kpi"><div class="k">BSA Media</div><div class="v" id="kpiBsaMean">0</div><div class="s">Promedio pacientes</div></div>
+        <div class="kpi"><div class="k">BSA &gt; 10%</div><div class="v" id="kpiBsaHigh">0 (0%)</div><div class="s">Extensión elevada</div></div>
+        <div class="kpi"><div class="k">Biológico Activo</div><div class="v" id="kpiBio">0 (0%)</div><div class="s">Tratamiento activo</div></div>
+        <div class="kpi"><div class="k">Zonas Especiales</div><div class="v" id="kpiSpecial">0 (0%)</div><div class="s">Afectación relevante</div></div>
+      </section>
+
+      <section class="charts-grid">
+        <article class="chart-card">
+          <div class="chart-title">Semáforo de Control</div>
+          <div id="chartControl"></div>
+        </article>
+        <article class="chart-card">
+          <div class="chart-title">Distribución Fenotipo</div>
+          <div id="chartFenotipo"></div>
+        </article>
+        <article class="chart-card">
+          <div class="chart-title">Distribución Procedencia</div>
+          <div id="chartProcedencia"></div>
+        </article>
+        <article class="chart-card">
+          <div class="chart-title">Familias Terapéuticas Activas</div>
+          <div id="chartFamilies"></div>
+        </article>
+        <article class="chart-card">
+          <div class="chart-title">Top Fármacos Activos</div>
+          <div id="chartDrugs"></div>
+        </article>
+        <article class="chart-card">
+          <div class="chart-title">Top Comorbilidades</div>
+          <div id="chartComorb"></div>
+        </article>
+        <article class="chart-card w6">
+          <div class="chart-title">Zonas Especiales Afectadas</div>
+          <div id="chartSpecialZones"></div>
+        </article>
+        <article class="chart-card w6">
+          <div class="chart-title">Tendencia Mensual (visitas filtradas)</div>
+          <div id="chartTrend"></div>
+        </article>
+      </section>
+
+      <section class="card panel">
+        <div class="export-row">
+          <div>
+            <h2>Exportación</h2>
+            <div class="hint">Exporta en XLSX el resultado filtrado (base de gestión por última visita).</div>
+            <div class="hint"><span id="exportCount">0</span> registros listos para exportar.</div>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn-main" id="exportBtn">Exportar Filtrados (XLSX)</button>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <section class="card panel hidden" id="pacientePanel">
+        <h2>Seguimiento de Paciente</h2>
+        <div class="subline">Evolución longitudinal por NUSHA en todas las visitas registradas.</div>
+
+        <div class="patient-search-row">
+          <div>
+            <label for="nushaSearch">NUSHA</label>
+            <input id="nushaSearch" list="nushaList" placeholder="Ej: VALM0001">
+            <datalist id="nushaList"></datalist>
+          </div>
+          <div class="actions">
+            <button class="btn-main" type="button" id="searchPatientBtn">Buscar Paciente</button>
+          </div>
+        </div>
+
+        <div id="patientMsg" class="hidden"></div>
+
+        <div id="patientContent" class="hidden patient-workspace">
+          <div class="patient-overview">
+            <div class="patient-hero">
+              <div class="patient-avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="icon-stroke">
+                  <circle cx="12" cy="7.75" r="3.25"></circle>
+                  <path d="M4.5 19c1.7-3.2 4.2-4.9 7.5-4.9s5.8 1.7 7.5 4.9"></path>
+                </svg>
+              </div>
+              <div class="patient-hero-main">
+                <div class="patient-id-pill" id="patientIdPill">NUSHA</div>
+                <div class="patient-main" id="patientMainTitle">Paciente</div>
+                <div class="hint" id="patientMainHint"></div>
+              </div>
+              <div class="patient-hero-status" id="patientHeroStatus">Sin Datos</div>
+            </div>
+            <div class="patient-kpi-grid" id="patientKpiGrid"></div>
+          </div>
+
+          <div class="patient-section-title">Evolución Longitudinal</div>
+          <div class="timeline-toolbar">
+            <button class="btn-soft" type="button" id="toggleTimelineBtn">Mostrar Timeline</button>
+          </div>
+          <div class="timeline hidden" id="patientTimeline"></div>
+
+          <div class="patient-grid">
+            <article class="pcard w6 tone-teal">
+              <div class="pcard-head">
+                <span class="pcard-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="icon-stroke">
+                    <path d="M4 19V5"></path>
+                    <path d="M4 19H20"></path>
+                    <path d="M7.5 14.5l3.4-3.5 2.9 2.5 4.2-5"></path>
+                  </svg>
+                </span>
+                <h4>Evolución de Actividad (PASI, BSA, PGA)</h4>
+              </div>
+              <div id="activityChart" class="svg-wrap"></div>
+              <div id="activityLegend" class="legend"></div>
+            </article>
+
+            <article class="pcard w6 tone-blue">
+              <div class="pcard-head">
+                <span class="pcard-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="icon-stroke">
+                    <rect x="6" y="4.5" width="12" height="15" rx="2.2"></rect>
+                    <path d="M9 9.2h6"></path>
+                    <path d="M9 12.2h6"></path>
+                    <path d="M9 15.2h4"></path>
+                  </svg>
+                </span>
+                <h4>Evolución PROs (DLQI, EVA Prurito, EVA Dolor)</h4>
+              </div>
+              <div id="promsChart" class="svg-wrap"></div>
+              <div id="promsLegend" class="legend"></div>
+            </article>
+
+            <article class="pcard w6 tone-purple">
+              <div class="pcard-head">
+                <span class="pcard-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="icon-stroke">
+                    <rect x="5" y="5" width="14" height="14" rx="7"></rect>
+                    <path d="M8 8l8 8"></path>
+                    <path d="M10.3 5.5l8.2 8.2"></path>
+                  </svg>
+                </span>
+                <h4>Tratamiento Activo (Última Visita)</h4>
+              </div>
+              <div id="patientTreatment"></div>
+            </article>
+
+            <article class="pcard w6 tone-amber">
+              <div class="pcard-head">
+                <span class="pcard-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="icon-stroke">
+                    <rect x="5" y="4.5" width="14" height="15" rx="2.2"></rect>
+                    <path d="M9 9h6"></path>
+                    <path d="M9 12.2h6"></path>
+                    <path d="M9 15.4h4.5"></path>
+                  </svg>
+                </span>
+                <h4>Resumen Clínico de Seguimiento</h4>
+              </div>
+              <div id="patientDecision"></div>
+            </article>
+
+            <article class="pcard w6 tone-green">
+              <div class="pcard-head">
+                <span class="pcard-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="icon-stroke">
+                    <rect x="5" y="4.5" width="14" height="15" rx="2"></rect>
+                    <path d="M9 9.3h6"></path>
+                    <path d="M12 6.5v5.6"></path>
+                    <path d="M9.2 15.2h5.6"></path>
+                  </svg>
+                </span>
+                <h4>Comorbilidades Activas</h4>
+              </div>
+              <div id="patientComorb"></div>
+            </article>
+
+            <article class="pcard w6 tone-red">
+              <div class="pcard-head">
+                <span class="pcard-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="icon-stroke">
+                    <path d="M12 20s6-5.8 6-10.2A6 6 0 0 0 6 9.8C6 14.2 12 20 12 20z"></path>
+                    <circle cx="12" cy="9.5" r="2.2"></circle>
+                  </svg>
+                </span>
+                <h4>Localizaciones y Zonas Especiales</h4>
+              </div>
+              <div id="patientLocations"></div>
+            </article>
+
+            <article class="pcard w12 tone-slate">
+              <div class="pcard-head">
+                <span class="pcard-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="icon-stroke">
+                    <rect x="4.5" y="6" width="15" height="13.5" rx="2.2"></rect>
+                    <path d="M8 4.5v3"></path>
+                    <path d="M16 4.5v3"></path>
+                    <path d="M4.5 9.5h15"></path>
+                  </svg>
+                </span>
+                <h4>Historial de Visitas</h4>
+              </div>
+              <div id="patientHistoryTable"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="../../materials_hs_valme/node_modules/jszip/dist/jszip.min.js"></script>
+  <script>
+    const THERAPY_SLOT_LIMIT = 3;
+
+    const COMORBIDITY_FIELDS = [
+      { key: "comorb_obesidad", label: "Obesidad" },
+      { key: "comorb_sobrepeso", label: "Sobrepeso" },
+      { key: "comorb_hta", label: "HTA" },
+      { key: "comorb_dislipemia", label: "Dislipemia" },
+      { key: "comorb_diabetes_prediabetes", label: "Diabetes/Prediabetes" },
+      { key: "comorb_sindrome_metabolico", label: "Síndrome Metabólico" },
+      { key: "comorb_esteatosis_hepatica", label: "Esteatosis Hepática" },
+      { key: "comorb_alteracion_transaminasas", label: "Alteración Transaminasas" },
+      { key: "comorb_hepatopatia_cronica", label: "Hepatopatía Crónica" },
+      { key: "comorb_artritis_psoriasica_conocida", label: "Artritis Psoriásica Conocida" },
+      { key: "comorb_sospecha_artritis_psoriasica", label: "Sospecha Artritis Psoriásica" },
+      { key: "comorb_eii", label: "EII" },
+      { key: "comorb_cardiopatia_isquemica", label: "Cardiopatía Isquémica" },
+      { key: "comorb_ictus_ait", label: "Ictus/AIT" },
+      { key: "comorb_insuficiencia_cardiaca", label: "Insuficiencia Cardíaca" },
+      { key: "comorb_enfermedad_vascular_periferica", label: "Enf. Vascular Periférica" },
+      { key: "comorb_tabaquismo", label: "Tabaquismo" },
+      { key: "comorb_alcohol", label: "Alcohol" },
+      { key: "comorb_ansiedad_depresion", label: "Ansiedad/Depresión" }
+    ];
+
+    const SPECIAL_ZONE_FIELDS = [
+      { key: "zona_esp_cuero_cabelludo", label: "Cuero Cabelludo" },
+      { key: "zona_esp_unas", label: "Uñas" },
+      { key: "zona_esp_cara", label: "Cara" },
+      { key: "zona_esp_genitales", label: "Genitales" },
+      { key: "zona_esp_palmas", label: "Palmas" },
+      { key: "zona_esp_plantas", label: "Plantas" },
+      { key: "zona_esp_pliegues", label: "Pliegues" }
+    ];
+
+    const LOCATION_FIELDS = [
+      { key: "loc_cuero_cabelludo", label: "Cuero Cabelludo" },
+      { key: "loc_cara", label: "Cara" },
+      { key: "loc_tronco", label: "Tronco" },
+      { key: "loc_miembros_superiores", label: "Miembros Superiores" },
+      { key: "loc_miembros_inferiores", label: "Miembros Inferiores" },
+      { key: "loc_pliegues", label: "Pliegues" },
+      { key: "loc_genitales", label: "Genitales" },
+      { key: "loc_palmas", label: "Palmas" },
+      { key: "loc_plantas", label: "Plantas" },
+      { key: "loc_unas", label: "Uñas" }
+    ];
+
+    const THERAPY_FAMILIES = [
+      { key: "topicos", label: "Tópicos" },
+      { key: "sinteticos_convencionales", label: "Sintéticos Convencionales" },
+      { key: "fototerapia", label: "Fototerapia" },
+      { key: "biologicos", label: "Biológicos" }
+    ];
+
+    const CONTROL_STATUS = {
+      controlada: { label: "Controlada", color: "#1f9d55" },
+      intermedia: { label: "Intermedia", color: "#e6a700" },
+      no_controlada: { label: "No Controlada", color: "#d64545" },
+      sin_datos: { label: "Sin Datos", color: "#7a8d99" }
+    };
+
+    const PIE_PALETTE = [
+      "#0f766e",
+      "#145b73",
+      "#2f93c5",
+      "#7f56d9",
+      "#db7c2a",
+      "#d64545",
+      "#5a7080",
+      "#3aa37a"
+    ];
+
+    const el = {
+      loadBtn: document.getElementById("loadBtn"),
+      fileInput: document.getElementById("fileInput"),
+      loadStatus: document.getElementById("loadStatus"),
+      appShell: document.getElementById("appShell"),
+      moduleSwitch: document.getElementById("moduleSwitch"),
+      btnGestion: document.getElementById("btnGestion"),
+      btnPaciente: document.getElementById("btnPaciente"),
+      gestionBundle: document.getElementById("gestionBundle"),
+      gestionPanel: document.getElementById("gestionPanel"),
+      pacientePanel: document.getElementById("pacientePanel"),
+      dateFrom: document.getElementById("dateFrom"),
+      dateTo: document.getElementById("dateTo"),
+      tipoVisitaFilter: document.getElementById("tipoVisitaFilter"),
+      procedenciaFilter: document.getElementById("procedenciaFilter"),
+      fenotipoFilter: document.getElementById("fenotipoFilter"),
+      cursoFilter: document.getElementById("cursoFilter"),
+      comorbFilter: document.getElementById("comorbFilter"),
+      specialFilter: document.getElementById("specialFilter"),
+      familyFilter: document.getElementById("familyFilter"),
+      drugFilter: document.getElementById("drugFilter"),
+      controlFilter: document.getElementById("controlFilter"),
+      clearFiltersBtn: document.getElementById("clearFiltersBtn"),
+      exportBtn: document.getElementById("exportBtn"),
+      exportCount: document.getElementById("exportCount"),
+      nushaSearch: document.getElementById("nushaSearch"),
+      nushaList: document.getElementById("nushaList"),
+      searchPatientBtn: document.getElementById("searchPatientBtn"),
+      patientMsg: document.getElementById("patientMsg"),
+      patientContent: document.getElementById("patientContent"),
+      patientIdPill: document.getElementById("patientIdPill"),
+      patientMainTitle: document.getElementById("patientMainTitle"),
+      patientMainHint: document.getElementById("patientMainHint"),
+      patientHeroStatus: document.getElementById("patientHeroStatus"),
+      toggleTimelineBtn: document.getElementById("toggleTimelineBtn"),
+      patientTimeline: document.getElementById("patientTimeline"),
+      patientKpiGrid: document.getElementById("patientKpiGrid"),
+      activityChart: document.getElementById("activityChart"),
+      activityLegend: document.getElementById("activityLegend"),
+      promsChart: document.getElementById("promsChart"),
+      promsLegend: document.getElementById("promsLegend"),
+      patientTreatment: document.getElementById("patientTreatment"),
+      patientDecision: document.getElementById("patientDecision"),
+      patientComorb: document.getElementById("patientComorb"),
+      patientLocations: document.getElementById("patientLocations"),
+      patientHistoryTable: document.getElementById("patientHistoryTable")
+    };
+
+    let sourceHeaders = [];
+    let rawRows = [];
+    let filteredVisitRows = [];
+    let latestRows = [];
+    let selectedModule = "paciente";
+    let currentPatientRows = [];
+    let loadedFileName = "";
+    let timelineExpanded = false;
+    const PATIENT_ONLY_MODE = true;
+    const DATA_CACHE_KEY = "pso_valme_dashboard_cache_v1";
+
+    function normalizeKey(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function normalizeText(value) {
+      return String(value || "").trim();
+    }
+
+    function normalizeId(value) {
+      return normalizeText(value).toUpperCase();
+    }
+
+    function isTrue(value) {
+      const v = normalizeText(value).toLowerCase();
+      return v === "1" || v === "si" || v === "sí" || v === "true";
+    }
+
+    function toNumber(value) {
+      if (value === null || value === undefined) return Number.NaN;
+      const text = String(value).replace(",", ".").trim();
+      if (!text) return Number.NaN;
+      const num = Number(text);
+      return Number.isFinite(num) ? num : Number.NaN;
+    }
+
+    function parseDateValue(value) {
+      if (value === null || value === undefined || String(value).trim() === "") return null;
+      const text = String(value).trim();
+      const serial = Number(text);
+      if (Number.isFinite(serial) && serial > 20000 && serial < 80000) {
+        const ms = (serial - 25569) * 86400000;
+        const date = new Date(ms);
+        return Number.isNaN(date.getTime()) ? null : new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+      }
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(text)) {
+        const [d, m, y] = text.split("/").map(Number);
+        const date = new Date(y, m - 1, d);
+        return Number.isNaN(date.getTime()) ? null : date;
+      }
+      const date = new Date(text);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function formatDate(date) {
+      if (!date) return "-";
+      return date.toLocaleDateString("es-ES");
+    }
+
+    function formatPercent(part, total) {
+      if (!total) return "0%";
+      return `${((part / total) * 100).toFixed(1)}%`;
+    }
+
+    function mean(values) {
+      const valid = values.filter(v => Number.isFinite(v));
+      if (!valid.length) return Number.NaN;
+      return valid.reduce((a, b) => a + b, 0) / valid.length;
+    }
+
+    function humanizeCode(value) {
+      const t = normalizeText(value).toLowerCase();
+      const map = {
+        atencion_primaria: "Atención Primaria",
+        dermatologia_general: "Dermatología General",
+        multidisciplinar_derma_reuma: "Multidisciplinar Derma-Reuma",
+        primera: "Primera Visita",
+        seguimiento: "Visita de Seguimiento",
+        brotes: "Brotes",
+        persistente: "Persistente",
+        progresiva: "Progresiva",
+        intermitente: "Intermitente",
+        perdida_eficacia: "Pérdida de eficacia",
+        efectos_adversos: "Efectos adversos"
+      };
+      if (map[t]) return map[t];
+      if (!t) return "-";
+      return t.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function showMessage(text, ok = false) {
+      el.patientMsg.className = `msg ${ok ? "ok" : "error"}`;
+      el.patientMsg.textContent = text;
+      el.patientMsg.classList.remove("hidden");
+    }
+
+    function clearMessage() {
+      el.patientMsg.classList.add("hidden");
+      el.patientMsg.textContent = "";
+      el.patientMsg.className = "hidden";
+    }
+
+    function setLoadStatus(text, ok = false) {
+      el.loadStatus.textContent = text;
+      el.loadStatus.classList.toggle("ok", ok);
+    }
+
+    function toggleModule(module) {
+      if (PATIENT_ONLY_MODE) module = "paciente";
+      selectedModule = module;
+      el.btnGestion.classList.toggle("active", module === "gestion");
+      el.btnPaciente.classList.toggle("active", module === "paciente");
+      if (el.gestionBundle) el.gestionBundle.classList.toggle("hidden", module !== "gestion");
+      el.gestionPanel.classList.toggle("hidden", module !== "gestion");
+      el.pacientePanel.classList.toggle("hidden", module !== "paciente");
+      if (PATIENT_ONLY_MODE && el.moduleSwitch) el.moduleSwitch.classList.add("hidden");
+    }
+
+    function setSelectOptions(select, options, defaultLabel = "Todos") {
+      const old = select.value;
+      select.innerHTML = `<option value="">${defaultLabel}</option>`;
+      options.forEach(option => {
+        select.innerHTML += `<option value="${escapeHtml(option)}">${escapeHtml(humanizeCode(option))}</option>`;
+      });
+      if (options.includes(old)) select.value = old;
+    }
+
+    function getTherapyPrefix(row) {
+      const hasFollow = THERAPY_FAMILIES.some(f => {
+        for (let i = 1; i <= THERAPY_SLOT_LIMIT; i++) {
+          if (normalizeText(row[`tx_seguimiento_${f.key}_farmaco_${i}`]) || normalizeText(row[`tx_seguimiento_${f.key}_posologia_${i}`])) return true;
+        }
+        return normalizeText(row[`tx_seguimiento_${f.key}_otros`]) !== "";
+      });
+      if (hasFollow) return "tx_seguimiento";
+
+      const hasFirst = THERAPY_FAMILIES.some(f => {
+        for (let i = 1; i <= THERAPY_SLOT_LIMIT; i++) {
+          if (normalizeText(row[`tx_primera_${f.key}_farmaco_${i}`]) || normalizeText(row[`tx_primera_${f.key}_posologia_${i}`])) return true;
+        }
+        return normalizeText(row[`tx_primera_${f.key}_otros`]) !== "";
+      });
+      return hasFirst ? "tx_primera" : "";
+    }
+
+    function parseOthersField(raw) {
+      return normalizeText(raw).split("||").map(x => normalizeText(x)).filter(Boolean).map(item => {
+        const [drug, ...rest] = item.split("|");
+        return {
+          drug: normalizeText(drug),
+          posology: normalizeText(rest.join("|"))
+        };
+      });
+    }
+
+    function getActiveTherapy(row) {
+      const prefix = getTherapyPrefix(row);
+      const result = {};
+      THERAPY_FAMILIES.forEach(family => {
+        const items = [];
+        if (prefix) {
+          for (let i = 1; i <= THERAPY_SLOT_LIMIT; i++) {
+            const drug = normalizeText(row[`${prefix}_${family.key}_farmaco_${i}`]);
+            const posology = normalizeText(row[`${prefix}_${family.key}_posologia_${i}`]);
+            if (drug || posology) items.push({ drug, posology });
+          }
+          parseOthersField(row[`${prefix}_${family.key}_otros`]).forEach(x => {
+            if (x.drug || x.posology) items.push(x);
+          });
+        }
+        result[family.key] = items;
+      });
+      return result;
+    }
+
+    function getActiveDrugNames(row) {
+      const therapy = getActiveTherapy(row);
+      const names = new Set();
+      Object.values(therapy).forEach(items => {
+        items.forEach(item => {
+          if (item.drug) names.add(item.drug);
+        });
+      });
+      return [...names];
+    }
+
+    function getComorbidities(row) {
+      return COMORBIDITY_FIELDS.filter(c => isTrue(row[c.key])).map(c => c.label);
+    }
+
+    function getSpecialZones(row) {
+      return SPECIAL_ZONE_FIELDS.filter(z => isTrue(row[z.key])).map(z => z.label);
+    }
+
+    function getLocations(row) {
+      return LOCATION_FIELDS.filter(z => isTrue(row[z.key])).map(z => z.label);
+    }
+
+    function hasSpecialZones(row) {
+      return SPECIAL_ZONE_FIELDS.some(z => isTrue(row[z.key]));
+    }
+
+    // Criterio de semáforo acordado:
+    // no_controlada: PASI > 10 o BSA > 10 o PGA >= 3 o DLQI > 10
+    // controlada: PASI <= 2 y BSA <= 3 y PGA <= 1 y DLQI <= 5
+    function getControlStatus(row) {
+      const pasi = toNumber(row.pasi);
+      const bsa = toNumber(row.bsa);
+      const pga = toNumber(row.pga);
+      const dlqi = toNumber(row.dlqi_total);
+
+      const hasAny = [pasi, bsa, pga, dlqi].some(Number.isFinite);
+      if (!hasAny) return "sin_datos";
+
+      if ((Number.isFinite(pasi) && pasi > 10) ||
+          (Number.isFinite(bsa) && bsa > 10) ||
+          (Number.isFinite(pga) && pga >= 3) ||
+          (Number.isFinite(dlqi) && dlqi > 10)) {
+        return "no_controlada";
+      }
+
+      const allPresent = [pasi, bsa, pga, dlqi].every(Number.isFinite);
+      if (allPresent && pasi <= 2 && bsa <= 3 && pga <= 1 && dlqi <= 5) return "controlada";
+      return "intermedia";
+    }
+
+    function preparePieEntries(entries, limit = 7, keepZeros = false) {
+      const safe = (entries || [])
+        .map(e => ({ label: normalizeText(e.label), value: Number(e.value) || 0 }))
+        .filter(e => e.label && (keepZeros || e.value > 0))
+        .sort((a, b) => b.value - a.value);
+      if (safe.length <= limit) return safe;
+      const head = safe.slice(0, Math.max(1, limit - 1));
+      const tail = safe.slice(Math.max(1, limit - 1));
+      const other = tail.reduce((sum, e) => sum + e.value, 0);
+      if (other > 0) head.push({ label: "Otros", value: other });
+      return head;
+    }
+
+    function renderPie(containerId, entries, totalForPercent = 0, colorByLabel = {}, limit = 7, keepZeros = false) {
+      const container = document.getElementById(containerId);
+      const pieEntries = preparePieEntries(entries, limit, keepZeros);
+      if (!pieEntries.length) {
+        container.innerHTML = '<div class="no-data">Sin datos para mostrar con los filtros actuales.</div>';
+        return;
+      }
+
+      const total = pieEntries.reduce((sum, e) => sum + e.value, 0);
+      if (total <= 0) {
+        container.innerHTML = '<div class="no-data">Sin datos para mostrar con los filtros actuales.</div>';
+        return;
+      }
+
+      let current = 0;
+      const gradientParts = [];
+      const colored = pieEntries.map((entry, idx) => {
+        const color = colorByLabel[entry.label] || PIE_PALETTE[idx % PIE_PALETTE.length];
+        const deg = (entry.value / total) * 360;
+        const start = current;
+        const end = current + deg;
+        gradientParts.push(`${color} ${start.toFixed(2)}deg ${end.toFixed(2)}deg`);
+        current = end;
+        return { ...entry, color };
+      });
+
+      const baseTotal = totalForPercent || total;
+      const legend = colored.map(entry => {
+        const pct = baseTotal ? formatPercent(entry.value, baseTotal) : "0%";
+        return `
+          <div class="pie-item">
+            <span class="pie-dot" style="background:${entry.color}"></span>
+            <span class="pie-label">${escapeHtml(entry.label)}</span>
+            <span class="pie-value">${entry.value} (${pct})</span>
+          </div>
+        `;
+      }).join("");
+
+      container.innerHTML = `
+        <div class="pie-layout">
+          <div class="pie-wrap">
+            <div class="pie-donut" style="--pie-bg: conic-gradient(${gradientParts.join(",")});">
+              <div class="pie-hole">
+                <span class="n">N</span>
+                <span class="v">${baseTotal}</span>
+              </div>
+            </div>
+          </div>
+          <div class="pie-list">${legend}</div>
+        </div>
+      `;
+    }
+
+    function buildBarList(containerId, entries, totalForPercent = 0, colorByLabel = {}, limit = 10, keepZeros = false) {
+      const container = document.getElementById(containerId);
+      const barEntries = preparePieEntries(entries, limit, keepZeros);
+      if (!barEntries.length) {
+        container.innerHTML = '<div class="no-data">Sin datos para mostrar con los filtros actuales.</div>';
+        return;
+      }
+      const maxVal = Math.max(...barEntries.map(e => e.value), 1);
+      const total = totalForPercent || barEntries.reduce((sum, e) => sum + e.value, 0);
+      container.innerHTML = `<div class="bar-list">` + barEntries.map((entry, idx) => {
+        const pctBar = (entry.value / maxVal) * 100;
+        const pctTxt = total ? ` (${formatPercent(entry.value, total)})` : "";
+        const color = colorByLabel[entry.label] || PIE_PALETTE[idx % PIE_PALETTE.length];
+        return `
+          <div class="bar-row">
+            <div class="bar-label">${escapeHtml(entry.label)}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pctBar}%;background:${color}"></div></div>
+            <div class="bar-value">${entry.value}${pctTxt}</div>
+          </div>
+        `;
+      }).join("") + `</div>`;
+    }
+
+    function aggregateCounts(rows, labelFn) {
+      const map = new Map();
+      rows.forEach(row => {
+        const label = labelFn(row);
+        if (!label || label === "-") return;
+        map.set(label, (map.get(label) || 0) + 1);
+      });
+      return [...map.entries()].map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value);
+    }
+
+    function renderTrendTable(rows) {
+      const container = document.getElementById("chartTrend");
+      const groups = new Map();
+      rows.forEach(row => {
+        if (!row.__date) return;
+        const key = `${row.__date.getFullYear()}-${String(row.__date.getMonth() + 1).padStart(2, "0")}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(row);
+      });
+      const keys = [...groups.keys()].sort();
+      if (!keys.length) {
+        container.innerHTML = '<div class="no-data">No hay visitas con fecha válida para tendencia.</div>';
+        return;
+      }
+
+      const html = keys.map(key => {
+        const visits = groups.get(key);
+        const pasi = mean(visits.map(v => toNumber(v.pasi)));
+        const bsa = mean(visits.map(v => toNumber(v.bsa)));
+        const dlqi = mean(visits.map(v => toNumber(v.dlqi_total)));
+        const monthLabel = new Date(`${key}-01`).toLocaleDateString("es-ES", { month: "short", year: "numeric" });
+        return `
+          <tr>
+            <td>${escapeHtml(monthLabel)}</td>
+            <td>${visits.length}</td>
+            <td>${Number.isFinite(pasi) ? pasi.toFixed(1) : "-"}</td>
+            <td>${Number.isFinite(bsa) ? bsa.toFixed(1) : "-"}</td>
+            <td>${Number.isFinite(dlqi) ? dlqi.toFixed(1) : "-"}</td>
+          </tr>
+        `;
+      }).join("");
+
+      container.innerHTML = `
+        <table class="trend-table">
+          <thead>
+            <tr><th>Mes</th><th>Visitas</th><th>PASI</th><th>BSA</th><th>DLQI</th></tr>
+          </thead>
+          <tbody>${html}</tbody>
+        </table>
+      `;
+    }
+
+    function getLatestRows(rows) {
+      const map = new Map();
+      rows.forEach(row => {
+        const id = normalizeId(row.nusha);
+        if (!id) return;
+        const prev = map.get(id);
+        if (!prev) {
+          map.set(id, row);
+          return;
+        }
+        const prevTs = prev.__date ? prev.__date.getTime() : Number.NEGATIVE_INFINITY;
+        const currTs = row.__date ? row.__date.getTime() : Number.NEGATIVE_INFINITY;
+        if (currTs > prevTs || (currTs === prevTs && row.__index > prev.__index)) {
+          map.set(id, row);
+        }
+      });
+      return [...map.values()];
+    }
+
+    function applyFilters() {
+      const fromDate = parseDateValue(el.dateFrom.value);
+      const toDate = parseDateValue(el.dateTo.value);
+      const tipo = normalizeText(el.tipoVisitaFilter.value);
+      const procedencia = normalizeText(el.procedenciaFilter.value);
+      const fenotipo = normalizeText(el.fenotipoFilter.value);
+      const curso = normalizeText(el.cursoFilter.value);
+      const comorb = normalizeText(el.comorbFilter.value);
+      const special = normalizeText(el.specialFilter.value);
+      const family = normalizeText(el.familyFilter.value);
+      const drug = normalizeText(el.drugFilter.value).toLowerCase();
+      const control = normalizeText(el.controlFilter.value);
+
+      const hasDateFilter = Boolean(fromDate || toDate);
+
+      filteredVisitRows = rawRows.filter(row => {
+        if (hasDateFilter) {
+          if (!row.__date) return false;
+          if (fromDate && row.__date < fromDate) return false;
+          if (toDate && row.__date > toDate) return false;
+        }
+
+        if (tipo && normalizeText(row.tipo_visita) !== tipo) return false;
+        if (procedencia && normalizeText(row.procedencia) !== procedencia) return false;
+        if (fenotipo && normalizeText(row.fenotipo) !== fenotipo) return false;
+        if (curso && normalizeText(row.curso_evolutivo) !== curso) return false;
+        if (comorb && !isTrue(row[comorb])) return false;
+
+        if (special === "any_special" && !hasSpecialZones(row)) return false;
+        if (special === "no_special" && hasSpecialZones(row)) return false;
+        if (special && special !== "any_special" && special !== "no_special" && !isTrue(row[special])) return false;
+
+        const therapy = getActiveTherapy(row);
+        if (family === "sin_tratamiento") {
+          const anyTx = THERAPY_FAMILIES.some(f => therapy[f.key].length > 0);
+          if (anyTx) return false;
+        } else if (family && family !== "all") {
+          if (!therapy[family] || therapy[family].length === 0) return false;
+        }
+
+        if (drug) {
+          const names = getActiveDrugNames(row).map(v => v.toLowerCase());
+          if (!names.includes(drug)) return false;
+        }
+
+        if (control && getControlStatus(row) !== control) return false;
+        return true;
+      });
+
+      latestRows = getLatestRows(filteredVisitRows);
+      renderGestion();
+    }
+
+    function renderGestion() {
+      const total = latestRows.length;
+      const statuses = latestRows.map(getControlStatus);
+
+      const noControlCount = statuses.filter(s => s === "no_controlada").length;
+      const pasiVals = latestRows.map(r => toNumber(r.pasi));
+      const bsaVals = latestRows.map(r => toNumber(r.bsa));
+      const pasiHigh = latestRows.filter(r => Number.isFinite(toNumber(r.pasi)) && toNumber(r.pasi) > 10).length;
+      const bsaHigh = latestRows.filter(r => Number.isFinite(toNumber(r.bsa)) && toNumber(r.bsa) > 10).length;
+      const bioActive = latestRows.filter(r => getActiveTherapy(r).biologicos.length > 0).length;
+      const specialAffected = latestRows.filter(hasSpecialZones).length;
+
+      document.getElementById("kpiPatients").textContent = String(total);
+      document.getElementById("kpiActive").textContent = `${noControlCount} (${formatPercent(noControlCount, total)})`;
+      document.getElementById("kpiPasiMean").textContent = Number.isFinite(mean(pasiVals)) ? mean(pasiVals).toFixed(1) : "-";
+      document.getElementById("kpiPasiHigh").textContent = `${pasiHigh} (${formatPercent(pasiHigh, total)})`;
+      document.getElementById("kpiBsaMean").textContent = Number.isFinite(mean(bsaVals)) ? mean(bsaVals).toFixed(1) : "-";
+      document.getElementById("kpiBsaHigh").textContent = `${bsaHigh} (${formatPercent(bsaHigh, total)})`;
+      document.getElementById("kpiBio").textContent = `${bioActive} (${formatPercent(bioActive, total)})`;
+      document.getElementById("kpiSpecial").textContent = `${specialAffected} (${formatPercent(specialAffected, total)})`;
+
+      const statusCount = {
+        [CONTROL_STATUS.controlada.label]: statuses.filter(s => s === "controlada").length,
+        [CONTROL_STATUS.intermedia.label]: statuses.filter(s => s === "intermedia").length,
+        [CONTROL_STATUS.no_controlada.label]: statuses.filter(s => s === "no_controlada").length,
+        [CONTROL_STATUS.sin_datos.label]: statuses.filter(s => s === "sin_datos").length
+      };
+      renderPie("chartControl",
+        Object.entries(statusCount).map(([label, value]) => ({ label, value })),
+        total,
+        {
+          [CONTROL_STATUS.controlada.label]: CONTROL_STATUS.controlada.color,
+          [CONTROL_STATUS.intermedia.label]: CONTROL_STATUS.intermedia.color,
+          [CONTROL_STATUS.no_controlada.label]: CONTROL_STATUS.no_controlada.color,
+          [CONTROL_STATUS.sin_datos.label]: CONTROL_STATUS.sin_datos.color
+        },
+        8,
+        true
+      );
+
+      buildBarList("chartFenotipo", aggregateCounts(latestRows, row => humanizeCode(row.fenotipo)), total, {}, 8);
+      buildBarList("chartProcedencia", aggregateCounts(latestRows, row => humanizeCode(row.procedencia)), total, {}, 6);
+
+      const familyEntries = THERAPY_FAMILIES.map(family => ({
+        label: family.label,
+        value: latestRows.filter(r => getActiveTherapy(r)[family.key].length > 0).length
+      }));
+      buildBarList("chartFamilies", familyEntries, total, {}, 6, true);
+
+      const drugMap = new Map();
+      latestRows.forEach(row => {
+        const names = new Set(getActiveDrugNames(row));
+        names.forEach(name => drugMap.set(name, (drugMap.get(name) || 0) + 1));
+      });
+      const topDrugs = [...drugMap.entries()]
+        .map(([label, value]) => ({ label, value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 10);
+      buildBarList("chartDrugs", topDrugs, total, {}, 10);
+
+      const comorbEntries = COMORBIDITY_FIELDS.map(c => ({
+        label: c.label,
+        value: latestRows.filter(r => isTrue(r[c.key])).length
+      })).sort((a, b) => b.value - a.value).slice(0, 10);
+      buildBarList("chartComorb", comorbEntries, total, {}, 10);
+
+      const zoneEntries = SPECIAL_ZONE_FIELDS.map(z => ({
+        label: z.label,
+        value: latestRows.filter(r => isTrue(r[z.key])).length
+      })).sort((a, b) => b.value - a.value);
+      buildBarList("chartSpecialZones", zoneEntries, total, {}, 8, true);
+
+      renderTrendTable(filteredVisitRows);
+      el.exportCount.textContent = String(latestRows.length);
+    }
+
+    function buildFilterOptions() {
+      const uniq = (key) => [...new Set(rawRows.map(r => normalizeText(r[key])).filter(Boolean))].sort();
+      setSelectOptions(el.procedenciaFilter, uniq("procedencia"), "Todas");
+      setSelectOptions(el.fenotipoFilter, uniq("fenotipo"), "Todos");
+      setSelectOptions(el.cursoFilter, uniq("curso_evolutivo"), "Todos");
+
+      const comorbOptions = ['<option value="">Todas</option>']
+        .concat(COMORBIDITY_FIELDS.map(c => `<option value="${c.key}">${escapeHtml(c.label)}</option>`))
+        .join("");
+      el.comorbFilter.innerHTML = comorbOptions;
+
+      const specialOptions = ['<option value="">Todas</option>',
+        '<option value="any_special">Con alguna zona especial</option>',
+        '<option value="no_special">Sin zonas especiales</option>'
+      ].concat(SPECIAL_ZONE_FIELDS.map(s => `<option value="${s.key}">${escapeHtml(s.label)}</option>`));
+      el.specialFilter.innerHTML = specialOptions.join("");
+
+      const familyOptions = ['<option value="">Todas</option>',
+        '<option value="sin_tratamiento">Sin tratamiento activo</option>'
+      ].concat(THERAPY_FAMILIES.map(f => `<option value="${f.key}">${escapeHtml(f.label)}</option>`));
+      el.familyFilter.innerHTML = familyOptions.join("");
+
+      const drugSet = new Set();
+      rawRows.forEach(row => getActiveDrugNames(row).forEach(name => drugSet.add(name)));
+      const drugOptions = [...drugSet].sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
+      setSelectOptions(el.drugFilter, drugOptions, "Todos");
+
+      const nushas = [...new Set(rawRows.map(r => normalizeId(r.nusha)).filter(Boolean))].sort();
+      el.nushaList.innerHTML = nushas.map(n => `<option value="${escapeHtml(n)}"></option>`).join("");
+    }
+
+    function renderPatientTimeline() {
+      if (!timelineExpanded) {
+        el.patientTimeline.classList.add("hidden");
+        el.toggleTimelineBtn.textContent = "Mostrar Timeline";
+        return;
+      }
+      el.patientTimeline.classList.remove("hidden");
+      el.toggleTimelineBtn.textContent = "Ocultar Timeline";
+
+      el.patientTimeline.innerHTML = currentPatientRows.map((row, idx) => {
+        const status = getControlStatus(row);
+        const isLatest = idx === currentPatientRows.length - 1;
+        const cls = isLatest ? "visit-card active" : "visit-card";
+        const pase = metricValue(toNumber(row.pasi), 1);
+        return `
+          <div class="${cls}">
+            <div class="visit-date">${escapeHtml(formatDate(row.__date))}</div>
+            <div class="visit-type">${escapeHtml(humanizeCode(row.tipo_visita))}</div>
+            <div style="margin-top:0.2rem"><span class="status-chip status-${status}">${escapeHtml(CONTROL_STATUS[status].label)}</span></div>
+            <div style="margin-top:0.2rem;color:#2f5566;font-weight:700;font-size:0.78rem;">PASI: ${escapeHtml(pase)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderPatient() {
+      if (!currentPatientRows.length) {
+        el.patientContent.classList.add("hidden");
+        return;
+      }
+
+      const latest = currentPatientRows[currentPatientRows.length - 1];
+      if (!latest) return;
+      const status = getControlStatus(latest);
+
+      el.patientIdPill.textContent = normalizeId(latest.nusha) || "NUSHA";
+      el.patientMainTitle.textContent = "Seguimiento Estructurado de Paciente";
+      const firstDate = currentPatientRows[0].__date;
+      const lastDate = latest.__date;
+      el.patientMainHint.textContent = `${currentPatientRows.length} visitas registradas · ${formatDate(firstDate)} → ${formatDate(lastDate)} · Vista principal en última visita`;
+      el.patientHeroStatus.innerHTML = `<span class="status-chip big status-${status}">${escapeHtml(CONTROL_STATUS[status].label)}</span>`;
+
+      renderPatientTimeline();
+      renderPatientKpis(latest);
+      renderVisitActivityCharts();
+      renderVisitTreatment(latest);
+      renderVisitDecision(latest);
+      renderVisitComorb(latest);
+      renderVisitLocations(latest);
+      renderPatientHistoryTable();
+      el.patientContent.classList.remove("hidden");
+    }
+
+    function metricValue(num, digits = 1) {
+      return Number.isFinite(num) ? num.toFixed(digits) : "-";
+    }
+
+    function renderKpiChips(items, emptyText = "Sin registro.") {
+      if (!items.length) return `<div class="vsub">${escapeHtml(emptyText)}</div>`;
+      return `<div class="chip-list">${items.map(item => `<span class="chip">${escapeHtml(item)}</span>`).join("")}</div>`;
+    }
+
+    function summarizeTherapy(row) {
+      const therapy = getActiveTherapy(row);
+      const familyLines = THERAPY_FAMILIES.map(family => {
+        const items = therapy[family.key] || [];
+        if (!items.length) return "";
+        const text = items.map(item => `${item.drug || "(Sin fármaco)"}${item.posology ? ` | ${item.posology}` : ""}`).join(" ; ");
+        return `${family.label}: ${text}`;
+      }).filter(Boolean);
+      return familyLines;
+    }
+
+    function renderPatientKpis(row) {
+      const status = getControlStatus(row);
+      const therapyLines = summarizeTherapy(row);
+      const comorb = getComorbidities(row);
+      const locations = getLocations(row);
+      const specials = getSpecialZones(row);
+      const morisky = toNumber(row.seguimiento_morisky_total_no_adherencia);
+      const moriskyText = Number.isFinite(morisky)
+        ? (morisky === 0 ? "Morisky-Green: Adherente" : "Morisky-Green: No Adherente")
+        : "Morisky-Green: Sin Datos";
+      const adhesionCategory = normalizeText(row.seguimiento_adherencia_categoria);
+      const adherenceLine = adhesionCategory ? `Adherencia: ${humanizeCode(adhesionCategory)}` : "";
+
+      el.patientKpiGrid.innerHTML = `
+        <div class="pk-main-grid">
+          <div class="pk-main"><div class="k">Fecha Última Visita</div><div class="v">${escapeHtml(formatDate(row.__date))}</div></div>
+          <div class="pk-main"><div class="k">Tipo de Visita</div><div class="v">${escapeHtml(humanizeCode(row.tipo_visita))}</div></div>
+          <div class="pk-main"><div class="k">Estado de Control</div><div class="status-inline"><span class="status-chip big status-${status}">${escapeHtml(CONTROL_STATUS[status].label)}</span></div></div>
+          <div class="pk-main"><div class="k">PASI</div><div class="v">${escapeHtml(metricValue(toNumber(row.pasi), 1))}</div></div>
+          <div class="pk-main"><div class="k">BSA</div><div class="v">${escapeHtml(metricValue(toNumber(row.bsa), 1))}</div></div>
+          <div class="pk-main"><div class="k">PGA</div><div class="v">${escapeHtml(metricValue(toNumber(row.pga), 0))}</div></div>
+          <div class="pk-main"><div class="k">DLQI</div><div class="v">${escapeHtml(metricValue(toNumber(row.dlqi_total), 0))}</div></div>
+          <div class="pk-main"><div class="k">PURE-4</div><div class="v">${escapeHtml(metricValue(toNumber(row.pure4_total_positivas), 0))}</div></div>
+          <div class="pk-main"><div class="k">Derivación Derma-Reuma</div><div class="v">${isTrue(row.derivacion_derma_reuma) ? "Sí" : "No"}</div></div>
+        </div>
+        <div class="pk-info-grid">
+          <div class="pk-info tx">
+            <div class="k">Tratamiento Activo</div>
+            <div class="v">
+              ${therapyLines.length
+                ? therapyLines.map(line => `<div class="pk-line">${escapeHtml(line)}</div>`).join("")
+                : '<div class="vsub">Sin tratamiento activo.</div>'
+              }
+            </div>
+          </div>
+          <div class="pk-info comorb">
+            <div class="k">Comorbilidades Activas</div>
+            <div class="pk-count">${comorb.length}</div>
+            <div class="v">${renderKpiChips(comorb, "Sin comorbilidades activas.")}</div>
+          </div>
+          <div class="pk-info loc">
+            <div class="k">Localizaciones Activas</div>
+            <div class="pk-count">${locations.length}</div>
+            <div class="v">${renderKpiChips(locations, "Sin localizaciones activas.")}</div>
+          </div>
+          <div class="pk-info special">
+            <div class="k">Zonas Especiales y Adherencia</div>
+            <div class="pk-count">${specials.length}</div>
+            <div class="v">${renderKpiChips(specials, "Sin zonas especiales.")}</div>
+            <div class="pk-line"><strong>${escapeHtml(moriskyText)}</strong></div>
+            ${adherenceLine ? `<div class="pk-line">${escapeHtml(adherenceLine)}</div>` : ""}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPatientHistoryTable() {
+      if (!currentPatientRows.length) {
+        el.patientHistoryTable.innerHTML = '<div class="no-data">Sin historial de visitas.</div>';
+        return;
+      }
+
+      const rows = currentPatientRows.map(row => {
+        const status = getControlStatus(row);
+        const therapyText = summarizeTherapy(row).join(" || ");
+        return `
+          <tr>
+            <td>${escapeHtml(formatDate(row.__date))}</td>
+            <td>${escapeHtml(humanizeCode(row.tipo_visita))}</td>
+            <td><span class="status-chip status-${status}">${escapeHtml(CONTROL_STATUS[status].label)}</span></td>
+            <td>${escapeHtml(metricValue(toNumber(row.pasi), 1))}</td>
+            <td>${escapeHtml(metricValue(toNumber(row.bsa), 1))}</td>
+            <td>${escapeHtml(metricValue(toNumber(row.pga), 0))}</td>
+            <td>${escapeHtml(metricValue(toNumber(row.dlqi_total), 0))}</td>
+            <td>${escapeHtml(metricValue(toNumber(row.pure4_total_positivas), 0))}</td>
+            <td>${therapyText ? escapeHtml(therapyText) : "-"}</td>
+          </tr>
+        `;
+      }).join("");
+
+      el.patientHistoryTable.innerHTML = `
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Control</th>
+                <th>PASI</th>
+                <th>BSA</th>
+                <th>PGA</th>
+                <th>DLQI</th>
+                <th>PURE-4</th>
+                <th>Tratamiento Registrado</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function buildLineChartSvg(container, legend, labels, series, yMax = null) {
+      const width = 760;
+      const height = 240;
+      const padL = 42;
+      const padR = 12;
+      const padT = 18;
+      const padB = 34;
+      const innerW = width - padL - padR;
+      const innerH = height - padT - padB;
+
+      const allVals = series.flatMap(s => s.values).filter(Number.isFinite);
+      if (!allVals.length || labels.length < 2) {
+        container.innerHTML = '<div class="no-data">No hay datos suficientes para dibujar evolución.</div>';
+        legend.innerHTML = "";
+        return;
+      }
+
+      const maxVal = yMax || Math.max(...allVals, 1);
+      const minVal = 0;
+      const xAt = (i) => padL + (innerW * i) / Math.max(labels.length - 1, 1);
+      const yAt = (v) => padT + innerH - ((v - minVal) / Math.max(maxVal - minVal, 1)) * innerH;
+
+      const hLines = 4;
+      const grid = Array.from({ length: hLines + 1 }, (_, i) => {
+        const y = padT + (innerH / hLines) * i;
+        const val = (maxVal - (maxVal / hLines) * i).toFixed(0);
+        return `
+          <line x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="#e7eff4" stroke-width="1" />
+          <text x="${padL - 7}" y="${y + 4}" text-anchor="end" font-size="10" fill="#67808e">${val}</text>
+        `;
+      }).join("");
+
+      const lines = series.map(s => {
+        let segments = [];
+        let current = [];
+        s.values.forEach((v, i) => {
+          if (Number.isFinite(v)) {
+            current.push(`${xAt(i)},${yAt(v)}`);
+          } else if (current.length) {
+            segments.push(current);
+            current = [];
+          }
+        });
+        if (current.length) segments.push(current);
+
+        const polylines = segments.map(seg => `<polyline fill="none" stroke="${s.color}" stroke-width="2.4" points="${seg.join(" ")}" />`).join("");
+        const circles = s.values.map((v, i) => Number.isFinite(v)
+          ? `<circle cx="${xAt(i)}" cy="${yAt(v)}" r="3.2" fill="${s.color}" />`
+          : ""
+        ).join("");
+        return polylines + circles;
+      }).join("");
+
+      const labelsSvg = labels.map((txt, i) => {
+        if (labels.length > 10 && i % 2 === 1 && i !== labels.length - 1) return "";
+        return `<text x="${xAt(i)}" y="${height - 8}" text-anchor="middle" font-size="10" fill="#6b8491">${escapeHtml(txt)}</text>`;
+      }).join("");
+
+      container.innerHTML = `
+        <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="Evolución longitudinal">
+          ${grid}
+          <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" stroke="#c8d8e1" stroke-width="1.2"></line>
+          <line x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}" stroke="#c8d8e1" stroke-width="1.2"></line>
+          ${lines}
+          ${labelsSvg}
+        </svg>
+      `;
+
+      legend.innerHTML = series.map(s => `
+        <span class="legend-item"><span class="legend-dot" style="background:${s.color}"></span>${escapeHtml(s.label)}</span>
+      `).join("");
+    }
+
+    function renderVisitActivityCharts() {
+      const labels = currentPatientRows.map(row => {
+        const date = formatDate(row.__date);
+        return date === "-" ? `Visita ${row.__index}` : date;
+      });
+
+      buildLineChartSvg(
+        el.activityChart,
+        el.activityLegend,
+        labels,
+        [
+          { label: "PASI", color: "#d64545", values: currentPatientRows.map(r => toNumber(r.pasi)) },
+          { label: "BSA", color: "#0f766e", values: currentPatientRows.map(r => toNumber(r.bsa)) },
+          { label: "PGA", color: "#145b73", values: currentPatientRows.map(r => toNumber(r.pga)) }
+        ],
+        30
+      );
+
+      buildLineChartSvg(
+        el.promsChart,
+        el.promsLegend,
+        labels,
+        [
+          { label: "DLQI", color: "#7f56d9", values: currentPatientRows.map(r => toNumber(r.dlqi_total)) },
+          { label: "EVA Prurito", color: "#db7c2a", values: currentPatientRows.map(r => toNumber(r.eva_prurito)) },
+          { label: "EVA Dolor", color: "#2f93c5", values: currentPatientRows.map(r => toNumber(r.eva_dolor)) }
+        ],
+        30
+      );
+    }
+
+    function renderVisitTreatment(row) {
+      const therapy = getActiveTherapy(row);
+      const html = THERAPY_FAMILIES.map(family => {
+        const items = therapy[family.key];
+        if (!items.length) return "";
+        const lines = items.map(item => `${item.drug || "(Sin fármaco)"}${item.posology ? ` | ${item.posology}` : ""}`).join("<br>");
+        return `<div class="tx-block"><strong>${escapeHtml(family.label)}:</strong><br>${lines}</div>`;
+      }).join("");
+      el.patientTreatment.innerHTML = html || '<div class="no-data">No hay tratamiento activo registrado en la última visita.</div>';
+    }
+
+    function renderVisitDecision(row) {
+      const motivo = normalizeText(row.seguimiento_motivo_cambio);
+      const efectos = normalizeText(row.seguimiento_efectos_adversos);
+      const adherencia = normalizeText(row.seguimiento_adherencia_categoria);
+      const ajuste = normalizeText(row.seguimiento_ajuste_terapeutico);
+      const morisky = toNumber(row.seguimiento_morisky_total_no_adherencia);
+      const lines = [];
+
+      if (motivo) lines.push(`<div class="tx-block"><strong>Cambio de tratamiento:</strong> ${escapeHtml(humanizeCode(motivo))}</div>`);
+      else if (normalizeText(row.tipo_visita) === "seguimiento") lines.push('<div class="tx-block"><strong>Continuidad de tratamiento</strong></div>');
+
+      if (Number.isFinite(morisky)) lines.push(`<div class="tx-block"><strong>Morisky (No Adherencia):</strong> ${morisky.toFixed(0)}</div>`);
+      if (adherencia) lines.push(`<div class="tx-block"><strong>Adherencia (categoría):</strong> ${escapeHtml(humanizeCode(adherencia))}</div>`);
+      if (ajuste) lines.push(`<div class="tx-block"><strong>Ajuste terapéutico:</strong><br>${escapeHtml(ajuste)}</div>`);
+      if (efectos) lines.push(`<div class="tx-block"><strong>Efectos adversos:</strong> ${isTrue(efectos) ? "Sí" : "No"}</div>`);
+
+      el.patientDecision.innerHTML = lines.join("") || '<div class="no-data">Sin datos de decisión terapéutica para esta visita.</div>';
+    }
+
+    function renderVisitComorb(row) {
+      const list = getComorbidities(row);
+      el.patientComorb.innerHTML = list.length
+        ? `<div class="chip-list">${list.map(v => `<span class="chip">${escapeHtml(v)}</span>`).join("")}</div>`
+        : '<div class="no-data">No se registran comorbilidades activas.</div>';
+    }
+
+    function renderVisitLocations(row) {
+      const locations = getLocations(row);
+      const specials = getSpecialZones(row);
+      const locHtml = locations.length
+        ? `<div><strong>Localizaciones:</strong><div class="chip-list">${locations.map(v => `<span class="chip">${escapeHtml(v)}</span>`).join("")}</div></div>`
+        : '<div class="no-data">Sin localizaciones registradas.</div>';
+      const specialHtml = specials.length
+        ? `<div style="margin-top:0.55rem"><strong>Zonas Especiales:</strong><div class="chip-list">${specials.map(v => `<span class="chip">${escapeHtml(v)}</span>`).join("")}</div></div>`
+        : '<div style="margin-top:0.55rem" class="no-data">Sin zonas especiales afectadas.</div>';
+      el.patientLocations.innerHTML = locHtml + specialHtml;
+    }
+
+    function searchPatient() {
+      clearMessage();
+      const nusha = normalizeId(el.nushaSearch.value);
+      if (!nusha) {
+        showMessage("Introduce un NUSHA válido para buscar.");
+        el.patientContent.classList.add("hidden");
+        return;
+      }
+
+      currentPatientRows = rawRows
+        .filter(row => normalizeId(row.nusha) === nusha)
+        .sort((a, b) => {
+          const ta = a.__date ? a.__date.getTime() : Number.NEGATIVE_INFINITY;
+          const tb = b.__date ? b.__date.getTime() : Number.NEGATIVE_INFINITY;
+          return ta === tb ? a.__index - b.__index : ta - tb;
+        });
+
+      if (!currentPatientRows.length) {
+        showMessage(`No se encontraron visitas para ${nusha}.`);
+        el.patientContent.classList.add("hidden");
+        return;
+      }
+
+      timelineExpanded = false;
+      renderPatient();
+      showMessage(`Paciente ${nusha} cargado (${currentPatientRows.length} visitas).`, true);
+    }
+
+    function updatePatientModuleAfterFilter() {
+      // El módulo de paciente ignora filtros de gestión; no se recalcula aquí.
+    }
+
+    function clearFilters() {
+      el.dateFrom.value = "";
+      el.dateTo.value = "";
+      el.tipoVisitaFilter.value = "";
+      el.procedenciaFilter.value = "";
+      el.fenotipoFilter.value = "";
+      el.cursoFilter.value = "";
+      el.comorbFilter.value = "";
+      el.specialFilter.value = "";
+      el.familyFilter.value = "";
+      el.drugFilter.value = "";
+      el.controlFilter.value = "";
+      applyFilters();
+    }
+
+    function columnRefToIndex(ref) {
+      let idx = 0;
+      const letters = String(ref || "").replace(/[^A-Z]/gi, "").toUpperCase();
+      for (let i = 0; i < letters.length; i++) idx = idx * 26 + (letters.charCodeAt(i) - 64);
+      return Math.max(0, idx - 1);
+    }
+
+    function normalizeZipPath(path) {
+      const raw = String(path || "").replace(/^\/+/, "");
+      const parts = [];
+      raw.split("/").forEach(part => {
+        if (!part || part === ".") return;
+        if (part === "..") { parts.pop(); return; }
+        parts.push(part);
+      });
+      return parts.join("/");
+    }
+
+    function buildRowsFromPlain(headers, plainRows) {
+      return plainRows
+        .map((plain, idx) => {
+          const row = {};
+          headers.forEach(h => { row[h] = normalizeText(plain[h]); });
+          row.__index = idx;
+          row.__date = parseDateValue(row.fecha_visita);
+          return row;
+        })
+        .filter(row => normalizeId(row.nusha) !== "");
+    }
+
+    function activateDataset(headers, rows, fileName, statusPrefix = "Base cargada") {
+      sourceHeaders = headers;
+      rawRows = rows;
+      loadedFileName = fileName;
+      const patients = new Set(rawRows.map(r => normalizeId(r.nusha))).size;
+      setLoadStatus(`${statusPrefix}: ${loadedFileName} (${rawRows.length} visitas, ${patients} pacientes).`, true);
+      buildFilterOptions();
+      applyFilters();
+      el.appShell.classList.remove("hidden");
+      toggleModule("paciente");
+      el.nushaSearch.focus();
+      clearMessage();
+    }
+
+    function persistDatasetCache() {
+      if (!sourceHeaders.length || !rawRows.length) return;
+      try {
+        const rowsForCache = rawRows.map(row => {
+          const plain = {};
+          sourceHeaders.forEach(h => { plain[h] = row[h] ?? ""; });
+          return plain;
+        });
+        const payload = {
+          version: 1,
+          fileName: loadedFileName,
+          cachedAt: new Date().toISOString(),
+          headers: sourceHeaders,
+          rows: rowsForCache
+        };
+        localStorage.setItem(DATA_CACHE_KEY, JSON.stringify(payload));
+      } catch (error) {
+        console.warn("No se pudo guardar cache local de la base:", error);
+      }
+    }
+
+    function restoreCachedDataset() {
+      try {
+        const rawCache = localStorage.getItem(DATA_CACHE_KEY);
+        if (!rawCache) return false;
+        const payload = JSON.parse(rawCache);
+        if (!payload || !Array.isArray(payload.headers) || !Array.isArray(payload.rows)) {
+          localStorage.removeItem(DATA_CACHE_KEY);
+          return false;
+        }
+        const headers = payload.headers.map(h => normalizeKey(h));
+        if (!headers.includes("nusha") || !headers.includes("fecha_visita") || !headers.includes("tipo_visita")) {
+          localStorage.removeItem(DATA_CACHE_KEY);
+          return false;
+        }
+        const rows = buildRowsFromPlain(headers, payload.rows);
+        if (!rows.length) {
+          localStorage.removeItem(DATA_CACHE_KEY);
+          return false;
+        }
+        const cachedDate = payload.cachedAt ? parseDateValue(payload.cachedAt) : null;
+        const suffix = cachedDate ? ` · cache ${formatDate(cachedDate)}` : " · cache local";
+        activateDataset(headers, rows, `${payload.fileName || "Base Sin Nombre"}${suffix}`, "Base restaurada automáticamente");
+        return true;
+      } catch (error) {
+        console.warn("No se pudo restaurar cache local de la base:", error);
+        return false;
+      }
+    }
+
+    async function parseXLSX(file) {
+      if (typeof JSZip === "undefined") throw new Error("JSZip no está disponible.");
+      const zip = await JSZip.loadAsync(await file.arrayBuffer());
+      const workbookXml = await zip.file("xl/workbook.xml")?.async("text");
+      const relsXml = await zip.file("xl/_rels/workbook.xml.rels")?.async("text");
+      if (!workbookXml || !relsXml) throw new Error("Archivo XLSX inválido.");
+
+      const parser = new DOMParser();
+      const wbDoc = parser.parseFromString(workbookXml, "application/xml");
+      const relDoc = parser.parseFromString(relsXml, "application/xml");
+
+      const firstSheet = wbDoc.getElementsByTagName("sheet")[0];
+      if (!firstSheet) throw new Error("El XLSX no contiene hojas.");
+      const relId = firstSheet.getAttribute("r:id") || firstSheet.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id");
+      if (!relId) throw new Error("No se pudo resolver la hoja principal.");
+
+      const relationships = Array.from(relDoc.getElementsByTagName("Relationship"));
+      const rel = relationships.find(item => item.getAttribute("Id") === relId);
+      if (!rel) throw new Error("No se encontró el vínculo de hoja.");
+
+      const target = rel.getAttribute("Target") || "";
+      const sheetPath = normalizeZipPath(target.startsWith("/") ? target : `xl/${target}`);
+      const sheetXml = await zip.file(sheetPath)?.async("text");
+      if (!sheetXml) throw new Error("No se pudo leer la hoja de cálculo.");
+
+      let sharedStrings = [];
+      const sharedXml = await zip.file("xl/sharedStrings.xml")?.async("text");
+      if (sharedXml) {
+        const sharedDoc = parser.parseFromString(sharedXml, "application/xml");
+        sharedStrings = Array.from(sharedDoc.getElementsByTagName("si")).map(si => {
+          return Array.from(si.getElementsByTagName("t")).map(t => t.textContent || "").join("");
+        });
+      }
+
+      const sheetDoc = parser.parseFromString(sheetXml, "application/xml");
+      const rows = Array.from(sheetDoc.getElementsByTagName("row")).map(rowNode => {
+        const row = [];
+        Array.from(rowNode.getElementsByTagName("c")).forEach(cell => {
+          const ref = cell.getAttribute("r") || "";
+          const index = columnRefToIndex(ref);
+          const type = cell.getAttribute("t") || "";
+          let value = "";
+          if (type === "inlineStr") {
+            value = Array.from(cell.getElementsByTagName("t")).map(t => t.textContent || "").join("");
+          } else {
+            const v = cell.getElementsByTagName("v")[0]?.textContent || "";
+            value = type === "s" ? (sharedStrings[Number(v)] ?? "") : v;
+          }
+          row[index] = value;
+        });
+        return row;
+      }).filter(row => row.some(v => normalizeText(v) !== ""));
+
+      return rows;
+    }
+
+    function processMatrix(matrix, fileName) {
+      if (!matrix.length) throw new Error("Archivo sin contenido.");
+      const headers = matrix[0].map(v => normalizeKey(v));
+      if (!headers.includes("nusha") || !headers.includes("fecha_visita") || !headers.includes("tipo_visita")) {
+        throw new Error("Cabecera inválida: faltan columnas requeridas (nusha, fecha_visita, tipo_visita).");
+      }
+
+      const plainRows = matrix.slice(1).map(raw => {
+        const row = {};
+        headers.forEach((h, i) => { row[h] = normalizeText(raw[i]); });
+        return row;
+      });
+      const rows = buildRowsFromPlain(headers, plainRows);
+
+      if (!rows.length) throw new Error("No hay filas válidas con NUSHA.");
+      activateDataset(headers, rows, fileName, "Base cargada");
+      persistDatasetCache();
+    }
+
+    function onFileSelected(file) {
+      if (!file) return;
+      if (!/\.xlsx$/i.test(file.name)) {
+        setLoadStatus("Archivo no válido. Selecciona un XLSX.", false);
+        return;
+      }
+      setLoadStatus("Procesando archivo...", false);
+      parseXLSX(file)
+        .then(matrix => processMatrix(matrix, file.name))
+        .catch(err => setLoadStatus(`Error: ${err.message}`, false));
+    }
+
+    function getSourceHeadersForExport() {
+      const safeHeaders = sourceHeaders.filter(h => !h.startsWith("__"));
+      return safeHeaders.length ? safeHeaders : Object.keys(latestRows[0] || {}).filter(h => !h.startsWith("__"));
+    }
+
+    function escapeXml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+    }
+
+    function indexToColumnRef(index) {
+      let n = index + 1;
+      let s = "";
+      while (n > 0) {
+        const mod = (n - 1) % 26;
+        s = String.fromCharCode(65 + mod) + s;
+        n = Math.floor((n - 1) / 26);
+      }
+      return s;
+    }
+
+    function createCellXml(colIndex, rowIndex, value) {
+      const ref = `${indexToColumnRef(colIndex)}${rowIndex}`;
+      const text = escapeXml(String(value ?? ""));
+      return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${text}</t></is></c>`;
+    }
+
+    function createSheetXml(headers, rows) {
+      let xmlRows = "";
+      const buildRow = (rowNumber, values) => {
+        const cells = values.map((value, colIndex) => createCellXml(colIndex, rowNumber, value)).join("");
+        return `<row r="${rowNumber}">${cells}</row>`;
+      };
+      xmlRows += buildRow(1, headers);
+      rows.forEach((row, i) => { xmlRows += buildRow(i + 2, row); });
+
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetData>${xmlRows}</sheetData>
+</worksheet>`;
+    }
+
+    async function exportFilteredXlsx() {
+      if (!latestRows.length) {
+        setLoadStatus("No hay registros filtrados para exportar.", false);
+        return;
+      }
+      if (typeof JSZip === "undefined") {
+        setLoadStatus("No se pudo exportar: JSZip no está disponible.", false);
+        return;
+      }
+
+      const headers = getSourceHeadersForExport();
+      const rows = latestRows.map(row => headers.map(h => row[h] ?? ""));
+
+      const zip = new JSZip();
+      zip.file("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>`);
+
+      zip.folder("_rels").file(".rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>`);
+
+      zip.folder("docProps").file("app.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+  <Application>Codex</Application>
+</Properties>`);
+
+      zip.folder("docProps").file("core.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:creator>Valme Dashboard</dc:creator>
+  <cp:lastModifiedBy>Valme Dashboard</cp:lastModifiedBy>
+</cp:coreProperties>`);
+
+      zip.folder("xl").file("workbook.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Psoriasis_Filtrado" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>`);
+
+      zip.folder("xl").folder("_rels").file("workbook.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+</Relationships>`);
+
+      zip.folder("xl").folder("worksheets").file("sheet1.xml", createSheetXml(headers, rows));
+
+      const blob = await zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+      a.href = url;
+      a.download = `Psoriasis_Valme_Filtrado_${stamp}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setLoadStatus(`Exportación XLSX completada (${latestRows.length} registros).`, true);
+    }
+
+    function wireEvents() {
+      el.loadBtn.addEventListener("click", () => el.fileInput.click());
+      el.fileInput.addEventListener("change", () => onFileSelected(el.fileInput.files?.[0]));
+
+      el.btnGestion.addEventListener("click", () => toggleModule("gestion"));
+      el.btnPaciente.addEventListener("click", () => toggleModule("paciente"));
+
+      [
+        el.dateFrom, el.dateTo, el.tipoVisitaFilter, el.procedenciaFilter, el.fenotipoFilter,
+        el.cursoFilter, el.comorbFilter, el.specialFilter, el.familyFilter, el.drugFilter, el.controlFilter
+      ].forEach(node => node.addEventListener("change", applyFilters));
+
+      el.clearFiltersBtn.addEventListener("click", clearFilters);
+      el.searchPatientBtn.addEventListener("click", searchPatient);
+      el.toggleTimelineBtn.addEventListener("click", () => {
+        timelineExpanded = !timelineExpanded;
+        renderPatientTimeline();
+      });
+      el.nushaSearch.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          searchPatient();
+        }
+      });
+      el.exportBtn.addEventListener("click", exportFilteredXlsx);
+    }
+
+    wireEvents();
+    toggleModule("paciente");
+    restoreCachedDataset();
+
+    const specialOptionsInit = ['<option value="">Todas</option>',
+      '<option value="any_special">Con alguna zona especial</option>',
+      '<option value="no_special">Sin zonas especiales</option>'
+    ].concat(SPECIAL_ZONE_FIELDS.map(s => `<option value="${s.key}">${escapeHtml(s.label)}</option>`));
+    el.specialFilter.innerHTML = specialOptionsInit.join("");
+
+    const comorbInit = ['<option value="">Todas</option>']
+      .concat(COMORBIDITY_FIELDS.map(c => `<option value="${c.key}">${escapeHtml(c.label)}</option>`));
+    el.comorbFilter.innerHTML = comorbInit.join("");
+
+    const familyInit = ['<option value="">Todas</option>',
+      '<option value="sin_tratamiento">Sin tratamiento activo</option>'
+    ].concat(THERAPY_FAMILIES.map(f => `<option value="${f.key}">${escapeHtml(f.label)}</option>`));
+    el.familyFilter.innerHTML = familyInit.join("");
+  </script>
+</body>
+</html>
