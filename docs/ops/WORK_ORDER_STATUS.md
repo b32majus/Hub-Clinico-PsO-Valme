@@ -10,7 +10,7 @@
 |---|---|
 | `main` | Base original del prototipo; HEAD inicial verificado para este plan: `9d722c8da792ffe51ce2ea9a1420af71a70522f1` |
 | Rama de ejecución actual | `work/pso-valme-train-a-20260928` |
-| Cambio funcional en esta rama | PSO-02 (aislamiento de estado) y PSO-03 (missingness de scores) en `index.html`; PSO-04 (cohorte de estado actual) en `Cuadro_Mando_Psoriasis_Valme_v2.html` |
+| Cambio funcional en esta rama | PSO-02 (aislamiento de estado) y PSO-03 (missingness de scores) en `index.html`; PSO-04 (cohorte de estado actual) en `Cuadro_Mando_Psoriasis_Valme_v2.html`; PSO-05 (longitudinalidad y fechas) en `index.html` y V2 |
 | Dashboard de referencia | `Cuadro_Mando_Psoriasis_Valme_v2.html` adjudicado como baseline donante por PSO-01 (veredicto `V2_WITH_V1_FEATURES_TO_PORT`) |
 | Dashboard v1 | Referencia histórica temporal; no borrar; única capacidad V1-only: caché local con auto-restauración |
 | Estado asistencial | Prototipo / datos sintéticos; no piloto ni producción |
@@ -39,7 +39,7 @@
 | PSO-02 | Aislamiento de estado por paciente | Clínica/funcional | `DONE_VERIFIED` | PSO-01 | PsO-Valme (`index.html`) |
 | PSO-03 | Missingness PASI/DLQI/PURE-4 | Clínica/funcional | `DONE_VERIFIED` | PSO-01; PSO-02 | PsO-Valme (`index.html`) |
 | PSO-04 | Cohorte actual y filtros dashboard | Analítica/funcional | `DONE_VERIFIED` | PSO-01 | PsO-Valme (`Cuadro_Mando_Psoriasis_Valme_v2.html`) |
-| PSO-05 | Longitudinalidad y fechas | Datos/funcional | `PLANNED` | PSO-01 | PsO-Valme |
+| PSO-05 | Longitudinalidad y fechas | Datos/funcional | `DONE_VERIFIED` | PSO-01 | PsO-Valme (`index.html`, V2) |
 | PSO-06 | Portabilidad XLSX + schema | Técnica | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-07 | Contrato donante Psoriasis | Documental/contrato | `BLOCKED` | PSO-02/03/04/05 adjudicadas | PsO-Valme |
 | DERMA-READ-01 | Auditoría onboarding PROMueve live (Reuma) | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
@@ -303,6 +303,70 @@ Un único commit local `fix(pso): apply dashboard filters to current patient sta
 
 Revertir el commit restaura el pipeline anterior sin tocar datos.
 
+## PSO-05 — cierre
+
+### Objetivo
+
+Impedir que una visita futura se hidrate como historia previa y unificar el parsing de
+fechas entre formulario y dashboard V2, sin rediseñar el modelo de almacenamiento.
+
+### Base / rama
+
+`work/pso-valme-train-a-20260928`; HEAD de partida `566575309912a3180492d29200c8ac0fe7b55a10`; árbol limpio.
+
+### Causa raíz
+
+- `getLatestVisitRow(id, currentDate)` solo restringía a visitas anteriores si existía al menos una;
+  sin visita anterior devolvía la última visita global, que podía ser **futura** (auditoría inicial P1.1).
+- `parseDateToTs()` usaba `new Date(value)` en el formulario: los seriales Excel se interpretaban como
+  año (`new Date("46023")` → año 46023) y `dd/mm/yyyy` como formato US (`new Date("01/06/2026")` → 6 ene).
+- El dashboard V2 ya manejaba seriales y `dd/mm/yyyy`, pero con desbordamiento de mes (`13/13`) y
+  *fallback* genérico `new Date` que podía fabricar cronología. Dashboard y formulario divergían.
+
+### Contrato normalizado
+
+`docs/ops/PSO-05_LONGITUDINAL_DATE_CONTRACT.md`. Función semántica única `parseCalendarDate(value)`:
+ISO `yyyy-mm-dd`/`yyyy/mm/dd` (hora ignorada), `dd/mm/yyyy`, serial Excel 1900 en `[20000, 80000]`,
+inválido → desconocido. Devuelve día de calendario local a medianoche; sin inferencia de timestamps.
+
+### Cambio
+
+- `index.html`: `parseCalendarDate` + `buildCalendarDate` canónicos; `parseDateToTs` y `formatDateEs`
+  delegan en ellos. `getLatestVisitRow` solo considera visitas con fecha válida y, con D válida,
+  exige fecha **estrictamente anterior**; sin visita elegible devuelve `null` y no hidrata nada.
+  El estado distingue «paciente sin visita previa a la fecha indicada» de «NUSHA no encontrado».
+- `Cuadro_Mando_Psoriasis_Valme_v2.html`: mismo parser canónico; `getLatestRows` ignora filas sin
+  fecha válida (la cronología desconocida no cae a orden de origen).
+- Empate del mismo día: `__index` mayor en ambas superficies, documentado como limitación, no como
+  orden clínico. Con D válida, el mismo día no es «previo» (`< D` estricto).
+
+### No toca
+
+V1; umbrales/missingness de scores; cohorte/filtros de PSO-04 salvo el parser compartido; schema;
+importación/exportación XLSX; fixtures demo; `main`; `Hub-Clinico-Badajoz`.
+
+### Regresión determinista
+
+`tests/longitudinal_date_semantics.test.js` (Playwright headless sobre ambos HTML, datos sintéticos)
+cubre A (sin visita previa → nada de futuro), B (visita previa válida), C (serial Excel ≡ texto),
+D (vacío/inválido desconocido y no seleccionado), E (empate del mismo día determinista), F (paridad
+de orden formulario ↔ V2). Resultado: 49/49 PASS. Regresiones previas: PSO-02 46/46, PSO-03 42/42,
+PSO-04 39/39 PASS. `git diff --check` PASS.
+
+### Limitación de mismo día
+
+Sin `visit_id`/`record_id`, dos filas del mismo paciente y fecha no admiten orden clínico. Se resuelve
+de forma determinista por orden de origen (`__index`) y queda documentado; la deuda de identidad de
+visita permanece fuera de este ticket.
+
+### Delivery
+
+Un único commit local `fix(pso): harden longitudinal visit and date semantics`; sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit restaura el comportamiento previo sin tocar datos.
+
 ## DERMA-READ-01 — cierre
 
 ### Objetivo
@@ -394,8 +458,8 @@ El repositorio externo permaneció sin modificar (refs remotas re-verificadas id
 Dado que la prioridad de producto es Extremadura:
 
 1. adjudicar la caché local V1-only en **PSO-06** (o descartarla motivadamente);
-2. **PSO-02, PSO-03 y PSO-04 completadas** (`DONE_VERIFIED`; PSO-02/03 en `index.html`, PSO-04 en
-   `Cuadro_Mando_Psoriasis_Valme_v2.html`); continuar **PSO-05** y **PSO-06**, cerrando los
+2. **PSO-02, PSO-03, PSO-04 y PSO-05 completadas** (`DONE_VERIFIED`; PSO-02/03/05 en `index.html`,
+   PSO-04/05 en `Cuadro_Mando_Psoriasis_Valme_v2.html`); continuar **PSO-06**, cerrando los
    defectos listados en el informe de PSO-01;
 3. **DERMA-READ-01 y DERMA-READ-01B completadas** (`DONE_VERIFIED`); sus informes (Reuma y
    Farmacia/Nexus) alimentan **DERMA-DESIGN-01**, aún `BLOCKED` por PSO-07 + DERMA-READ-01 +

@@ -51,6 +51,15 @@ Preserva la auditoría técnica/funcional inicial del prototipo antes de modific
 
 Adjudica V2 como baseline donante (`V2_WITH_V1_FEATURES_TO_PORT`), documenta la única capacidad V1-only (caché local con auto-restauración) y lista defectos compartidos por ambos.
 
+### Contrato de fechas y longitudinalidad (PSO-05)
+
+[`ops/PSO-05_LONGITUDINAL_DATE_CONTRACT.md`](./ops/PSO-05_LONGITUDINAL_DATE_CONTRACT.md)
+
+Contrato semántico mínimo compartido por `index.html` y `Cuadro_Mando_Psoriasis_Valme_v2.html`:
+formas de fecha soportadas (ISO, `dd/mm/yyyy`, serial Excel), valores inválidos como desconocidos,
+selección de visita estrictamente anterior, fila actual del dashboard y limitación documentada del
+empate del mismo día sin `visit_id`/`record_id`.
+
 ### Auditoría de onboarding Reuma → Dermatología (DERMA-READ-01)
 
 [`audits/PROMUEVE_REUMA_DERMATOLOGY_ONBOARDING_AUDIT_20260928.md`](./audits/PROMUEVE_REUMA_DERMATOLOGY_ONBOARDING_AUDIT_20260928.md)

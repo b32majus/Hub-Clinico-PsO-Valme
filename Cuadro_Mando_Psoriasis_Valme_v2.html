@@ -1567,22 +1567,45 @@
       return Number.isFinite(num) ? num : Number.NaN;
     }
 
-    function parseDateValue(value) {
-      if (value === null || value === undefined || String(value).trim() === "") return null;
+    // Canonical date semantics (PSO-05), kept semantically identical to
+    // `index.html` (see docs/ops/PSO-05_LONGITUDINAL_DATE_CONTRACT.md):
+    //   - ISO-like `yyyy-mm-dd` / `yyyy/mm/dd` (an optional time part is ignored);
+    //   - Spanish `dd/mm/yyyy` / `d/m/yyyy`;
+    //   - Excel 1900-system serial numbers in [20000, 80000];
+    //   - blank / invalid -> unknown (null), never epoch/today.
+    // Returns a local-midnight Date. A bare number outside the serial range is
+    // NOT a date, and day/month roll-over (31/02) is rejected.
+    function buildCalendarDate(year, month, day) {
+      if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+      const date = new Date(year, month - 1, day);
+      if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+      return date;
+    }
+
+    function parseCalendarDate(value) {
+      if (value === null || value === undefined) return null;
       const text = String(value).trim();
-      const serial = Number(text);
-      if (Number.isFinite(serial) && serial > 20000 && serial < 80000) {
-        const ms = (serial - 25569) * 86400000;
-        const date = new Date(ms);
-        return Number.isNaN(date.getTime()) ? null : new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+      if (!text) return null;
+
+      if (/^\d+(\.\d+)?$/.test(text)) {
+        const serial = Number(text);
+        if (!(serial >= 20000 && serial <= 80000)) return null;
+        const utc = new Date((Math.floor(serial) - 25569) * 86400000);
+        if (Number.isNaN(utc.getTime())) return null;
+        return new Date(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
       }
-      if (/^\d{2}\/\d{2}\/\d{4}$/.test(text)) {
-        const [d, m, y] = text.split("/").map(Number);
-        const date = new Date(y, m - 1, d);
-        return Number.isNaN(date.getTime()) ? null : date;
-      }
-      const date = new Date(text);
-      return Number.isNaN(date.getTime()) ? null : date;
+
+      let m = text.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})(?:[T ].*)?$/);
+      if (m) return buildCalendarDate(Number(m[1]), Number(m[2]), Number(m[3]));
+
+      m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[T ].*)?$/);
+      if (m) return buildCalendarDate(Number(m[3]), Number(m[2]), Number(m[1]));
+
+      return null;
+    }
+
+    function parseDateValue(value) {
+      return parseCalendarDate(value);
     }
 
     function formatDate(date) {
@@ -1922,13 +1945,16 @@
       rows.forEach(row => {
         const id = normalizeId(row.nusha);
         if (!id) return;
+        // A row without a valid date cannot represent the patient's current
+        // state: unknown chronology must never fall back to source order.
+        if (!row.__date) return;
         const prev = map.get(id);
         if (!prev) {
           map.set(id, row);
           return;
         }
-        const prevTs = prev.__date ? prev.__date.getTime() : Number.NEGATIVE_INFINITY;
-        const currTs = row.__date ? row.__date.getTime() : Number.NEGATIVE_INFINITY;
+        const prevTs = prev.__date.getTime();
+        const currTs = row.__date.getTime();
         if (currTs > prevTs || (currTs === prevTs && row.__index > prev.__index)) {
           map.set(id, row);
         }

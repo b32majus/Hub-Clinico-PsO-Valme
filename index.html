@@ -1465,17 +1465,55 @@ function normalizeId(value) {
   return String(value || "").trim().toUpperCase();
 }
 
+// ---------------------------------------------------------------------------
+// Canonical date semantics (PSO-05). One documented, date-only interpretation,
+// kept semantically identical to `Cuadro_Mando_Psoriasis_Valme_v2.html`
+// (see docs/ops/PSO-05_LONGITUDINAL_DATE_CONTRACT.md):
+//   - ISO-like `yyyy-mm-dd` / `yyyy/mm/dd` (an optional time part is ignored);
+//   - Spanish `dd/mm/yyyy` / `d/m/yyyy`;
+//   - Excel 1900-system serial numbers in [20000, 80000];
+//   - blank / invalid -> unknown (never epoch, today or a default date).
+// Returns a local-midnight Date so a calendar day can never shift because of a
+// timezone. A bare number outside the serial range is NOT a date.
+function buildCalendarDate(year, month, day) {
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+  return date;
+}
+
+function parseCalendarDate(value) {
+  if (value === null || value === undefined) return null;
+  const text = String(value).trim();
+  if (!text) return null;
+
+  if (/^\d+(\.\d+)?$/.test(text)) {
+    const serial = Number(text);
+    if (!(serial >= 20000 && serial <= 80000)) return null;
+    const utc = new Date((Math.floor(serial) - 25569) * 86400000);
+    if (Number.isNaN(utc.getTime())) return null;
+    return new Date(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
+  }
+
+  let m = text.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})(?:[T ].*)?$/);
+  if (m) return buildCalendarDate(Number(m[1]), Number(m[2]), Number(m[3]));
+
+  m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[T ].*)?$/);
+  if (m) return buildCalendarDate(Number(m[3]), Number(m[2]), Number(m[1]));
+
+  return null;
+}
+
 function parseDateToTs(value) {
-  if (!value) return Number.NaN;
-  const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? Number.NaN : d.getTime();
+  const date = parseCalendarDate(value);
+  return date ? date.getTime() : Number.NaN;
 }
 
 function formatDateEs(value) {
-  if (!value) return "";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return String(value);
-  return d.toLocaleDateString("es-ES");
+  if (value === null || value === undefined || String(value).trim() === "") return "";
+  const date = parseCalendarDate(value);
+  if (!date) return String(value);
+  return date.toLocaleDateString("es-ES");
 }
 
 function humanizeCode(value) {
@@ -1711,25 +1749,36 @@ async function loadBaseFromFile(file) {
   }
 }
 
+// Previous-visit selection (PSO-05):
+//   - only visits with a valid date are eligible;
+//   - with a known encounter date D, only visits STRICTLY before D are eligible;
+//   - if no eligible prior visit exists, return null and hydrate nothing. A
+//     future (or same-day) visit is never used as prior history.
+// When the encounter date D is blank/invalid the form cannot prove any order,
+// so it keeps its legacy preload of the latest known visit (documented
+// limitation) but still ignores undated rows.
+// Same-day ties without a visit id resolve to the highest source `__index`
+// deterministically; that is a documented tie-break, not a clinical ordering
+// claim.
 function getLatestVisitRow(id, currentDate) {
   const candidates = baseRows.filter(r => r.__id === id);
   if (!candidates.length) return null;
+
+  const dated = candidates.filter(r => !Number.isNaN(parseDateToTs(r.fecha_visita)));
+  if (!dated.length) return null;
+
   const currentTs = parseDateToTs(currentDate);
-  let scoped = candidates;
+  let scoped = dated;
   if (!Number.isNaN(currentTs)) {
-    const previous = candidates.filter(r => {
-      const ts = parseDateToTs(r.fecha_visita);
-      return !Number.isNaN(ts) && ts < currentTs;
-    });
-    if (previous.length) scoped = previous;
+    scoped = dated.filter(r => parseDateToTs(r.fecha_visita) < currentTs);
+    if (!scoped.length) return null;
   }
+
   scoped.sort((a, b) => {
     const ta = parseDateToTs(a.fecha_visita);
     const tb = parseDateToTs(b.fecha_visita);
-    if (Number.isNaN(ta) && Number.isNaN(tb)) return b.__index - a.__index;
-    if (Number.isNaN(ta)) return 1;
-    if (Number.isNaN(tb)) return -1;
-    return tb - ta;
+    if (tb !== ta) return tb - ta;
+    return b.__index - a.__index;
   });
   return scoped[0] || null;
 }
@@ -2482,7 +2531,12 @@ function autoSearchByNusha() {
   if (!found) {
     resetPatientState();
     setVisitTypeLock(false);
-    setBaseStatus(`Base cargada: ${baseFileName} (${baseRows.length} filas). NUSHA no encontrado.`, false);
+    const known = baseRows.some(r => r.__id === id);
+    setBaseStatus(
+      `Base cargada: ${baseFileName} (${baseRows.length} filas). ` +
+        (known ? "Paciente sin visita previa a la fecha indicada." : "NUSHA no encontrado."),
+      false
+    );
     setPreviousVisitContext(null);
     return;
   }
