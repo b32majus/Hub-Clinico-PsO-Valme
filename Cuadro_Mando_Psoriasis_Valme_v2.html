@@ -491,6 +491,11 @@
       color: #92400e;
     }
 
+    .status-incompleto {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
     .status-no_controlada {
       background: #fee2e2;
       color: #b91c1c;
@@ -1164,6 +1169,7 @@
               <option value="controlada">Controlada</option>
               <option value="intermedia">Intermedia</option>
               <option value="no_controlada">No Controlada</option>
+              <option value="incompleto">Datos Incompletos</option>
               <option value="sin_datos">Sin Datos</option>
             </select>
           </div>
@@ -1462,6 +1468,7 @@
     const CONTROL_STATUS = {
       controlada: { label: "Controlada", color: "#1f9d55" },
       intermedia: { label: "Intermedia", color: "#e6a700" },
+      incompleto: { label: "Datos Incompletos", color: "#4f46e5" },
       no_controlada: { label: "No Controlada", color: "#d64545" },
       sin_datos: { label: "Sin Datos", color: "#7a8d99" }
     };
@@ -1527,7 +1534,7 @@
 
     let sourceHeaders = [];
     let rawRows = [];
-    let filteredVisitRows = [];
+    let visitScopeRows = [];
     let latestRows = [];
     let selectedModule = "paciente";
     let currentPatientRows = [];
@@ -1735,9 +1742,18 @@
       return SPECIAL_ZONE_FIELDS.some(z => isTrue(row[z.key]));
     }
 
-    // Criterio de semáforo acordado:
-    // no_controlada: PASI > 10 o BSA > 10 o PGA >= 3 o DLQI > 10
-    // controlada: PASI <= 2 y BSA <= 3 y PGA <= 1 y DLQI <= 5
+    // Criterio de semáforo acordado (autoridad explícita del prototipo):
+    // no_controlada: PASI > 10 o BSA > 10 o PGA >= 3 o DLQI > 10 (disyunción;
+    //   una sola métrica en rojo marca alerta aunque falten otras).
+    // controlada: PASI <= 2 y BSA <= 3 y PGA <= 1 y DLQI <= 5 (exige las 4).
+    //
+    // Semántica de missingness (PSO-04): una fila con datos parciales solo es
+    // clasificable si la parte presente ya cruza el umbral rojo. Si no hay
+    // ninguna métrica, es sin_datos. Si hay métricas, no hay rojo y no están
+    // las cuatro, NO se fuerza "intermedia": se marca como "incompleto"
+    // (datos insuficientes), que no equivale a una clasificación clínica real.
+    // "intermedia" queda reservada a registros con las 4 métricas evaluables
+    // y sin alcanzar el umbral rojo ni el verde.
     function getControlStatus(row) {
       const pasi = toNumber(row.pasi);
       const bsa = toNumber(row.bsa);
@@ -1755,7 +1771,8 @@
       }
 
       const allPresent = [pasi, bsa, pga, dlqi].every(Number.isFinite);
-      if (allPresent && pasi <= 2 && bsa <= 3 && pga <= 1 && dlqi <= 5) return "controlada";
+      if (!allPresent) return "incompleto";
+      if (pasi <= 2 && bsa <= 3 && pga <= 1 && dlqi <= 5) return "controlada";
       return "intermedia";
     }
 
@@ -1919,6 +1936,17 @@
       return [...map.values()];
     }
 
+    // Modelo de cohorte en tres etapas (PSO-04):
+    //   1. Visit scope  -> qué visitas son elegibles (ventana temporal y
+    //      criterios genuinamente de visita: tipo_visita, procedencia).
+    //   2. Current row  -> la visita más reciente por paciente DENTRO del
+    //      visit scope (orden determinista: __date y desempate __index).
+    //   3. Current-state filters -> comorbilidad, zona especial, familia
+    //      terapéutica, fármaco, control, fenotipo y curso se aplican a la
+    //      fila actual ya seleccionada, nunca a visitas históricas. Así un
+    //      filtro de estado actual no puede resucitar una visita antigua.
+    // El trend (renderTrendTable) sigue usando TODO el visit scope, no solo
+    // las filas actuales, para no colapsar la serie longitudinal.
     function applyFilters() {
       const fromDate = parseDateValue(el.dateFrom.value);
       const toDate = parseDateValue(el.dateTo.value);
@@ -1934,7 +1962,8 @@
 
       const hasDateFilter = Boolean(fromDate || toDate);
 
-      filteredVisitRows = rawRows.filter(row => {
+      // Etapa 1 — visit scope (ventana temporal + criterios de visita).
+      visitScopeRows = rawRows.filter(row => {
         if (hasDateFilter) {
           if (!row.__date) return false;
           if (fromDate && row.__date < fromDate) return false;
@@ -1943,6 +1972,14 @@
 
         if (tipo && normalizeText(row.tipo_visita) !== tipo) return false;
         if (procedencia && normalizeText(row.procedencia) !== procedencia) return false;
+        return true;
+      });
+
+      // Etapa 2 — fila actual por paciente dentro del visit scope.
+      const currentRows = getLatestRows(visitScopeRows);
+
+      // Etapa 3 — filtros de estado actual sobre la fila ya seleccionada.
+      latestRows = currentRows.filter(row => {
         if (fenotipo && normalizeText(row.fenotipo) !== fenotipo) return false;
         if (curso && normalizeText(row.curso_evolutivo) !== curso) return false;
         if (comorb && !isTrue(row[comorb])) return false;
@@ -1968,7 +2005,6 @@
         return true;
       });
 
-      latestRows = getLatestRows(filteredVisitRows);
       renderGestion();
     }
 
@@ -1996,6 +2032,7 @@
       const statusCount = {
         [CONTROL_STATUS.controlada.label]: statuses.filter(s => s === "controlada").length,
         [CONTROL_STATUS.intermedia.label]: statuses.filter(s => s === "intermedia").length,
+        [CONTROL_STATUS.incompleto.label]: statuses.filter(s => s === "incompleto").length,
         [CONTROL_STATUS.no_controlada.label]: statuses.filter(s => s === "no_controlada").length,
         [CONTROL_STATUS.sin_datos.label]: statuses.filter(s => s === "sin_datos").length
       };
@@ -2005,6 +2042,7 @@
         {
           [CONTROL_STATUS.controlada.label]: CONTROL_STATUS.controlada.color,
           [CONTROL_STATUS.intermedia.label]: CONTROL_STATUS.intermedia.color,
+          [CONTROL_STATUS.incompleto.label]: CONTROL_STATUS.incompleto.color,
           [CONTROL_STATUS.no_controlada.label]: CONTROL_STATUS.no_controlada.color,
           [CONTROL_STATUS.sin_datos.label]: CONTROL_STATUS.sin_datos.color
         },
@@ -2044,7 +2082,7 @@
       })).sort((a, b) => b.value - a.value);
       buildBarList("chartSpecialZones", zoneEntries, total, {}, 8, true);
 
-      renderTrendTable(filteredVisitRows);
+      renderTrendTable(visitScopeRows);
       el.exportCount.textContent = String(latestRows.length);
     }
 

@@ -10,7 +10,7 @@
 |---|---|
 | `main` | Base original del prototipo; HEAD inicial verificado para este plan: `9d722c8da792ffe51ce2ea9a1420af71a70522f1` |
 | Rama de ejecución actual | `work/pso-valme-train-a-20260928` |
-| Cambio funcional en esta rama | PSO-02 (aislamiento de estado) y PSO-03 (missingness de scores) en `index.html` |
+| Cambio funcional en esta rama | PSO-02 (aislamiento de estado) y PSO-03 (missingness de scores) en `index.html`; PSO-04 (cohorte de estado actual) en `Cuadro_Mando_Psoriasis_Valme_v2.html` |
 | Dashboard de referencia | `Cuadro_Mando_Psoriasis_Valme_v2.html` adjudicado como baseline donante por PSO-01 (veredicto `V2_WITH_V1_FEATURES_TO_PORT`) |
 | Dashboard v1 | Referencia histórica temporal; no borrar; única capacidad V1-only: caché local con auto-restauración |
 | Estado asistencial | Prototipo / datos sintéticos; no piloto ni producción |
@@ -38,7 +38,7 @@
 | PSO-01 | Caracterización V1 vs V2 | Read-only / QA | `DONE_VERIFIED` | DOC-00 | PsO-Valme |
 | PSO-02 | Aislamiento de estado por paciente | Clínica/funcional | `DONE_VERIFIED` | PSO-01 | PsO-Valme (`index.html`) |
 | PSO-03 | Missingness PASI/DLQI/PURE-4 | Clínica/funcional | `DONE_VERIFIED` | PSO-01; PSO-02 | PsO-Valme (`index.html`) |
-| PSO-04 | Cohorte actual y filtros dashboard | Analítica/funcional | `PLANNED` | PSO-01 | PsO-Valme |
+| PSO-04 | Cohorte actual y filtros dashboard | Analítica/funcional | `DONE_VERIFIED` | PSO-01 | PsO-Valme (`Cuadro_Mando_Psoriasis_Valme_v2.html`) |
 | PSO-05 | Longitudinalidad y fechas | Datos/funcional | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-06 | Portabilidad XLSX + schema | Técnica | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-07 | Contrato donante Psoriasis | Documental/contrato | `BLOCKED` | PSO-02/03/04/05 adjudicadas | PsO-Valme |
@@ -229,6 +229,80 @@ Un único commit local `fix(pso): preserve missingness in clinical scores`; sin 
 
 Revertir el commit restaura el comportamiento previo sin tocar datos.
 
+## PSO-04 — cierre
+
+### Objetivo
+
+Separar en el pipeline de cohorte del dashboard V2 el *visit scope* temporal, la *fila actual* por
+paciente y los *filtros de estado actual*, de modo que un filtro clínico como "biológico activo",
+fármaco, control, comorbilidad, zona especial, fenotipo o curso no pueda incluir a un paciente por
+una visita antigua cuando su visita elegible más reciente ya no cumple el criterio.
+
+### Base / rama
+
+`work/pso-valme-train-a-20260928`; HEAD de partida `68f949f1cf8a27794d670f48388b3beac560daaf`; árbol limpio.
+V2 confirmado como baseline donante por PSO-01 (`V2_WITH_V1_FEATURES_TO_PORT`); dependencia satisfecha.
+
+### Causa raíz
+
+`applyFilters()` filtraba `rawRows` con todos los criterios (incluidos los de estado actual) y solo
+después aplicaba `getLatestRows()`. Una visita antigua que cumplía el filtro sobrevivía y pasaba a
+representar al paciente como si su estado actual fuese el antiguo (auditoría inicial P0.3).
+
+### Cambio (tres etapas explícitas)
+
+1. **Visit scope** (`visitScopeRows`): ventana temporal (`dateFrom`/`dateTo`) y criterios
+genuinamente de visita (`tipo_visita`, `procedencia`).
+2. **Fila actual** (`getLatestRows(visitScopeRows)`): la visita elegible más reciente por paciente,
+con orden determinista `__date` y desempate `__index`.
+3. **Filtros de estado actual** (`latestRows`): fenotipo, curso, comorbilidad, zona especial,
+familia terapéutica, fármaco y control se aplican DESPUÉS de seleccionar la fila actual.
+
+El *trend* global (`renderTrendTable`) sigue usando TODO `visitScopeRows`; no se colapsa a las
+filas actuales. La vista longitudinal de paciente (`searchPatient`/`currentPatientRows`) permanece
+independiente de los filtros de cohorte.
+
+**Ventana temporal (comportamiento explícito, escenario D):** la fila actual se elige dentro del
+visit scope, no necesariamente la última de toda la vida del paciente. Si el usuario acota fechas,
+el estado actual evaluado es el de la última visita elegible dentro de esa ventana. Es intencional
+y queda documentado aquí y en el comentario de `applyFilters()`.
+
+### Missingness de estado de control
+
+`getControlStatus()` conserva la autoridad explícita del prototipo (rojo disyuntivo
+`PASI>10 o BSA>10 o PGA>=3 o DLQI>10`; verde solo con las 4 métricas) y añade la distinción que
+faltaba: con métricas parciales, sin rojo y sin las cuatro, devuelve el nuevo estado `incompleto`
+("Datos Incompletos") en lugar de forzar `intermedia`. `intermedia` queda reservada a registros
+plenamente evaluables. No se inventan umbrales nuevos; `sin_datos` se mantiene para ausencia total.
+
+### No toca
+
+V1; `index.html`; umbrales PASI/BSA/PGA/DLQI; rediseño visual amplio (solo etiqueta/estado
+"incompleto" para hacer honesto el estado existente); dependencia/importación XLSX; schema de datos;
+fixtures; `main`; `Hub-Clinico-Badajoz`.
+
+### Regresión determinista
+
+`tests/dashboard_current_state_cohort.test.js` (Playwright headless sobre V2, dataset sintético)
+cubre los escenarios A–F: biológico retirado, fármaco cambiado, control cambiado, ventana temporal,
+missingness/incompleto y preservación del trend longitudinal. Resultado: 39/39 PASS. El mismo
+harness falla sobre el V2 pre-fix. PSO-02 (46/46) y PSO-03 (42/42) permanecen PASS.
+`git diff --check` PASS. QA de navegador: el harness headless ejercita los filtros
+biológico/fármaco/control sobre V2; no hubo QA visual manual.
+
+### Deuda analítica restante (fuera de este ticket)
+
+Denominadores KPI sin distinguir población total de evaluable (P1.4); escalas incompatibles en el
+gráfico longitudinal PASI/BSA/PGA (P1.5); identidad de visita dependiente de `__index` (P1/P2).
+
+### Delivery
+
+Un único commit local `fix(pso): apply dashboard filters to current patient state`; sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit restaura el pipeline anterior sin tocar datos.
+
 ## DERMA-READ-01 — cierre
 
 ### Objetivo
@@ -320,8 +394,9 @@ El repositorio externo permaneció sin modificar (refs remotas re-verificadas id
 Dado que la prioridad de producto es Extremadura:
 
 1. adjudicar la caché local V1-only en **PSO-06** (o descartarla motivadamente);
-2. **PSO-02 y PSO-03 completadas** (`DONE_VERIFIED`, `index.html`); continuar **PSO-04/PSO-05**,
-   cerrando los defectos listados en el informe de PSO-01;
+2. **PSO-02, PSO-03 y PSO-04 completadas** (`DONE_VERIFIED`; PSO-02/03 en `index.html`, PSO-04 en
+   `Cuadro_Mando_Psoriasis_Valme_v2.html`); continuar **PSO-05** y **PSO-06**, cerrando los
+   defectos listados en el informe de PSO-01;
 3. **DERMA-READ-01 y DERMA-READ-01B completadas** (`DONE_VERIFIED`); sus informes (Reuma y
    Farmacia/Nexus) alimentan **DERMA-DESIGN-01**, aún `BLOCKED` por PSO-07 + DERMA-READ-01 +
    DERMA-READ-01B;
