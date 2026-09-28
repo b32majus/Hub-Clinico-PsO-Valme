@@ -61,6 +61,19 @@ patrones con `REUSE_CONCEPT` / `REUSE_AFTER_STRANGLER` / `DERMA_OWN_DOMAIN` /
 `LEGACY_DO_NOT_COPY` / `PLANNED_NOT_IMPLEMENTED`, y separa lo implementado (Read Port F5.1) de lo
 pendiente (F5.2/F5.3/F5.4, F6, F7) y de los defectos `KNOWN_LEGACY` preservados. No modifica PROMueve.
 
+### Auditoría de onboarding Farmacia + Nexus/Foundation (DERMA-READ-01B)
+
+[`audits/PROMUEVE_FARMACIA_NEXUS_DERMATOLOGY_ONBOARDING_AUDIT_20260928.md`](./audits/PROMUEVE_FARMACIA_NEXUS_DERMATOLOGY_ONBOARDING_AUDIT_20260928.md)
+
+Auditoría read-only de la **Farmacia live** y del estado **Nexus/Foundation** en
+`b32majus/Hub-Clinico-Badajoz` para el futuro módulo Dermatología. Verifica baseline GitHub live,
+clasifica cada seam con `IMPLEMENTED` / `DOCUMENTED_DECIDED` / `PLANNED` / `NOT_FOUND`, mapea el
+flujo lectura/escritura/handoff de Farmacia y separa explícitamente los seams tomables ahora
+(`SAFE_TO_TARGET_NOW`) de los diferidos (`WAIT_FOR_FOUNDATION_OR_SEPARATE_WO`), los comportamientos
+que no deben copiarse (`DO_NOT_COPY_FROM_FARMACIA`) y los blockers que exigen decisión humana o
+producto posterior. Distingue el contrato de transporte e-Orden D17/D17_EXT_V1 (publicado) del
+Pharmacy Act/entrega F4.4/F4.5 (solo arquitectura). No modifica PROMueve.
+
 ## 3. Decisiones vigentes
 
 - La prioridad de producto es **PROMueve Extremadura / Dermatología**.

@@ -42,8 +42,9 @@
 | PSO-05 | Longitudinalidad y fechas | Datos/funcional | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-06 | Portabilidad XLSX + schema | Técnica | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-07 | Contrato donante Psoriasis | Documental/contrato | `BLOCKED` | PSO-02/03/04/05 adjudicadas | PsO-Valme |
-| DERMA-READ-01 | Auditoría onboarding PROMueve live | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
-| DERMA-DESIGN-01 | Diseño módulo Dermatología | Arquitectura/producto | `BLOCKED` | PSO-07 + DERMA-READ-01 | PsO-Valme |
+| DERMA-READ-01 | Auditoría onboarding PROMueve live (Reuma) | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
+| DERMA-READ-01B | Auditoría onboarding Farmacia + Nexus/Foundation | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
+| DERMA-DESIGN-01 | Diseño módulo Dermatología | Arquitectura/producto | `BLOCKED` | PSO-07 + DERMA-READ-01 + DERMA-READ-01B | PsO-Valme |
 | PROMUEVE-DERMA-* | Implementación Psoriasis en Nexus | Técnica | `BLOCKED` | gate de transferencia + autorización | Hub-Clinico-Badajoz |
 | VALME-FULL-* | Rescate completo independiente | Técnica | `DEFERRED` | necesidad real | PsO-Valme |
 
@@ -165,12 +166,58 @@ PROMueve runtime. No se propone modificar PROMueve en esta WO.
 Un único commit local `docs(derma): audit Reuma onboarding patterns`; sin push/PR/merge. El
 repositorio externo permaneció sin modificar (refs remotas re-verificadas idénticas al cierre).
 
+## DERMA-READ-01B — cierre
+
+### Objetivo
+
+Auditar la **Farmacia live** y el estado **Nexus/Foundation** de `b32majus/Hub-Clinico-Badajoz` para
+determinar qué seams puede depender Dermatología hoy, cuáles serían ficción arquitectónica y qué
+no debe copiarse de Farmacia.
+
+### Baseline externo verificado (live, read-only)
+
+| Elemento | Valor |
+|---|---|
+| Repo | `b32majus/Hub-Clinico-Badajoz` (público; `main` stale en `a25cccb8…`) |
+| Rama canónica activa | `promueve/nexus-v4` |
+| Tip Git live | `b5028ecdd4c0cb5e3385352c6028d9a48ef4b41d` (Merge PR #437, documentation-only) |
+| Último HEAD de producto Nexus | `e17512384b96fc361668202cdbec5e09022614ff` (PR #435) |
+| Último train clínico | TRAIN-NEXUS-CLINICAL-STRANGLER-05 (#426) → merge `10422f4e…` |
+| Línea Farmacia | `recovery/farmacia-pr-replay-20260727` HISTORICAL; tip live `a8cec035…`; último producto `771fb80c…` |
+| Madurez | Evaluación sintética; no piloto ni producción |
+
+### Entregable
+
+`docs/audits/PROMUEVE_FARMACIA_NEXUS_DERMATOLOGY_ONBOARDING_AUDIT_20260928.md`.
+
+### Veredicto
+
+`DONE_VERIFIED` (documental). Matriz `IMPLEMENTED` / `DOCUMENTED_DECIDED` / `PLANNED` / `NOT_FOUND`
+cerrada con evidencia de código inspeccionada. Se separa lo implementado (Home/registry/
+PlatformContext/release sintético; Farmacia Data Port + Read DTO v2 F4.1 + facade async F4.2;
+Unified Clinical Intake y parser e-Orden D17/D17_EXT_V1) de lo decidido o planeado (Pharmacy Act
+F4.4, delivery result F4.5, qualification real F7, lifecycle F6, paciente compartido) y de lo que no
+debe copiarse (envelope `sessionStorage`, fila v2 de 152 columnas, inferencia catálogo/CIMA,
+`offline-capable` no acreditado). Listas explícitas `SAFE_TO_TARGET_NOW`,
+`WAIT_FOR_FOUNDATION_OR_SEPARATE_WO` y `DO_NOT_COPY_FROM_FARMACIA` publicadas.
+
+### NO TOCA
+
+`Hub-Clinico-Badajoz` (solo lectura live); código Farmacia/Reuma; fixtures; `main`; V1/V2 de Valme;
+PROMueve runtime.
+
+### Delivery
+
+Un único commit local `docs(derma): audit Farmacia and Nexus onboarding seams`; sin push/PR/merge.
+El repositorio externo permaneció sin modificar (refs remotas re-verificadas idénticas al cierre).
+
 ## Próxima acción recomendada
 
 Dado que la prioridad de producto es Extremadura:
 
 1. adjudicar la caché local V1-only en **PSO-06** (o descartarla motivadamente);
 2. ejecutar **PSO-02…PSO-05** sobre V2, cerrando defectos compartidos listados en el informe de PSO-01;
-3. **DERMA-READ-01 completada** (`DONE_VERIFIED`); su informe alimenta **DERMA-DESIGN-01**, aún
-   `BLOCKED` por PSO-07 + DERMA-READ-01;
+3. **DERMA-READ-01 y DERMA-READ-01B completadas** (`DONE_VERIFIED`); sus informes (Reuma y
+   Farmacia/Nexus) alimentan **DERMA-DESIGN-01**, aún `BLOCKED` por PSO-07 + DERMA-READ-01 +
+   DERMA-READ-01B;
 4. no iniciar cambios en `Hub-Clinico-Badajoz` hasta completar el gate de transferencia y recibir autorización explícita.
