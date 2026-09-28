@@ -51,6 +51,16 @@ Preserva la auditoría técnica/funcional inicial del prototipo antes de modific
 
 Adjudica V2 como baseline donante (`V2_WITH_V1_FEATURES_TO_PORT`), documenta la única capacidad V1-only (caché local con auto-restauración) y lista defectos compartidos por ambos.
 
+### Auditoría de onboarding Reuma → Dermatología (DERMA-READ-01)
+
+[`audits/PROMUEVE_REUMA_DERMATOLOGY_ONBOARDING_AUDIT_20260928.md`](./audits/PROMUEVE_REUMA_DERMATOLOGY_ONBOARDING_AUDIT_20260928.md)
+
+Auditoría read-only de la Reumatología **live** en `b32majus/Hub-Clinico-Badajoz` para el futuro
+módulo Dermatología. Verifica baseline GitHub live, mapea arquitectura/flujo de datos, clasifica
+patrones con `REUSE_CONCEPT` / `REUSE_AFTER_STRANGLER` / `DERMA_OWN_DOMAIN` /
+`LEGACY_DO_NOT_COPY` / `PLANNED_NOT_IMPLEMENTED`, y separa lo implementado (Read Port F5.1) de lo
+pendiente (F5.2/F5.3/F5.4, F6, F7) y de los defectos `KNOWN_LEGACY` preservados. No modifica PROMueve.
+
 ## 3. Decisiones vigentes
 
 - La prioridad de producto es **PROMueve Extremadura / Dermatología**.

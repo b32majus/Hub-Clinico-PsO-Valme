@@ -42,7 +42,7 @@
 | PSO-05 | Longitudinalidad y fechas | Datos/funcional | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-06 | Portabilidad XLSX + schema | Técnica | `PLANNED` | PSO-01 | PsO-Valme |
 | PSO-07 | Contrato donante Psoriasis | Documental/contrato | `BLOCKED` | PSO-02/03/04/05 adjudicadas | PsO-Valme |
-| DERMA-READ-01 | Auditoría onboarding PROMueve live | Read-only arquitectura/producto | `READY_FOR_READONLY` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
+| DERMA-READ-01 | Auditoría onboarding PROMueve live | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
 | DERMA-DESIGN-01 | Diseño módulo Dermatología | Arquitectura/producto | `BLOCKED` | PSO-07 + DERMA-READ-01 | PsO-Valme |
 | PROMUEVE-DERMA-* | Implementación Psoriasis en Nexus | Técnica | `BLOCKED` | gate de transferencia + autorización | Hub-Clinico-Badajoz |
 | VALME-FULL-* | Rescate completo independiente | Técnica | `DEFERRED` | necesidad real | PsO-Valme |
@@ -124,11 +124,53 @@ V1/V2, `index.html`, XLSX/CSV/DOCX, fixtures, `main`, `Hub-Clinico-Badajoz`.
 
 Informe documental; un único commit local `docs(pso): characterize dashboard v1 vs v2`; sin push/PR/merge.
 
+## DERMA-READ-01 — cierre
+
+### Objetivo
+
+Auditar la Reumatología **live** de `b32majus/Hub-Clinico-Badajoz` para determinar qué patrones
+puede reutilizar con seguridad el futuro módulo Dermatología, qué debe esperar al strangler y qué
+debe permanecer propio de Dermatología.
+
+### Baseline externo verificado (live, read-only)
+
+| Elemento | Valor |
+|---|---|
+| Repo | `b32majus/Hub-Clinico-Badajoz` (público; `main` stale en `a25cccb8…`) |
+| Rama canónica activa | `promueve/nexus-v4` |
+| Tip Git live | `b5028ecdd4c0cb5e3385352c6028d9a48ef4b41d` (Merge PR #437, documentation-only) |
+| Último HEAD de producto Nexus | `e17512384b96fc361668202cdbec5e09022614ff` (PR #435) |
+| Snapshot estable | `CÁCERES-REVIEW-0.6` (@ `e1120ba8…`) |
+| Madurez | Evaluación sintética; no piloto ni producción |
+
+### Entregable
+
+`docs/audits/PROMUEVE_REUMA_DERMATOLOGY_ONBOARDING_AUDIT_20260928.md`.
+
+### Veredicto
+
+`DONE_VERIFIED` (documental). Matriz de reutilización cerrada con las cinco clases requeridas. Se
+separa lo implementado y publicado (Read Port Reuma F5.1, Home/module-registry, oráculos
+deterministas) de lo pendiente (F5.2/F5.3/F5.4, F6, F7) y de los defectos `KNOWN_LEGACY / NON_GOLDEN`
+preservados (K1–K8; export 1–5). No existe engine declarativo de configuración ni módulo
+Dermatología; una plantilla no equivale a módulo (freeze).
+
+### NO TOCA
+
+`Hub-Clinico-Badajoz` (solo lectura live); código Reuma/Farmacia; fixtures; `main`; V1/V2 de Valme;
+PROMueve runtime. No se propone modificar PROMueve en esta WO.
+
+### Delivery
+
+Un único commit local `docs(derma): audit Reuma onboarding patterns`; sin push/PR/merge. El
+repositorio externo permaneció sin modificar (refs remotas re-verificadas idénticas al cierre).
+
 ## Próxima acción recomendada
 
 Dado que la prioridad de producto es Extremadura:
 
 1. adjudicar la caché local V1-only en **PSO-06** (o descartarla motivadamente);
 2. ejecutar **PSO-02…PSO-05** sobre V2, cerrando defectos compartidos listados en el informe de PSO-01;
-3. iniciar en paralelo **DERMA-READ-01**, auditoría read-only de Reuma/Farmacia/Foundation en PROMueve;
+3. **DERMA-READ-01 completada** (`DONE_VERIFIED`); su informe alimenta **DERMA-DESIGN-01**, aún
+   `BLOCKED` por PSO-07 + DERMA-READ-01;
 4. no iniciar cambios en `Hub-Clinico-Badajoz` hasta completar el gate de transferencia y recibir autorización explícita.
