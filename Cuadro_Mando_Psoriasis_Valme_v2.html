@@ -1539,6 +1539,8 @@
     let selectedModule = "paciente";
     let currentPatientRows = [];
     let loadedFileName = "";
+    // Monotonic id of the latest user-initiated load request (PSO-06C).
+    let loadRequestId = 0;
     let timelineExpanded = false;
     const PATIENT_ONLY_MODE = false;
     // Minimal XLSX schema contract: a compatible workbook MUST expose these
@@ -2662,10 +2664,19 @@
         setLoadStatus("Archivo no válido. Selecciona un XLSX.", false);
         return;
       }
+      // Latest-request-wins coordination (PSO-06C): every user-initiated load
+      // gets a monotonically newer request id. Only the id that is still
+      // current may commit success state, reset state, or surface a terminal
+      // error; stale completion is side-effect free.
+      const requestId = ++loadRequestId;
       setLoadStatus("Procesando archivo...", false);
       parseXLSX(file)
-        .then(matrix => processMatrix(matrix, file.name))
+        .then(matrix => {
+          if (requestId !== loadRequestId) return; // stale success: ignored
+          processMatrix(matrix, file.name);
+        })
         .catch(err => {
+          if (requestId !== loadRequestId) return; // stale failure: ignored
           resetDashboardState();
           setLoadStatus(err && err.message ? err.message : "Error al cargar el XLSX.", false);
         });
