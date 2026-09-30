@@ -1541,6 +1541,9 @@
     let loadedFileName = "";
     let timelineExpanded = false;
     const PATIENT_ONLY_MODE = false;
+    // Minimal XLSX schema contract: a compatible workbook MUST expose these
+    // columns. Incompatible workbooks fail closed before any cohort logic.
+    const REQUIRED_XLSX_HEADERS = ["nusha", "fecha_visita", "tipo_visita"];
 
     function normalizeKey(value) {
       return String(value || "").trim().toLowerCase();
@@ -2613,8 +2616,9 @@
     function processMatrix(matrix, fileName) {
       if (!matrix.length) throw new Error("Archivo sin contenido.");
       const headers = matrix[0].map(v => normalizeKey(v));
-      if (!headers.includes("nusha") || !headers.includes("fecha_visita") || !headers.includes("tipo_visita")) {
-        throw new Error("Cabecera inválida: faltan columnas requeridas (nusha, fecha_visita, tipo_visita).");
+      const missing = REQUIRED_XLSX_HEADERS.filter(h => !headers.includes(h));
+      if (missing.length) {
+        throw new Error(`XLSX incompatible: faltan columnas requeridas (${missing.join(", ")}).`);
       }
 
       const rows = matrix.slice(1).map((raw, idx) => {
@@ -2639,6 +2643,19 @@
       clearMessage();
     }
 
+    // Drops the active dataset so a failed/incompatible load can never leave a
+    // stale cohort reachable by filters/patient logic.
+    function resetDashboardState() {
+      sourceHeaders = [];
+      rawRows = [];
+      visitScopeRows = [];
+      latestRows = [];
+      currentPatientRows = [];
+      loadedFileName = "";
+      el.appShell.classList.add("hidden");
+      clearMessage();
+    }
+
     function onFileSelected(file) {
       if (!file) return;
       if (!/\.xlsx$/i.test(file.name)) {
@@ -2648,7 +2665,10 @@
       setLoadStatus("Procesando archivo...", false);
       parseXLSX(file)
         .then(matrix => processMatrix(matrix, file.name))
-        .catch(err => setLoadStatus(`Error: ${err.message}`, false));
+        .catch(err => {
+          resetDashboardState();
+          setLoadStatus(err && err.message ? err.message : "Error al cargar el XLSX.", false);
+        });
     }
 
     function getSourceHeadersForExport() {

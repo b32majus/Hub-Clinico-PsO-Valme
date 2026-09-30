@@ -1282,6 +1282,9 @@ const changeBlock = document.getElementById("changeBlock");
 
 let baseRows = [];
 let baseFileName = "";
+// Minimal XLSX schema contract: a compatible workbook MUST expose these
+// columns. Incompatible workbooks fail closed before any row/cohort logic.
+const REQUIRED_XLSX_HEADERS = ["nusha", "fecha_visita", "tipo_visita"];
 let autoTimer = null;
 let applyingPreload = false;
 let visitTypeLockedToFollowup = false;
@@ -1720,24 +1723,46 @@ async function parseXLSX(file) {
   return matrix;
 }
 
+// Clears the active base so a failed/incompatible load never leaves a stale
+// dataset reachable by patient/cohort logic.
+function clearBaseState() {
+  baseRows = [];
+  baseFileName = "";
+  setVisitTypeLock(false);
+  setPreviousVisitContext(null);
+}
+
+// Returns the required XLSX headers absent from `header` (trimmed, exact names).
+function missingRequiredXlsxHeaders(header) {
+  const present = new Set(header.map(h => String(h ?? "").trim()));
+  return REQUIRED_XLSX_HEADERS.filter(h => !present.has(h));
+}
+
 async function loadBaseFromFile(file) {
   const isXlsx = /\.xlsx$/i.test(file.name) || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
   const matrix = isXlsx ? await parseXLSX(file) : parseCSV(await file.text());
   if (!matrix.length) {
-    baseRows = [];
-    setVisitTypeLock(false);
+    clearBaseState();
     setBaseStatus("Base vacía o inválida.", false);
-    setPreviousVisitContext(null);
     return;
   }
   const header = matrix[0].map(h => String(h || "").trim());
+  if (isXlsx) {
+    const missing = missingRequiredXlsxHeaders(header);
+    if (missing.length) {
+      clearBaseState();
+      throw new Error(`XLSX incompatible: faltan columnas requeridas (${missing.join(", ")}).`);
+    }
+  }
   baseRows = matrix.slice(1).map((cells, index) => {
     const row = {};
     header.forEach((key, i) => {
       row[key] = String(cells[i] ?? "").trim();
     });
     row.__index = index;
-    row.__id = normalizeId(row.nusha || row.nhc);
+    // XLSX identity is strictly `nusha`; alternate identity columns (`nhc`,
+    // `id_paciente`) are never coerced. CSV keeps its legacy `nhc` fallback.
+    row.__id = normalizeId(row.nusha) || (isXlsx ? "" : normalizeId(row.nhc));
     return row;
   }).filter(row => row.__id);
   baseFileName = file.name;
@@ -2636,7 +2661,8 @@ baseFileInput.addEventListener("change", async () => {
   try {
     await loadBaseFromFile(file);
   } catch (err) {
-    setBaseStatus("Error al cargar archivo de base (Excel/CSV).", false);
+    clearBaseState();
+    setBaseStatus(err && err.message ? err.message : "Error al cargar archivo de base (Excel/CSV).", false);
   }
 });
 
