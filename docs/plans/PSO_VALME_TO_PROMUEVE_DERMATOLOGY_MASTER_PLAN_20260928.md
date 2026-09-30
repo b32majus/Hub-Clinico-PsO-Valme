@@ -330,13 +330,16 @@ Los siguientes IDs son **nombres de planificación**, no issues creados ni autor
 **Estado (Train-B, 2026-09-29):** ejecutada como **PSO-06A** (JSZip repo-local) y **PSO-06B**
 (contrato de carga fail-closed), ambas `DONE_VERIFIED`; ver `docs/ops/WORK_ORDER_STATUS.md` y el
 handoff de QA manual. El gate de QA visual manual sigue pendiente y no está cubierto por esta
-aceptación técnica.
+aceptación técnica.\
+**Nota Train-C (2026-09-30):** PSO-06C (aislamiento `latest-request-wins` de cargas asíncronas) y
+PSO-QA-03 quedaron `DONE_VERIFIED`; el handoff de QA manual vigente es el consolidado de Train-C,
+[`docs/qa/TRAIN_C_MANUAL_QA_HANDOFF_20260930.md`](../qa/TRAIN_C_MANUAL_QA_HANDOFF_20260930.md).
 
 ### PSO-07 — Contrato donante Psoriasis
 
 **Objetivo:** documentar semántica clínica independiente de HTML/Excel.  
-**Dependencias:** PSO-02…PSO-05 cerradas o adjudicadas; PSO-06A/PSO-06B cerradas; **gate de QA
-manual de Train-B adjudicado**.\
+**Dependencias:** PSO-02…PSO-05 cerradas o adjudicadas; PSO-06A/PSO-06B/PSO-06C cerradas;
+**gate de QA manual adjudicado** (handoff consolidado de Train-C).\
 **Alcance:** diccionario, entidades, reglas, estados, lineage y vistas requeridas.  
 **NO TOCA:** código PROMueve.  
 **Aceptación:** un equipo puede diseñar una nueva implementación sin inferir la semántica desde el DOM.

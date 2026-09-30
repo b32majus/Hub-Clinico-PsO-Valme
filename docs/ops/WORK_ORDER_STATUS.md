@@ -1,6 +1,6 @@
 # Work Order Status — Hub Clínico Psoriasis Valme
 
-**Última actualización:** 2026-09-29\
+**Última actualización:** 2026-09-30\
 **Repositorio:** `b32majus/Hub-Clinico-PsO-Valme`  
 **Propósito:** tablero vivo de trabajo para el rescate mínimo de PsO-Valme y el handoff hacia PROMueve Dermatología.  
 
@@ -8,12 +8,15 @@
 
 | Elemento | Estado |
 |---|---|
-| `main` | Base original del prototipo; HEAD verificado: `9d722c8da792ffe51ce2ea9a1420af71a70522f1`; **intacto** (Train-B no publica) |
+| `main` | Base original del prototipo; HEAD verificado: `9d722c8da792ffe51ce2ea9a1420af71a70522f1`; **intacto** |
 | Rama Train-A (cerrada) | `work/pso-valme-train-a-20260928`; HEAD `4ee26bbc388b72714201dffd7e0ca55ac4d2e881` |
-| Rama Train-B (actual) | `work/pso-valme-train-b-20260929`; START_HEAD `4ee26bbc388b72714201dffd7e0ca55ac4d2e881`; checkpoint técnico #14 `93fd3259473d55e460d6bd1480b771cea021326c`; #15 añade encima un commit documental; **local-only / NOT PUBLISHED** |
+| Rama Train-B (publicada) | `work/pso-valme-train-b-20260929`; START_HEAD `4ee26bbc388b72714201dffd7e0ca55ac4d2e881`; #14 `93fd3259473d55e460d6bd1480b771cea021326c`; #15 (DOC-B) añade `7976663bdd97ee0e759090f6f8caa32799d5bb1a`; **PUBLICADA REMOTAMENTE** en `7976663bdd97ee0e759090f6f8caa32799d5bb1a` (verificado live 2026-09-30) |
+| Rama Train-C (actual) | `work/pso-valme-train-c-20260930`; START_HEAD `7976663bdd97ee0e759090f6f8caa32799d5bb1a`; #17 (PSO-06C) `d91fbc2357c8f5af7a307effb35b86773d8c388a`; #18 (PSO-QA-03) `011d624234cc5fb5a07387bf5f0e6aaeed09a4a6`; **local-only / NOT PUBLISHED BY TRAIN-C** |
 | Cambio funcional Train-A | PSO-02 (aislamiento de estado) y PSO-03 (missingness de scores) en `index.html`; PSO-04 (cohorte de estado actual) en `Cuadro_Mando_Psoriasis_Valme_v2.html`; PSO-05 (longitudinalidad y fechas) en `index.html` y V2 |
 | Cambio funcional Train-B | PSO-06A JSZip repo-local en `index.html` y V2; PSO-06B contrato de carga XLSX fail-closed; PSO-QA-01 fixture XLSX demo reproducible; PSO-QA-02 regresión de navegador de loader + filtros PSO-04 |
-| Estado terminal del train | `TRAIN-B = IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING / NOT_PUBLISHED_BY_TRAIN` |
+| Cambio funcional Train-C | PSO-06C coordinación *latest-request-wins* de cargas asíncronas en `index.html` y V2; PSO-QA-03 regresión de navegador de cargas fuera de orden y aislamiento de estado |
+| Estado terminal de Train-B | `TRAIN-B = IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING` (rama publicada remotamente) |
+| Estado terminal de Train-C | `TRAIN-C = IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING / NOT_PUBLISHED_BY_TRAIN-C` |
 | Dashboard de referencia | `Cuadro_Mando_Psoriasis_Valme_v2.html` adjudicado como baseline donante por PSO-01 (veredicto `V2_WITH_V1_FEATURES_TO_PORT`) |
 | Dashboard v1 | Referencia histórica temporal; no borrar; única capacidad V1-only: caché local con auto-restauración |
 | Estado asistencial | Prototipo / datos sintéticos; no piloto ni producción |
@@ -47,7 +50,10 @@
 | PSO-06B | Contrato de carga XLSX y fail-closed | Técnica | `DONE_VERIFIED` | PSO-06A | PsO-Valme (`index.html`, V2) |
 | PSO-QA-01 | Fixture XLSX demo reproducible | QA/datos | `DONE_VERIFIED` | PSO-06A/06B | PsO-Valme (fixture, `tools/`) |
 | PSO-QA-02 | Regresión de navegador del loader + filtros PSO-04 | QA | `DONE_VERIFIED` | PSO-QA-01 | PsO-Valme (V2) |
-| PSO-07 | Contrato donante Psoriasis | Documental/contrato | `BLOCKED` | PSO-02/03/04/05 adjudicadas; PSO-06A/06B; **gate de QA manual** | PsO-Valme |
+| PSO-06C | Aislar cargas asíncronas (`latest-request-wins`) | Técnica | `DONE_VERIFIED` | PSO-06B | PsO-Valme (`index.html`, V2) |
+| PSO-QA-03 | Regresión browser de cargas fuera de orden | QA | `DONE_VERIFIED` | PSO-06C | PsO-Valme (`tests/`) |
+| DOC-C | Reconciliar Train-C y handoff de QA manual | Documental | `DONE_DOCS` | PSO-06C; PSO-QA-03 | PsO-Valme |
+| PSO-07 | Contrato donante Psoriasis | Documental/contrato | `BLOCKED` | PSO-02/03/04/05 adjudicadas; PSO-06A/06B/06C; **gate de QA manual** | PsO-Valme |
 | DERMA-READ-01 | Auditoría onboarding PROMueve live (Reuma) | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
 | DERMA-READ-01B | Auditoría onboarding Farmacia + Nexus/Foundation | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
 | DERMA-DESIGN-01 | Diseño módulo Dermatología | Arquitectura/producto | `BLOCKED` | PSO-07 + DERMA-READ-01 + DERMA-READ-01B | PsO-Valme |
@@ -540,6 +546,120 @@ Un único commit local `test(pso): cover dashboard XLSX current-state filtering`
 
 Revertir el commit elimina el harness de QA sin tocar el producto.
 
+## PSO-06C — cierre
+
+### Objetivo
+
+Hacer explícita la autoridad de orden de peticiones en las dos superficies soportadas, de modo que
+la **última carga iniciada por el usuario sea la autoritativa** y una finalización asíncrona stale
+(éxito o error) sea libre de efectos.
+
+### Base / rama
+
+`work/pso-valme-train-c-20260930`; START_HEAD `7976663bdd97ee0e759090f6f8caa32799d5bb1a`; árbol limpio.
+
+### Causa raíz
+
+Ambas superficies cargaban ficheros de forma asíncrona sin coordinación de orden. Una petición
+antigua podía completar después de que otra más nueva fuese iniciada y aún ejecutar sus efectos de
+éxito/error sobre el estado compartido (dataset, estado de carga, shell), permitiendo exponer estado
+stale o limpiar estado vigente.
+
+### Cambio
+
+- `index.html`: contador monótono `baseLoadRequest`; cada carga recibe un `requestId`. `loadBaseFromFile(file, requestId)`
+solo commitea dataset/estado si `requestId === baseLoadRequest`; el manejador de error ignora un fallo
+stale en lugar de limpiar la base vigente.
+- `Cuadro_Mando_Psoriasis_Valme_v2.html`: contador monótono `loadRequestId`; el `.then` de parseo
+ignora un éxito stale y el `.catch` ignora un fallo stale, preservando el dataset/estado del último
+request.
+- El fail-closed del request **autoritativo** (el más nuevo) se conserva intacto: si la última carga
+falla validación/parseo, se limpia el estado y se muestra el error explícito.
+
+### No toca
+
+V1; semántica clínica PSO-02/03/04/05; contrato XLSX de PSO-06B; vendor/JSZip PSO-06A; fixtures;
+`main`; `Hub-Clinico-Badajoz`.
+
+### Regresión determinista y de navegador
+
+`tests/load_race_isolation.test.js` (Playwright headless Chromium, interacción real de
+`<input type="file">`, únicos *seams*: retención determinista de `JSZip.loadAsync` y
+`Blob.prototype.text`). Escenarios A (fallo stale tras éxito nuevo), B (éxito stale tras request
+nuevo pendiente) y C (fallo autoritativo del request nuevo) sobre ambas superficies, más cargas
+ordinarias/CSV y el camino demo XLSX. Resultado consolidado en #18: **31/31 PASS**. Regresiones
+Train-A/B permanecen verdes (ver #18). `git diff --check` PASS. QA: navegador automatizado (headless);
+no hubo QA visual manual.
+
+### Delivery
+
+Un único commit local `fix(pso): isolate concurrent dataset loads`
+(`d91fbc2357c8f5af7a307effb35b86773d8c388a`); sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit restaura el comportamiento previo sin tocar datos ni `main`.
+
+## PSO-QA-03 — cierre
+
+### Objetivo
+
+Demostrar mediante interacción soportada de navegador que las finalizaciones asíncronas fuera de
+orden no pueden limpiar, reemplazar ni reetiquetar el dataset autoritativo en ninguna de las dos
+superficies.
+
+### Base / rama
+
+`work/pso-valme-train-c-20260930`; HEAD de partida = checkpoint aceptado de #17
+`d91fbc2357c8f5af7a307effb35b86773d8c388a`; árbol limpio.
+
+### Cambio (QA-only)
+
+Consolidación y ampliación de `tests/load_race_isolation.test.js` (mismo harness, sin segundo
+framework): escenarios A/B/C sobre `index.html` y V2, cargas ordinarias válidas (XLSX y CSV en el
+formulario; XLSX en el dashboard), fail-closed de XLSX incompatible y el camino demo real
+(baseline 4 pacientes, escenarios PSO-04 A/B Acitretina). Sin cambios de producto.
+
+### Regresión determinista y de navegador
+
+| Suite | Resultado |
+|---|---|
+| `tests/load_race_isolation.test.js` (PSO-QA-03) | **31/31 PASS** |
+| `tests/patient_state_isolation.test.js` (PSO-02) | **46/46 PASS** |
+| `tests/clinical_score_missingness.test.js` (PSO-03) | **42/42 PASS** |
+| `tests/dashboard_current_state_cohort.test.js` (PSO-04) | **39/39 PASS** |
+| `tests/longitudinal_date_semantics.test.js` (PSO-05) | **49/49 PASS** |
+| `tests/jszip_local_dependency.test.js` (PSO-06A) | **21/21 PASS** |
+| `tests/xlsx_load_contract.test.js` (PSO-06B) | **34/34 PASS** |
+| `tests/demo_xlsx_fixture.test.js` (PSO-QA-01) | **17/17 PASS** |
+| `tests/dashboard_xlsx_current_state.test.js` (PSO-QA-02) | **21/21 PASS** |
+
+Total **300/300 checks PASS**, 0 fallos. `git diff --check` PASS. El navegador headless **no**
+sustituye al QA visual manual, que sigue **pendiente** (ver handoff Train-C).
+
+### Delivery
+
+Un único commit local `test(pso): cover out-of-order dataset loads`
+(`011d624234cc5fb5a07387bf5f0e6aaeed09a4a6`); sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit elimina la cobertura QA sin alterar el fix de #17.
+
+## Train-C — estado y frontera de publicación
+
+```text
+TRAIN-C = IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING / NOT_PUBLISHED_BY_TRAIN-C
+```
+
+- Implementación (#17 `d91fbc2`) y QA determinista/automatizada (#18 `011d624`) completas y verdes.
+- La rama `work/pso-valme-train-c-20260930` es **local-only / NOT PUBLISHED BY TRAIN-C**: sin `push`,
+  PR, merge, cambio de Pages ni mutación de `main`.
+- El QA visual manual consolidado sigue **pendiente**: ver
+  [`docs/qa/TRAIN_C_MANUAL_QA_HANDOFF_20260930.md`](../qa/TRAIN_C_MANUAL_QA_HANDOFF_20260930.md)
+  (sustituye al handoff de Train-B).
+- `main` permanece intacto en `9d722c8da792ffe51ce2ea9a1420af71a70522f1`.
+
 ## Train-B — revisión nativa Gentle y deuda (trabajo futuro)
 
 Los cuatro candidatos de Train-B (#11–#14) pasaron la revisión nativa Gentle 4R y quedaron
@@ -555,6 +675,47 @@ por esta documentación; se preservan como trabajo futuro:
   dependiente de `__index`.
 
 Ninguna de estas observaciones es un defecto clínico abierto ni forma parte del alcance de #15.
+
+## DOC-C — cierre
+
+### Objetivo
+
+Reconciliar la documentación viva con el estado real de Train-C, corregir el estado de publicación
+stale de DOC-B y dejar un único handoff de QA manual desde cero.
+
+### Base / rama
+
+`work/pso-valme-train-c-20260930`; HEAD de partida = checkpoint aceptado de #18
+`011d624234cc5fb5a07387bf5f0e6aaeed09a4a6`; árbol limpio.
+
+### Hechos live verificados (2026-09-30, read-only)
+
+| Elemento | Valor verificado |
+|---|---|
+| Train-B remoto `work/pso-valme-train-b-20260929` | `7976663bdd97ee0e759090f6f8caa32799d5bb1a` |
+| `main` remoto | `9d722c8da792ffe51ce2ea9a1420af71a70522f1` |
+| Train-C remoto `work/pso-valme-train-c-20260930` | **no existe** (404); local-only |
+
+### Entregables
+
+- `docs/INDEX.md` actualizado;
+- `docs/ops/WORK_ORDER_STATUS.md` actualizado;
+- `docs/qa/TRAIN_C_MANUAL_QA_HANDOFF_20260930.md` creado (handoff consolidado vigente);
+- `docs/qa/TRAIN_B_MANUAL_QA_HANDOFF_20260929.md` marcado **SUPERSEDED / histórico**.
+
+### Verificación
+
+Enlaces Markdown resuelven a ficheros reales; el tablero coincide con los checkpoints reales
+(`d91fbc2`, `011d624`) y con los hechos live; sin cambios HTML/JS/datos/fixtures; sin reclamar QA
+manual donde solo existe automatizado; `git diff --check` PASS; árbol limpio tras el commit.
+
+### Delivery
+
+Un único commit local `docs(pso): reconcile Train-C and manual QA handoff`; sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit restaura la documentación previa sin tocar los checkpoints técnicos ni `main`.
 
 ## DERMA-READ-01 — cierre
 
@@ -646,16 +807,17 @@ El repositorio externo permaneció sin modificar (refs remotas re-verificadas id
 
 Dado que la prioridad de producto es Extremadura:
 
-1. **TRAIN-B completado técnicamente** (`PSO-06A`, `PSO-06B`, `PSO-QA-01`, `PSO-QA-02` en
-   `DONE_VERIFIED`); el estado terminal es
-   `IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING / NOT_PUBLISHED_BY_TRAIN`.
-2. **Gate humano pendiente:** publicar la rama Train-B (push / Pages) bajo autorización separada y
-   ejecutar el QA visual manual guiado por
-   [`../qa/TRAIN_B_MANUAL_QA_HANDOFF_20260929.md`](../qa/TRAIN_B_MANUAL_QA_HANDOFF_20260929.md),
+1. **Train-B está publicado remotamente** en `work/pso-valme-train-b-20260929` @
+   `7976663bdd97ee0e759090f6f8caa32799d5bb1a` (verificado live 2026-09-30).
+2. **Train-C está técnicamente completo** (`PSO-06C`, `PSO-QA-03` en `DONE_VERIFIED`); su estado
+   terminal es `IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING / NOT_PUBLISHED_BY_TRAIN-C`.
+3. **Gate humano pendiente:** publicar Train-C (push / Pages) bajo autorización separada y ejecutar
+   el QA visual manual consolidado guiado por
+   [`../qa/TRAIN_C_MANUAL_QA_HANDOFF_20260930.md`](../qa/TRAIN_C_MANUAL_QA_HANDOFF_20260930.md),
    incluido el QA manual de **PSO-04**, que sigue pendiente.
-3. **PSO-07 sigue `BLOCKED`** hasta que se adjudique el gate de QA manual; no abrir el contrato
-   donante antes de esa adjudicación.
-4. **DERMA-READ-01 y DERMA-READ-01B completadas** (`DONE_VERIFIED`); sus informes (Reuma y
+4. **PSO-07 sigue `BLOCKED`** hasta que se adjudique el gate de QA manual; no abrir el contrato
+   donante antes de esa adjudicación y no cerrarlo por documentación.
+5. **DERMA-READ-01 y DERMA-READ-01B completadas** (`DONE_VERIFIED`); sus informes (Reuma y
    Farmacia/Nexus) alimentan **DERMA-DESIGN-01**, aún `BLOCKED` por PSO-07 + DERMA-READ-01 +
    DERMA-READ-01B.
-5. no iniciar cambios en `Hub-Clinico-Badajoz` hasta completar el gate de transferencia y recibir autorización explícita.
+6. no iniciar cambios en `Hub-Clinico-Badajoz` hasta completar el gate de transferencia y recibir autorización explícita.

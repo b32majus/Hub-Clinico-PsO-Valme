@@ -1,3 +1,10 @@
+> **SUPERSEDED / HISTÓRICO (2026-09-30).** Este handoff de Train-B ha sido sustituido por el
+> handoff consolidado [`TRAIN_C_MANUAL_QA_HANDOFF_20260930.md`](./TRAIN_C_MANUAL_QA_HANDOFF_20260930.md),
+> que es el **único** handoff de QA manual vigente. Se conserva únicamente como evidencia histórica.
+> No confundir con el estado real de Train-C; en particular, Train-B **sí** está publicado remotamente
+> (`work/pso-valme-train-b-20260929` @ `7976663bdd97ee0e759090f6f8caa32799d5bb1a`) y el gate de QA
+> manual vigente se ejecuta según el handoff consolidado de Train-C.
+
 # Handoff de QA manual — Train-B (20260929)
 
 **Tipo:** documentación / handoff de QA manual\
