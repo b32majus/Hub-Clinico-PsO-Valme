@@ -1,6 +1,6 @@
 # Índice documental — Hub Clínico Psoriasis Valme
 
-**Última actualización:** 2026-09-28  
+**Última actualización:** 2026-09-29\
 **Repositorio:** `b32majus/Hub-Clinico-PsO-Valme`  
 **Objetivo actual:** rescate mínimo fiable de Psoriasis + preparación del onboarding de Dermatología en PROMueve Extremadura.
 
@@ -60,6 +60,16 @@ formas de fecha soportadas (ISO, `dd/mm/yyyy`, serial Excel), valores inválidos
 selección de visita estrictamente anterior, fila actual del dashboard y limitación documentada del
 empate del mismo día sin `visit_id`/`record_id`.
 
+### Handoff de QA manual Train-B (DOC-B)
+
+[`qa/TRAIN_B_MANUAL_QA_HANDOFF_20260929.md`](./qa/TRAIN_B_MANUAL_QA_HANDOFF_20260929.md)
+
+Pasos exactos y reproducibles para el QA visual manual tras una publicación autorizada por separado:
+verificación del HEAD servido, carga de `Base Datos_PsO_Valme_demo.xlsx`, baseline de 4 pacientes,
+escenarios Acitretina/ventana temporal, fail-closed del XLSX longitudinal incompatible y registro
+de errores de consola. Distingue QA automatizado (hecho en headless) de QA visual manual (pendiente)
+y conserva el QA manual ya completado en Train-A.
+
 ### Auditoría de onboarding Reuma → Dermatología (DERMA-READ-01)
 
 [`audits/PROMUEVE_REUMA_DERMATOLOGY_ONBOARDING_AUDIT_20260928.md`](./audits/PROMUEVE_REUMA_DERMATOLOGY_ONBOARDING_AUDIT_20260928.md)
@@ -89,7 +99,8 @@ Pharmacy Act/entrega F4.4/F4.5 (solo arquitectura). No modifica PROMueve.
 - Valme no debe convertirse primero en un producto perfecto para después “migrarlo”.
 - Se realiza un saneamiento mínimo para obtener un contrato clínico fiable de Psoriasis.
 - `Cuadro_Mando_Psoriasis_Valme_v2.html` es la **baseline donante** adjudicada por PSO-01 (veredicto `V2_WITH_V1_FEATURES_TO_PORT`).
-- V1 no se elimina; su única capacidad V1-only es la caché local con auto-restauración, pendiente de adjudicar en PSO-06.
+- V1 no se elimina; su única capacidad V1-only es la caché local con auto-restauración, que **sigue pendiente de adjudicación explícita** (no fue resuelta por PSO-06A/PSO-06B, que cerraron la portabilidad XLSX y el contrato de carga).
+- El estado terminal de Train-B es `IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING / NOT_PUBLISHED_BY_TRAIN`: la rama `work/pso-valme-train-b-20260929` (checkpoint técnico #14 `93fd3259473d55e460d6bd1480b771cea021326c`) es local-only, el commit documental de DOC-B se añade encima y `main` permanece intacto.
 - La implementación real de Dermatología se hará nativamente en `Hub-Clinico-Badajoz` contra la autoridad viva de PROMueve Nexus.
 - Este repo puede conservar auditorías read-only y diseño previo del onboarding para evitar contaminar PROMueve antes de aprobar el traslado.
 - Solo datos sintéticos/demo en repositorios y QA.
@@ -101,9 +112,11 @@ Pharmacy Act/entrega F4.4/F4.5 (solo arquitectura). No modifica PROMueve.
 | `index.html` | Formulario Psoriasis; sujeto a saneamiento mínimo |
 | `Cuadro_Mando_Psoriasis_Valme_v2.html` | Dashboard de referencia / baseline donante (adjudicado PSO-01) |
 | `Cuadro_Mando_Psoriasis_Valme_v1.html` | Referencia histórica temporal; no borrar |
-| `Base Datos_PsO_Valme_demo.csv` | Fixture/demo textual visible |
+| `Base Datos_PsO_Valme_demo.csv` | Fixture/demo textual visible; fuente de verdad del fixture XLSX |
+| `Base Datos_PsO_Valme_demo.xlsx` | Fixture XLSX demo reproducible (PSO-QA-01), derivado lossless del CSV sintético; usado por el QA de navegador |
 | `Base Datos_PsO_Valme.xlsx` | XLSX presente; rol exacto pendiente de adjudicación |
-| `psoriasis_valme_base_longitudinal.xlsx` | XLSX longitudinal; rol exacto pendiente de adjudicación |
+| `psoriasis_valme_base_longitudinal.xlsx` | XLSX longitudinal; caso **incompatible** del fail-closed XLSX (no tiene `nusha`); no es master |
+| `vendor/jszip/3.10.1/` | Dependencia JSZip vendorizada para checkout limpio (PSO-06A) |
 | `Guia_Operativa_Psoriasis_Valme.docx` | Documentación operativa histórica |
 
 No asumir que un XLSX es “master” hasta documentarlo explícitamente.

@@ -1,6 +1,6 @@
 # Work Order Status — Hub Clínico Psoriasis Valme
 
-**Última actualización:** 2026-09-28  
+**Última actualización:** 2026-09-29\
 **Repositorio:** `b32majus/Hub-Clinico-PsO-Valme`  
 **Propósito:** tablero vivo de trabajo para el rescate mínimo de PsO-Valme y el handoff hacia PROMueve Dermatología.  
 
@@ -8,9 +8,12 @@
 
 | Elemento | Estado |
 |---|---|
-| `main` | Base original del prototipo; HEAD inicial verificado para este plan: `9d722c8da792ffe51ce2ea9a1420af71a70522f1` |
-| Rama de ejecución actual | `work/pso-valme-train-a-20260928` |
-| Cambio funcional en esta rama | PSO-02 (aislamiento de estado) y PSO-03 (missingness de scores) en `index.html`; PSO-04 (cohorte de estado actual) en `Cuadro_Mando_Psoriasis_Valme_v2.html`; PSO-05 (longitudinalidad y fechas) en `index.html` y V2 |
+| `main` | Base original del prototipo; HEAD verificado: `9d722c8da792ffe51ce2ea9a1420af71a70522f1`; **intacto** (Train-B no publica) |
+| Rama Train-A (cerrada) | `work/pso-valme-train-a-20260928`; HEAD `4ee26bbc388b72714201dffd7e0ca55ac4d2e881` |
+| Rama Train-B (actual) | `work/pso-valme-train-b-20260929`; START_HEAD `4ee26bbc388b72714201dffd7e0ca55ac4d2e881`; checkpoint técnico #14 `93fd3259473d55e460d6bd1480b771cea021326c`; #15 añade encima un commit documental; **local-only / NOT PUBLISHED** |
+| Cambio funcional Train-A | PSO-02 (aislamiento de estado) y PSO-03 (missingness de scores) en `index.html`; PSO-04 (cohorte de estado actual) en `Cuadro_Mando_Psoriasis_Valme_v2.html`; PSO-05 (longitudinalidad y fechas) en `index.html` y V2 |
+| Cambio funcional Train-B | PSO-06A JSZip repo-local en `index.html` y V2; PSO-06B contrato de carga XLSX fail-closed; PSO-QA-01 fixture XLSX demo reproducible; PSO-QA-02 regresión de navegador de loader + filtros PSO-04 |
+| Estado terminal del train | `TRAIN-B = IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING / NOT_PUBLISHED_BY_TRAIN` |
 | Dashboard de referencia | `Cuadro_Mando_Psoriasis_Valme_v2.html` adjudicado como baseline donante por PSO-01 (veredicto `V2_WITH_V1_FEATURES_TO_PORT`) |
 | Dashboard v1 | Referencia histórica temporal; no borrar; única capacidad V1-only: caché local con auto-restauración |
 | Estado asistencial | Prototipo / datos sintéticos; no piloto ni producción |
@@ -40,8 +43,11 @@
 | PSO-03 | Missingness PASI/DLQI/PURE-4 | Clínica/funcional | `DONE_VERIFIED` | PSO-01; PSO-02 | PsO-Valme (`index.html`) |
 | PSO-04 | Cohorte actual y filtros dashboard | Analítica/funcional | `DONE_VERIFIED` | PSO-01 | PsO-Valme (`Cuadro_Mando_Psoriasis_Valme_v2.html`) |
 | PSO-05 | Longitudinalidad y fechas | Datos/funcional | `DONE_VERIFIED` | PSO-01 | PsO-Valme (`index.html`, V2) |
-| PSO-06 | Portabilidad XLSX + schema | Técnica | `PLANNED` | PSO-01 | PsO-Valme |
-| PSO-07 | Contrato donante Psoriasis | Documental/contrato | `BLOCKED` | PSO-02/03/04/05 adjudicadas | PsO-Valme |
+| PSO-06A | JSZip repo-local / XLSX en checkout limpio | Técnica | `DONE_VERIFIED` | PSO-01 | PsO-Valme (`index.html`, V2, `vendor/`) |
+| PSO-06B | Contrato de carga XLSX y fail-closed | Técnica | `DONE_VERIFIED` | PSO-06A | PsO-Valme (`index.html`, V2) |
+| PSO-QA-01 | Fixture XLSX demo reproducible | QA/datos | `DONE_VERIFIED` | PSO-06A/06B | PsO-Valme (fixture, `tools/`) |
+| PSO-QA-02 | Regresión de navegador del loader + filtros PSO-04 | QA | `DONE_VERIFIED` | PSO-QA-01 | PsO-Valme (V2) |
+| PSO-07 | Contrato donante Psoriasis | Documental/contrato | `BLOCKED` | PSO-02/03/04/05 adjudicadas; PSO-06A/06B; **gate de QA manual** | PsO-Valme |
 | DERMA-READ-01 | Auditoría onboarding PROMueve live (Reuma) | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
 | DERMA-READ-01B | Auditoría onboarding Farmacia + Nexus/Foundation | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
 | DERMA-DESIGN-01 | Diseño módulo Dermatología | Arquitectura/producto | `BLOCKED` | PSO-07 + DERMA-READ-01 + DERMA-READ-01B | PsO-Valme |
@@ -367,6 +373,189 @@ Un único commit local `fix(pso): harden longitudinal visit and date semantics`;
 
 Revertir el commit restaura el comportamiento previo sin tocar datos.
 
+## PSO-06A — cierre
+
+### Objetivo
+
+Conseguir que un checkout limpio del repositorio pueda cargar XLSX sin depender de rutas
+externas, tanto en `index.html` como en `Cuadro_Mando_Psoriasis_Valme_v2.html`.
+
+### Base / rama
+
+`work/pso-valme-train-b-20260929`; START_HEAD `4ee26bbc388b72714201dffd7e0ca55ac4d2e881`; árbol limpio.
+
+### Causa raíz
+
+Ambas superficies cargaban JSZip mediante la ruta relativa externa
+`../../materials_hs_valme/node_modules/jszip/dist/jszip.min.js`, inexistente en un checkout limpio
+del repositorio; el loader fallaba con `JSZip no disponible` / `JSZip no está disponible`.
+
+### Cambio
+
+- JSZip 3.10.1 vendorizado en `vendor/jszip/3.10.1/` (`jszip.min.js`, `LICENSE.markdown`, `PROVENANCE.md`).
+- `index.html` y V2 repuntan el `<script src>` a `vendor/jszip/3.10.1/jszip.min.js`.
+- Sin cambios de semántica clínica ni de datos.
+
+### No toca
+
+Contrato de carga XLSX (PSO-06B); fixtures; HTML clínico más allá del `<script src>`; `main`;
+`Hub-Clinico-Badajoz`.
+
+### Regresión determinista y de navegador
+
+`tests/jszip_local_dependency.test.js`: oráculo estático (existencia/legibilidad del artefacto,
+ausencia de la ruta externa) + smoke de navegador Playwright headless (`typeof JSZip !== "undefined"`
+y `JSZip.loadAsync` disponible en ambas superficies). Resultado: **21/21 PASS**.
+
+### Delivery
+
+Un único commit local `fix(pso): make JSZip runtime repository-local`
+(`bc1fa80dfd1c2a1c45e80662bdde0f8f4b811e6c`); sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit restaura la dependencia externa previa sin tocar datos.
+
+## PSO-06B — cierre
+
+### Objetivo
+
+Definir el contrato mínimo de carga XLSX y fallar cerrado ante schemas incompatibles, sin retener
+un dataset previo (stale) y sin inferir `nusha` desde `nhc` ni desde otra columna.
+
+### Base / rama
+
+`work/pso-valme-train-b-20260929`; HEAD de partida `bc1fa80dfd1c2a1c45e80662bdde0f8f4b811e6c`; árbol limpio.
+
+### Causa raíz
+
+El loader aceptaba cualquier libro y podía conservar el dataset anterior ante un error. El libro
+longitudinal del repositorio (`psoriasis_valme_base_longitudinal.xlsx`) tiene `id_paciente` y `nhc`
+pero **no** `nusha`, por lo que no satisface el contrato clínico del prototipo.
+
+### Cambio
+
+- Encabezados requeridos explícitos: `nusha`, `fecha_visita`, `tipo_visita`.
+- Si falta cualquiera, error explícito `XLSX incompatible` que cita la columna ausente.
+- El dataset (`baseRows` en `index.html`, `rawRows` en V2) se limpia; no queda cohorte stale.
+- No se mapea `nhc` → `nusha` ni se infiere identidad de paciente.
+- Aplica por igual a formulario y dashboard.
+
+### No toca
+
+Vendor/JSZip (PSO-06A); fixtures (PSO-QA-01); semántica de filtros PSO-04/PSO-05; `main`;
+`Hub-Clinico-Badajoz`.
+
+### Regresión determinista y de navegador
+
+`tests/xlsx_load_contract.test.js` (Playwright headless, libro compatible y libros incompatibles):
+carga correcta, fail-closed por `nusha`/`fecha_visita`/`tipo_visita`, ausencia de estado stale,
+sin errores de página. Resultado: **34/34 PASS**.
+
+### Delivery
+
+Un único commit local `fix(pso): harden XLSX load contract`
+(`774dd1d72e24019a5d3337849e185e148423ec9e`); sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit restaura el loader permisivo previo sin tocar datos.
+
+## PSO-QA-01 — cierre
+
+### Objetivo
+
+Disponer de un fixture XLSX sintético reproducible y lossless respecto del CSV demo ya versionado,
+para que el QA de navegador cargue siempre el mismo libro sin depender del entorno local.
+
+### Base / rama
+
+`work/pso-valme-train-b-20260929`; HEAD de partida `774dd1d72e24019a5d3337849e185e148423ec9e`; árbol limpio.
+
+### Cambio
+
+- `tools/build_demo_xlsx.py` genera el libro desde `Base Datos_PsO_Valme_demo.csv` (fuente de verdad).
+- `Base Datos_PsO_Valme_demo.xlsx`: 174 columnas, 9 visitas, sin inventar valores; recuentos
+  sintéticos `VALM0001 ×3`, `VALM0002 ×2`, `VALM0003 ×1`, `VALM0004 ×3`.
+
+### No toca
+
+HTML/JS de carga (PSO-06A/06B); semántica clínica; `main`; `Hub-Clinico-Badajoz`.
+
+### Regresión determinista y de navegador
+
+`tests/demo_xlsx_fixture.test.js`: SHA-256 del CSV, equivalencia lossless CSV↔XLSX con el parser
+del dashboard, smoke de carga en V2 (9 visitas, 4 pacientes) y en `index.html` (9 filas).
+Resultado: **17/17 PASS**.
+
+### Delivery
+
+Un único commit local `test(pso): add reproducible XLSX demo fixture`
+(`59754cde28246281956c608749a6d3f0cefb73e5`); sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit elimina el fixture y su generador sin tocar datos productivos.
+
+## PSO-QA-02 — cierre
+
+### Objetivo
+
+Probar en navegador headless, con interacción soportada, que el loader XLSX del dashboard V2
+funciona sobre el fixture demo y que los filtros de estado actual de PSO-04 no resucitan visitas
+antiguas.
+
+### Base / rama
+
+`work/pso-valme-train-b-20260929`; HEAD de partida `59754cde28246281956c608749a6d3f0cefb73e5`; árbol limpio.
+
+### Escenarios verificados
+
+| Escenario | Entrada | Resultado esperado | Resultado |
+|---|---|---|---|
+| Bootstrap | Carga del fixture demo por HTTP + input de fichero real | `Base cargada`, 9 visitas, shell visible | PASS |
+| Baseline | Sin filtros | `Pacientes Únicos = 4` | PASS |
+| A | Sin ventana de fechas, `Fármaco Activo = Acitretina` | `0` pacientes (sin resurrección histórica) | PASS |
+| B | Limpiar filtros; cota superior `2024-12-31`; `Acitretina` | `1` paciente, `VALM0004`, dentro del scope histórico | PASS |
+| Longitudinal | Historial de paciente | La vista longitudinal sigue alcanzable | PASS |
+| Fail-closed | `psoriasis_valme_base_longitudinal.xlsx` | Error explícito `XLSX incompatible`, sin cohorte stale, shell oculto | PASS |
+
+### Regresión determinista y de navegador
+
+`tests/dashboard_xlsx_current_state.test.js` (Playwright headless sobre V2 servido por HTTP).
+Resultado: **21/21 PASS**. Regresiones Train-A sobre el HEAD de Train-B: PSO-02 **46/46**,
+PSO-03 **42/42**, PSO-04 **39/39**, PSO-05 **49/49**; `git diff --check` PASS.
+
+### Límite de evidencia
+
+Esto es **QA de navegador automatizado (headless)**, no QA visual manual. La validación visual
+manual del dashboard, incluido PSO-04, sigue **PENDIENTE** (ver handoff).
+
+### Delivery
+
+Un único commit local `test(pso): cover dashboard XLSX current-state filtering`
+(`93fd3259473d55e460d6bd1480b771cea021326c`); sin push/PR/merge.
+
+### Reversión
+
+Revertir el commit elimina el harness de QA sin tocar el producto.
+
+## Train-B — revisión nativa Gentle y deuda (trabajo futuro)
+
+Los cuatro candidatos de Train-B (#11–#14) pasaron la revisión nativa Gentle 4R y quedaron
+**APPROVED**, con la autoridad de revisión consumida (authority burned) en cada uno. Las
+observaciones marcadas como advisory no bloquearon la aceptación y **no se cierran como defectos**
+por esta documentación; se preservan como trabajo futuro:
+
+- auditabilidad del fixture XLSX binario en la revisión de diff (mitigado por generador
+  reproducible y hash del CSV de origen, no por contenido inspeccionable en el parche);
+- fallback del harness de test a Playwright del `npm root` global (higiene de dependencias local);
+- deuda analítica ya registrada en PSO-04: denominadores KPI sin distinguir población total de
+  evaluable; escalas incompatibles en el gráfico longitudinal PASI/BSA/PGA; identidad de visita
+  dependiente de `__index`.
+
+Ninguna de estas observaciones es un defecto clínico abierto ni forma parte del alcance de #15.
+
 ## DERMA-READ-01 — cierre
 
 ### Objetivo
@@ -457,11 +646,16 @@ El repositorio externo permaneció sin modificar (refs remotas re-verificadas id
 
 Dado que la prioridad de producto es Extremadura:
 
-1. adjudicar la caché local V1-only en **PSO-06** (o descartarla motivadamente);
-2. **PSO-02, PSO-03, PSO-04 y PSO-05 completadas** (`DONE_VERIFIED`; PSO-02/03/05 en `index.html`,
-   PSO-04/05 en `Cuadro_Mando_Psoriasis_Valme_v2.html`); continuar **PSO-06**, cerrando los
-   defectos listados en el informe de PSO-01;
-3. **DERMA-READ-01 y DERMA-READ-01B completadas** (`DONE_VERIFIED`); sus informes (Reuma y
+1. **TRAIN-B completado técnicamente** (`PSO-06A`, `PSO-06B`, `PSO-QA-01`, `PSO-QA-02` en
+   `DONE_VERIFIED`); el estado terminal es
+   `IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING / NOT_PUBLISHED_BY_TRAIN`.
+2. **Gate humano pendiente:** publicar la rama Train-B (push / Pages) bajo autorización separada y
+   ejecutar el QA visual manual guiado por
+   [`../qa/TRAIN_B_MANUAL_QA_HANDOFF_20260929.md`](../qa/TRAIN_B_MANUAL_QA_HANDOFF_20260929.md),
+   incluido el QA manual de **PSO-04**, que sigue pendiente.
+3. **PSO-07 sigue `BLOCKED`** hasta que se adjudique el gate de QA manual; no abrir el contrato
+   donante antes de esa adjudicación.
+4. **DERMA-READ-01 y DERMA-READ-01B completadas** (`DONE_VERIFIED`); sus informes (Reuma y
    Farmacia/Nexus) alimentan **DERMA-DESIGN-01**, aún `BLOCKED` por PSO-07 + DERMA-READ-01 +
-   DERMA-READ-01B;
-4. no iniciar cambios en `Hub-Clinico-Badajoz` hasta completar el gate de transferencia y recibir autorización explícita.
+   DERMA-READ-01B.
+5. no iniciar cambios en `Hub-Clinico-Badajoz` hasta completar el gate de transferencia y recibir autorización explícita.

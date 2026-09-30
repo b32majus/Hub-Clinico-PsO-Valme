@@ -326,12 +326,17 @@ Los siguientes IDs son **nombres de planificación**, no issues creados ni autor
 **Alcance:** dependencia XLSX/JSZip y contrato mínimo de carga.  
 **NO TOCA:** backend, framework, React, Nexus.  
 **Tests:** checkout aislado, XLSX válido, fichero incompatible, dependencia ausente, mensaje de error.  
-**Aceptación:** modo local verdaderamente autocontenido para los recorridos declarados.
+**Aceptación:** modo local verdaderamente autocontenido para los recorridos declarados.\
+**Estado (Train-B, 2026-09-29):** ejecutada como **PSO-06A** (JSZip repo-local) y **PSO-06B**
+(contrato de carga fail-closed), ambas `DONE_VERIFIED`; ver `docs/ops/WORK_ORDER_STATUS.md` y el
+handoff de QA manual. El gate de QA visual manual sigue pendiente y no está cubierto por esta
+aceptación técnica.
 
 ### PSO-07 — Contrato donante Psoriasis
 
 **Objetivo:** documentar semántica clínica independiente de HTML/Excel.  
-**Dependencias:** PSO-02…PSO-05 cerradas o adjudicadas.  
+**Dependencias:** PSO-02…PSO-05 cerradas o adjudicadas; PSO-06A/PSO-06B cerradas; **gate de QA
+manual de Train-B adjudicado**.\
 **Alcance:** diccionario, entidades, reglas, estados, lineage y vistas requeridas.  
 **NO TOCA:** código PROMueve.  
 **Aceptación:** un equipo puede diseñar una nueva implementación sin inferir la semántica desde el DOM.
