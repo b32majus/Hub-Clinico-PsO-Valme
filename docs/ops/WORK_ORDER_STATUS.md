@@ -1,6 +1,6 @@
 # Work Order Status — Hub Clínico Psoriasis Valme
 
-**Última actualización:** 2026-09-30\
+**Última actualización:** 2026-10-03\
 **Repositorio:** `b32majus/Hub-Clinico-PsO-Valme`  
 **Propósito:** tablero vivo de trabajo para el rescate mínimo de PsO-Valme y el handoff hacia PROMueve Dermatología.  
 
@@ -11,18 +11,22 @@
 | `main` | Base original del prototipo; HEAD verificado: `9d722c8da792ffe51ce2ea9a1420af71a70522f1`; **intacto** |
 | Rama Train-A (cerrada) | `work/pso-valme-train-a-20260928`; HEAD `4ee26bbc388b72714201dffd7e0ca55ac4d2e881` |
 | Rama Train-B (publicada) | `work/pso-valme-train-b-20260929`; START_HEAD `4ee26bbc388b72714201dffd7e0ca55ac4d2e881`; #14 `93fd3259473d55e460d6bd1480b771cea021326c`; #15 (DOC-B) añade `7976663bdd97ee0e759090f6f8caa32799d5bb1a`; **PUBLICADA REMOTAMENTE** en `7976663bdd97ee0e759090f6f8caa32799d5bb1a` (verificado live 2026-09-30) |
-| Rama Train-C (actual) | `work/pso-valme-train-c-20260930`; START_HEAD `7976663bdd97ee0e759090f6f8caa32799d5bb1a`; #17 (PSO-06C) `d91fbc2357c8f5af7a307effb35b86773d8c388a`; #18 (PSO-QA-03) `011d624234cc5fb5a07387bf5f0e6aaeed09a4a6`; **local-only / NOT PUBLISHED BY TRAIN-C** |
+| Rama Train-C (publicada / Pages) | `work/pso-valme-train-c-20260930`; HEAD remoto `8d6257db2c586909e9a2900a4c685f646c9bb300`; GitHub Pages source = esta rama `/`, estado `built` verificado 2026-10-03; **QA manual humano pendiente** |
+| Train-D local-only — HOLD | `work/pso-valme-train-d-20260930` @ `3012034d78b9c96b3b59ad10ef5be70d7b1129ac`; árbol limpio; dos commits locales de QA-harness/docs no publicados; preservar, no reset/delete/absorber implícitamente |
+| Ejecución vigente | Atenea **C-083**: OpenCode V2 `--pure` + Matt upstream + agentes project-local; C-077–C-082/Gentle/Pi/RDD/4R/OpenCode V1 = histórico para ejecución |
 | Cambio funcional Train-A | PSO-02 (aislamiento de estado) y PSO-03 (missingness de scores) en `index.html`; PSO-04 (cohorte de estado actual) en `Cuadro_Mando_Psoriasis_Valme_v2.html`; PSO-05 (longitudinalidad y fechas) en `index.html` y V2 |
 | Cambio funcional Train-B | PSO-06A JSZip repo-local en `index.html` y V2; PSO-06B contrato de carga XLSX fail-closed; PSO-QA-01 fixture XLSX demo reproducible; PSO-QA-02 regresión de navegador de loader + filtros PSO-04 |
 | Cambio funcional Train-C | PSO-06C coordinación *latest-request-wins* de cargas asíncronas en `index.html` y V2; PSO-QA-03 regresión de navegador de cargas fuera de orden y aislamiento de estado |
 | Estado terminal de Train-B | `TRAIN-B = IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING` (rama publicada remotamente) |
-| Estado terminal de Train-C | `TRAIN-C = IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING / NOT_PUBLISHED_BY_TRAIN-C` |
+| Estado terminal de Train-C | `TRAIN-C = PUBLISHED / AUTOMATED_QA_COMPLETE / PAGES_DEPLOY_VERIFIED / MANUAL_QA_PENDING` |
 | Dashboard de referencia | `Cuadro_Mando_Psoriasis_Valme_v2.html` adjudicado como baseline donante por PSO-01 (veredicto `V2_WITH_V1_FEATURES_TO_PORT`) |
 | Dashboard v1 | Referencia histórica temporal; no borrar; única capacidad V1-only: caché local con auto-restauración |
 | Estado asistencial | Prototipo / datos sintéticos; no piloto ni producción |
 | Prioridad de producto | PROMueve Extremadura / módulo Dermatología |
 
 > Los SHAs de repositorios externos, especialmente `Hub-Clinico-Badajoz`, nunca se fijan aquí como autoridad futura. Se verifican live al ejecutar cada auditoría o WO.
+
+> Los issues históricos de Train-A/B/C/D conservan evidencia y contratos de producto, pero sus instrucciones Gentle/Pi/RDD/4R/OpenCode V1 no gobiernan nuevas ejecuciones bajo C-083.
 
 ## Leyenda
 
@@ -53,12 +57,29 @@
 | PSO-06C | Aislar cargas asíncronas (`latest-request-wins`) | Técnica | `DONE_VERIFIED` | PSO-06B | PsO-Valme (`index.html`, V2) |
 | PSO-QA-03 | Regresión browser de cargas fuera de orden | QA | `DONE_VERIFIED` | PSO-06C | PsO-Valme (`tests/`) |
 | DOC-C | Reconciliar Train-C y handoff de QA manual | Documental | `DONE_DOCS` | PSO-06C; PSO-QA-03 | PsO-Valme |
+| C083-RECON (#23) | Reconciliar ejecución local C-083 sin cambiar producto | Repo tooling/docs | `DONE_VERIFIED` | Train-C publicada; QA humano sigue pendiente | PsO-Valme |
 | PSO-07 | Contrato donante Psoriasis | Documental/contrato | `BLOCKED` | PSO-02/03/04/05 adjudicadas; PSO-06A/06B/06C; **gate de QA manual** | PsO-Valme |
 | DERMA-READ-01 | Auditoría onboarding PROMueve live (Reuma) | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
 | DERMA-READ-01B | Auditoría onboarding Farmacia + Nexus/Foundation | Read-only arquitectura/producto | `DONE_VERIFIED` | DOC-00 | lectura de Hub-Clinico-Badajoz; informe aquí |
 | DERMA-DESIGN-01 | Diseño módulo Dermatología | Arquitectura/producto | `BLOCKED` | PSO-07 + DERMA-READ-01 + DERMA-READ-01B | PsO-Valme |
 | PROMUEVE-DERMA-* | Implementación Psoriasis en Nexus | Técnica | `BLOCKED` | gate de transferencia + autorización | Hub-Clinico-Badajoz |
 | VALME-FULL-* | Rescate completo independiente | Técnica | `DEFERRED` | necesidad real | PsO-Valme |
+
+## C083-RECON (#23) — cierre local verificado
+
+- Base exacta: `work/pso-valme-train-c-20260930` @ `8d6257db2c586909e9a2900a4c685f646c9bb300`.
+- Rama de reconciliación: `work/c083-local-reconcile-20261003`.
+- Añadida autoridad local `AGENTS.md` / `CODING_STANDARDS.md` / `CONTEXT.md`, routing C-083 y agentes OpenCode project-local.
+- Matt: instalación project-local mediante CLI oficial upstream (`mattpocock/skills`), 37 skills; sin fork local de routing.
+- Smoke `opencode debug config --pure`: 11 agentes `atenea-*` resuelven a los provider/model/variant C-083 esperados; coordinadores mantienen allowlist cerrada a roles C-083.
+- Model catalog `--pure`: presentes MiMo 2.6 Flash, Qwen 3.8 Flash, DeepSeek V4 Flash, GLM 5.3 Flash, GPT-6 Luna y GPT-6.1 Sol.
+- Regresión existente: 9 suites / **300 checks PASS**.
+- Artifact boundary: `index.html`, dashboards, fixtures XLSX/CSV/DOCX, JSZip vendorizado y builder demo byte-identical a la base.
+- `git diff --check` y links Markdown relevantes: PASS.
+- Train-D local-only `3012034d...` sigue **HOLD**, limpio y no absorbido.
+- C-077–C-082 / Gentle / Pi / RDD / 4R / lineage / burn / OpenCode V1 quedan **HISTORICAL** para ejecución; no se borraron.
+- QA manual humano permanece pendiente; PSO-07 sigue `BLOCKED`.
+- Publicación de esta reconciliación: rama + PR autorizados; **merge no autorizado**.
 
 ## DOC-00 — cierre
 

@@ -1,6 +1,6 @@
 # Índice documental — Hub Clínico Psoriasis Valme
 
-**Última actualización:** 2026-09-30\
+**Última actualización:** 2026-10-03\
 **Repositorio:** `b32majus/Hub-Clinico-PsO-Valme`  
 **Objetivo actual:** rescate mínimo fiable de Psoriasis + preparación del onboarding de Dermatología en PROMueve Extremadura.
 
@@ -19,6 +19,18 @@ Orden recomendado dentro de este repositorio:
 Para `b32majus/Hub-Clinico-Badajoz`, este repo **no es autoridad**. Cualquier afirmación sobre PROMueve/Reuma/Farmacia/Nexus debe verificarse live en el repo PROMueve antes de actuar.
 
 ## 2. Documentos vigentes
+
+### Autoridad de ejecución local — Atenea C-083
+
+La ejecución vigente del repositorio se define en:
+
+- [`../AGENTS.md`](../AGENTS.md) — autoridad, seguridad, Git/publicación y límites del repo;
+- [`../CODING_STANDARDS.md`](../CODING_STANDARDS.md) — estándares de ingeniería locales;
+- [`../CONTEXT.md`](../CONTEXT.md) — estado actual del sistema, publicación y worktrees con estado único;
+- [`ATENEA_EXECUTION_ROUTING_V0.md`](./ATENEA_EXECUTION_ROUTING_V0.md) — bindings C-083 project-local para OpenCode V2 `--pure`;
+- [`agents/`](./agents/) — issue tracker, dominio y vocabulario de triage consumido por las skills upstream de Matt.
+
+Los procedimientos Gentle/Pi/RDD/4R/lineage/burn/OpenCode V1 que aparecen en issues o documentos de Train-A/B/C/D son **HISTORICAL** para ejecución. Sus requisitos de producto y evidencia pueden seguir siendo válidos cuando la autoridad vigente los preserve.
 
 ### Plan maestro
 
@@ -112,7 +124,9 @@ Pharmacy Act/entrega F4.4/F4.5 (solo arquitectura). No modifica PROMueve.
   Train-B **ya está publicado remotamente** en `work/pso-valme-train-b-20260929` @
   `7976663bdd97ee0e759090f6f8caa32799d5bb1a` (DOC-B). La afirmación previa de DOC-B de que la rama
 era local-only queda corregida por DOC-C.
-- El estado terminal de Train-C es `IMPLEMENTATION_COMPLETE / AUTOMATED_QA_COMPLETE / MANUAL_QA_PENDING / NOT_PUBLISHED_BY_TRAIN-C`: la implementación de #17 (`d91fbc2`) y su QA #18 (`011d624`) están en la rama local `work/pso-valme-train-c-20260930`; Train-C **no** se ha publicado (sin `push`/PR/merge/Pages).
+- Train-C está **publicada remotamente** en `work/pso-valme-train-c-20260930` @ `8d6257db2c586909e9a2900a4c685f646c9bb300`; GitHub Pages sirve esa rama desde `/` y estaba `built` al reconciliar C-083. Esto es publicación/browser-smoke, **no** el QA manual humano.
+- Existe un Train-D local-only limpio en `work/pso-valme-train-d-20260930` @ `3012034d78b9c96b3b59ad10ef5be70d7b1129ac` con QA-harness/docs no publicados; queda en **HOLD** y no se absorbe ni elimina desde esta reconciliación.
+- La ejecución vigente es **Atenea C-083 / OpenCode V2 `--pure` + Matt upstream**; los runbooks de ejecución C-077–C-082 quedan como provenance histórica.
 - `main` permanece **intacto** en `9d722c8da792ffe51ce2ea9a1420af71a70522f1`.
 - El QA visual manual consolidado sigue **pendiente** y `PSO-07` permanece `BLOCKED` por ese gate; no se cierra por documentación.
 - La implementación real de Dermatología se hará nativamente en `Hub-Clinico-Badajoz` contra la autoridad viva de PROMueve Nexus.
@@ -139,10 +153,10 @@ No asumir que un XLSX es “master” hasta documentarlo explícitamente.
 
 Para continuar el trabajo:
 
-1. leer este índice;
-2. leer `ops/WORK_ORDER_STATUS.md`;
-3. leer el plan maestro;
-4. abrir la auditoría inicial solo cuando se necesite detalle del diagnóstico;
+1. leer `../AGENTS.md`, `../CODING_STANDARDS.md` y `../CONTEXT.md`;
+2. leer este índice y `ops/WORK_ORDER_STATUS.md`;
+3. leer la WO/issue actual y el documento de dominio relacionado;
+4. usar `ATENEA_EXECUTION_ROUTING_V0.md` si se ejecuta con Atenea C-083;
 5. verificar GitHub live antes de iniciar cualquier WO.
 
 ## 6. Regla de frontera con PROMueve
